@@ -24,22 +24,22 @@ else
   exit 1
 fi
 
-# if test ${vcs} = "git"; then
-#  # major version is equal to the latest tag
-#  version=`git describe --all --always | sed 's/-/./'`
-# 
-#  branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
-#  commitdate=`git log -1 --pretty=format:"%ad"`
-#  cat << EOF > src/version-vcs.h
-# #define WASORA_VCS_BRANCH    "${branch}"
-# #define WASORA_VCS_VERSION   "${version}"
-# #define WASORA_VCS_DATE      "${commitdate}"
-# #define WASORA_VCS_CLEAN     `git status --porcelain | wc -l`
-# EOF
-# 
-# else
+if test ${vcs} = "git"; then
+ # major version is equal to the latest tag
+ version=`git describe --all --always | sed 's/-/./'`
+
+ branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+ commitdate=`git log -1 --pretty=format:"%ad"`
+ cat << EOF > src/version-vcs.h
+#define WASORA_VCS_BRANCH    "${branch}"
+#define WASORA_VCS_VERSION   "${version}"
+#define WASORA_VCS_DATE      "${commitdate}"
+#define WASORA_VCS_CLEAN     `git status --porcelain | wc -l`
+EOF
+
+else
  version=0.1.0
-# fi
+fi
 
 echo "define(libreblackjackversion, [${version}])dnl" > version.m4
 
@@ -55,7 +55,7 @@ else
   touch libreblackjack.texi
 fi
 
-touch ChangeLog
-# git log --oneline --decorate > ChangeLog
+# touch ChangeLog
+git log --oneline --decorate > ChangeLog
 
 autoreconf --install

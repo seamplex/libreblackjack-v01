@@ -32,27 +32,11 @@
 
 int send_command_card(player_t *player, char *command, card_t *card) {
   char full_command[BUF_SIZE];
-  char *c_card;
-  
-  switch (player->card_type) {
-    case card_ascii:
-      c_card = card->c_ascii;
-    break;
-    case card_utf8:
-      c_card = card->c_utf8;
-    break;
-    case card_id:
-      c_card = card->c_id;
-    break;
-    case card_value:
-      c_card = card->c_value;
-    break;
-  }
   
   if (player->has_split == 0) {
-    snprintf(full_command, BUF_SIZE-1, "%s %s", command, c_card);
+    snprintf(full_command, BUF_SIZE-1, "%s %s", command, card->token[player->token_type]);
   } else {
-    snprintf(full_command, BUF_SIZE-1, "%s %s #%d", command, c_card, player->current_hand->id);
+    snprintf(full_command, BUF_SIZE-1, "%s %s #%d", command, card->token[player->token_type], player->current_hand->id);
   }
   send_command(player, full_command);
    

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 jeremy theler
+ *  Copyright (C) 2016,2019 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -19,21 +19,28 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include <stdio.h>
+#include <wchar.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "libreblackjack.h"
 
+
+
+char suitname[4][12]  = {"spades", "hearts", "diamonds", "clubs"};
+char suitletter[4][8] = {"S",      "H",      "D",        "C"};
 char suitcode[4][8]   = {"♠", "♥", "♦", "♣"};
-char suitletter[4][8] = {"S", "H", "D", "C"};
-char suitname[4][12] = {"spades", "hearts", "diamonds", "clubs"};
-char numbername[14][4] = {"0", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"};
+//char suitcode[4][8]   = {"\u2660", "\u2665", "\u2666", "\u2663"};
+char numbername[14][4] = {"X", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"};
 int value[14] = {0, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10};
+
+
 
 
 void print_card_art(card_t *card) {
   int i;
-  for (i = 0; i < 6; i++) {
+  for (i = 0; i < CARD_ART_LINES; i++) {
     printf("%s\n", card->art[i]);
   }
   printf("\n");
@@ -43,7 +50,7 @@ void print_card_art(card_t *card) {
 void print_hand_art(hand_t *hand) {
   int i;
   card_t *card;
-  for (i = 0; i < 6; i++) {
+  for (i = 0; i < CARD_ART_LINES; i++) {
     LL_FOREACH(hand->cards, card) {
       printf("%s%c", card->art[i], (card->next != NULL) ? ' ' : '\n');
     }
@@ -207,8 +214,8 @@ void destroy_hands(hand_t **hands) {
 void init_shoe(void)  {
 
   int i;
-  int deck, suit, number;
-  int tag;
+  int deck, suit, rank;
+  int tag;  // an integer between 1 and 52 inclusive
 
   if (blackjack.shoe == NULL) {
     blackjack.shoe = malloc(blackjack_ini.decks * 52 * sizeof(int));
@@ -225,14 +232,17 @@ void init_shoe(void)  {
     blackjack.card = calloc(52+1, sizeof(card_t));
   }
 
-  // inicializamos el deck
+  // init the shoe: there can be many decks
+  // each deck has 4 suits { 0 = "spades", 1 = "hearts", 2 = "diamonds", 3 = "clubs" }
+  // each suit has 13 ranks 1--13
+  // the "tag" is 13*suit+rank
   i = 0;
   for (deck = 0; deck < blackjack_ini.decks; deck++) {
     for (suit = 0; suit < 4; suit++) {
-      for (number = 1; number <= 13; number++) {
-        tag = 13*suit + number;
+      for (rank = 1; rank <= 13; rank++) {
+        tag = 13*suit + rank;
         if (deck == 0) {
-          init_card(tag, number, suit);
+          init_card(tag, rank, suit);
         }
         blackjack.shoe[i++] = tag;
       }
@@ -240,31 +250,93 @@ void init_shoe(void)  {
   }  
   
   blackjack.current_card_index = 0;
-    
+
+  // https://en.wikipedia.org/wiki/Playing_cards_in_Unicode
+  // yes, I could loop and compute the code for each card and
+  // it would be hacky but hard to understand for humans
+  // UNIX rule of representation!
+  sprintf(blackjack.card[1].token[card_utf8_single], "🂡");
+  sprintf(blackjack.card[2].token[card_utf8_single], "🂢");
+  sprintf(blackjack.card[3].token[card_utf8_single], "🂣");
+  sprintf(blackjack.card[4].token[card_utf8_single], "🂤");
+  sprintf(blackjack.card[5].token[card_utf8_single], "🂥");
+  sprintf(blackjack.card[6].token[card_utf8_single], "🂦");
+  sprintf(blackjack.card[7].token[card_utf8_single], "🂧");
+  sprintf(blackjack.card[8].token[card_utf8_single], "🂨");
+  sprintf(blackjack.card[9].token[card_utf8_single], "🂩");
+  sprintf(blackjack.card[10].token[card_utf8_single], "🂪");
+  sprintf(blackjack.card[11].token[card_utf8_single], "🂫");
+  sprintf(blackjack.card[12].token[card_utf8_single], "🂭");
+  sprintf(blackjack.card[13].token[card_utf8_single], "🂮");
+  
+  sprintf(blackjack.card[14].token[card_utf8_single], "🂱");
+  sprintf(blackjack.card[15].token[card_utf8_single], "🂲");
+  sprintf(blackjack.card[16].token[card_utf8_single], "🂳");
+  sprintf(blackjack.card[17].token[card_utf8_single], "🂴");
+  sprintf(blackjack.card[18].token[card_utf8_single], "🂵");
+  sprintf(blackjack.card[19].token[card_utf8_single], "🂶");
+  sprintf(blackjack.card[20].token[card_utf8_single], "🂷");
+  sprintf(blackjack.card[21].token[card_utf8_single], "🂸");
+  sprintf(blackjack.card[22].token[card_utf8_single], "🂹");
+  sprintf(blackjack.card[23].token[card_utf8_single], "🂺");
+  sprintf(blackjack.card[24].token[card_utf8_single], "🂻");
+  sprintf(blackjack.card[25].token[card_utf8_single], "🂽");
+  sprintf(blackjack.card[26].token[card_utf8_single], "🂾");
+  
+  sprintf(blackjack.card[27].token[card_utf8_single], "🃁");
+  sprintf(blackjack.card[28].token[card_utf8_single], "🃂");
+  sprintf(blackjack.card[29].token[card_utf8_single], "🃃");
+  sprintf(blackjack.card[30].token[card_utf8_single], "🃄");
+  sprintf(blackjack.card[31].token[card_utf8_single], "🃅");
+  sprintf(blackjack.card[32].token[card_utf8_single], "🃆");
+  sprintf(blackjack.card[33].token[card_utf8_single], "🃇");
+  sprintf(blackjack.card[34].token[card_utf8_single], "🃈");
+  sprintf(blackjack.card[35].token[card_utf8_single], "🃉");
+  sprintf(blackjack.card[36].token[card_utf8_single], "🃊");
+  sprintf(blackjack.card[37].token[card_utf8_single], "🃋");
+  sprintf(blackjack.card[38].token[card_utf8_single], "🃍");
+  sprintf(blackjack.card[39].token[card_utf8_single], "🃍");
+  
+  sprintf(blackjack.card[40].token[card_utf8_single], "🃑");
+  sprintf(blackjack.card[41].token[card_utf8_single], "🃒");
+  sprintf(blackjack.card[42].token[card_utf8_single], "🃓");
+  sprintf(blackjack.card[43].token[card_utf8_single], "🃔");
+  sprintf(blackjack.card[44].token[card_utf8_single], "🃕");
+  sprintf(blackjack.card[45].token[card_utf8_single], "🃖");
+  sprintf(blackjack.card[46].token[card_utf8_single], "🃗");
+  sprintf(blackjack.card[47].token[card_utf8_single], "🃘");
+  sprintf(blackjack.card[48].token[card_utf8_single], "🃙");
+  sprintf(blackjack.card[49].token[card_utf8_single], "🃚");
+  sprintf(blackjack.card[50].token[card_utf8_single], "🃛");
+  sprintf(blackjack.card[51].token[card_utf8_single], "🃝");
+  sprintf(blackjack.card[52].token[card_utf8_single], "🃞");
+
   return;
 }
 
-void init_card(int tag, int number, int suit) {
+void init_card(int tag, int rank, int suit) {
+    
   blackjack.card[tag].tag = tag;
-  blackjack.card[tag].value = value[number];
+  blackjack.card[tag].value = value[rank];
+  
   if (stdout_opts.isatty) {
     sprintf(blackjack.card[tag].text, "%s%s%s%s", (suit == 1 || suit == 2) ? stdout_opts.red : stdout_opts.black,
-            numbername[number], suitcode[suit], stdout_opts.reset);
+            numbername[rank], suitcode[suit], stdout_opts.reset);
   } else {
-    sprintf(blackjack.card[tag].text, "%s%s", numbername[number], suitletter[suit]);
+    sprintf(blackjack.card[tag].text, "%s%s", numbername[rank], suitletter[suit]);
   }
 
-  sprintf(blackjack.card[tag].c_ascii, "%s%s", numbername[number], suitletter[suit]);
-  sprintf(blackjack.card[tag].c_utf8,  "%s%s", numbername[number], suitcode[suit]);
-  sprintf(blackjack.card[tag].c_id,    "%d", tag);
-  sprintf(blackjack.card[tag].c_value, "%d", value[number]);
+  sprintf(blackjack.card[tag].token[card_tag],             "%d", tag);
+  sprintf(blackjack.card[tag].token[card_ascii], "%s%s", numbername[rank], suitletter[suit]);
+  sprintf(blackjack.card[tag].token[card_utf8],  "%s%s", numbername[rank], suitcode[suit]);
+  sprintf(blackjack.card[tag].token[card_value],           "%d", value[rank]);
 
   sprintf(blackjack.card[tag].art[0], " _____ ");
-  sprintf(blackjack.card[tag].art[1], "|%s    |", numbername[number]);
+  sprintf(blackjack.card[tag].art[1], "|%s    |", numbername[rank]);
   sprintf(blackjack.card[tag].art[2], "|     |");
   sprintf(blackjack.card[tag].art[3], "|  %s  |", suitcode[suit]);
   sprintf(blackjack.card[tag].art[4], "|     |");
-  sprintf(blackjack.card[tag].art[5], "|____%s|", numbername[number]);
+  sprintf(blackjack.card[tag].art[5], "|____%s|", numbername[rank]);
 
   return;
 }

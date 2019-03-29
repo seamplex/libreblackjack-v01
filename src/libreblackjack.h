@@ -1,8 +1,8 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 German (jeremy) Theler
- *
+ *  Copyright (C) 2016,2019 Jeremy) Theler
+ * 
  *  This file is part of libreblackjack.
  *
  *  libreblackjack is free software: you can redistribute it and/or modify
@@ -191,11 +191,12 @@ struct player_t {
   double delay;
   
   enum {
-    card_ascii,
-    card_utf8,
-    card_id,
-    card_value
-  } card_type;
+    card_utf8,        // one ascii char for the rank and one utf8 representation of the suit ♠,♥,♦,♣
+    card_utf8_single, // a single utf8 entity for the card 
+    card_ascii,       // two ascii chars, one for the rank A,2,...,T,J,Q,J and one for the suit S,H,D,C
+    card_value,       // the value for the game, A = 11, J,Q,K=10 or ran
+    card_tag,         // integer between 1--52: tag = 13*suit + rank
+  } token_type;
 
   ipc_t dealer2player;
   ipc_t player2dealer;  
@@ -243,18 +244,16 @@ struct hand_t {
   hand_t *next;
 };
 
+#define CARD_ART_LINES 6
+#define CARD_TYPES     5
+
 struct card_t {
   int tag;
   int value;
-  
-  char c_ascii[4];
-  char c_utf8[8];
-  char c_id[4];
-  char c_value[4];
- 
-  
+
+  char token[CARD_TYPES][8];  
   char text[32];  
-  char art[6][12];
+  char art[CARD_ART_LINES][12];
   
   card_t *next;
 };

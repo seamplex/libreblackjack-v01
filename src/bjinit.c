@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 German (jeremy) Theler
+ *  Copyright (C) 2016 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -180,14 +180,16 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
 
   } else if (strcmp(name, "card_format") == 0) {
     player = player_from_section(section);
-    if (strcmp(value, "ascii") == 0) {
-      player->card_type = card_ascii;
-    } else if (strcmp(value, "utf8") == 0) {
-      player->card_type = card_utf8;
-    } else if (strcmp(value, "id") == 0) {
-      player->card_type = card_id;
+    if (strcmp(value, "utf8") == 0) {
+      player->token_type = card_utf8;
+    } else if (strcmp(value, "utf8_single") == 0) {
+      player->token_type = card_utf8_single;
+    } else if (strcmp(value, "ascii") == 0) {
+      player->token_type = card_ascii;
     } else if (strcmp(value, "value") == 0) {
-      player->card_type = card_value;
+      player->token_type = card_value;
+    } else if (strcmp(value, "tag") == 0) {
+      player->token_type = card_tag;
     }
 
   } else if (strcmp(name, "buffered_fifos") == 0 || strcmp(name, "buffered_fifo") == 0 || strcmp(name, "bufferedfifo") == 0) {

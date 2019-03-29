@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 jeremy theler
+ *  Copyright (C) 2016,2019 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -28,11 +28,9 @@ void libreblackjack_shortversion(void) {
   // TODO: gettext & version from hg
 
 #ifdef LIBREBLACKJACK_VCS_BRANCH
-  printf("libreblackjack %s.%s %s (%s%s %s)\n", LIBREBLACKJACK_VCS_MAJOR, LIBREBLACKJACK_VCS_MINOR,
-                                      strcmp(LIBREBLACKJACK_VCS_BRANCH, "default")?LIBREBLACKJACK_VCS_BRANCH:"",
-                                      LIBREBLACKJACK_VCS_SHORTID,
-                                      (LIBREBLACKJACK_VCS_CLEAN==0)?"":"+Δ",
-                                      LIBREBLACKJACK_VCS_DATE);
+  printf("libreblackjack %s%s %s\n", LIBREBLACKJACK_VCS_VERSION,
+                                    (LIBREBLACKJACK_VCS_CLEAN==0)?"":"+Δ",
+                                     strcmp(LIBREBLACKJACK_VCS_BRANCH, "master")?LIBREBLACKJACK_VCS_BRANCH:"");
 #else
   printf("libreblackjack %s\n", PACKAGE_VERSION);
 #endif
@@ -48,6 +46,6 @@ copyright (c) %s jeremy theler.\n\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\n",
-             "2016" );
+             "2016,2019" );
   return;
 }
