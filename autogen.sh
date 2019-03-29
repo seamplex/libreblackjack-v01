@@ -26,7 +26,7 @@ fi
 
 if test ${vcs} = "git"; then
  # major version is equal to the latest tag
- version=`git describe --all --always | sed 's/-/./'`
+ version=`git describe --always | sed 's/-/./'`
 
  branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
  commitdate=`git log -1 --pretty=format:"%ad"`

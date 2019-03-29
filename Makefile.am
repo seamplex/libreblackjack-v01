@@ -3,11 +3,9 @@ AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README
 #doc/libreblackjack.texi
 
-EXTRA_DIST = players src/version.sh \
-00-always-stand 05-no-bust 08-mimic-the-dealer 22-strategy-from-file
-
 TESTS = 00-always-stand 05-no-bust 08-mimic-the-dealer 22-strategy-from-file
 LOG_COMPILER = players/check.sh
+EXTRA_DIST = players src/version.sh $(TESTS)
 
 # ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 bin_PROGRAMS = libreblackjack
