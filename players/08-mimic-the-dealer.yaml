@@ -1,0 +1,40 @@
+rules:
+  decks:                  6
+  hands:                  100000
+  rng_seed:               244064057
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  double_after_split:     1
+  hit_soft_17:            1
+  penetration:            0.7
+  penetration_sigma:      0.05
+  blackjack_pays:         1.5
+cpu:
+  user:             0.664
+  system:           1.028
+  wall:             1.97641
+  second_per_hand:  2.0e-05
+  hands_per_second: 5.1e+04
+player: 
+  wins:               0.41175
+  pushes:             0.09559
+  losses:             0.49266
+  dealer_blackjacks:  0.04771
+  player_blackjacks:  0.04798
+  dealer_busts:       0.1914
+  player_busts:       0.27099
+  doubled_hands:      0
+  doubled_wins:       0
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    100000
+  number_of_shuffles: 2486
+  total_money_waged:  100000
+  worst_bankroll:     -5829.5
+  final_bankroll:     -5798
+  return:             -0.05798
+  variance:            0.958374
+  deviation:           0.978966
+  error:               0.00309576
+  result:             "(-5.80 ± 0.31) %"

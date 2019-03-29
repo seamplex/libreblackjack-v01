@@ -37,9 +37,7 @@ int write_yaml_report(player_t *player) {
   }
   
   // TODO: elegir que se agreguen comentarios con explicaciones
-  fprintf(file, "---\n");
   
-  // TODO: que salga automatico
   fprintf(file, "rules:\n");
   fprintf(file, "  decks:                  %d\n", blackjack_ini.decks);
   fprintf(file, "  hands:                  %ld\n", blackjack.hand);
