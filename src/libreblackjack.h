@@ -114,6 +114,21 @@ struct {
   
 } blackjack_ini;
 
+
+#define CARD_ART_LINES 6
+#define CARD_TYPES     5
+
+struct card_t {
+  int tag;
+  int value;
+
+  char token[CARD_TYPES][8];  
+  char text[32];  
+  char art[CARD_ART_LINES][12];
+  
+  card_t *next;
+};
+
 struct {
   
   unsigned long int hand;                      // actual hand number (splits are counted as a single hand)
@@ -130,7 +145,8 @@ struct {
   unsigned int n_arranged_cards;
   int *arranged_cards_array;
   
-  card_t *card;
+//  card_t *card;
+  card_t card[53];
   int *shoe;  
   
   player_t *players;
@@ -244,19 +260,6 @@ struct hand_t {
   hand_t *next;
 };
 
-#define CARD_ART_LINES 6
-#define CARD_TYPES     5
-
-struct card_t {
-  int tag;
-  int value;
-
-  char token[CARD_TYPES][8];  
-  char text[32];  
-  char art[CARD_ART_LINES][12];
-  
-  card_t *next;
-};
 
 
 // cards.c
