@@ -21,7 +21,11 @@
  */
 #include "libreblackjack.h"
 
+int count;
+
 int dealer_to_internal(player_t *player, const char *command) {
+  
+  
   
   return 0;
 }

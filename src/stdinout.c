@@ -31,12 +31,13 @@
 #include <sys/types.h>
 
 int dealer_to_stdout(player_t *player, const char *command) {
-  if (player->delay != 0) {
-    usleep((useconds_t)(1e6*player->delay));
-  }
 
   // TODO: choose colors
   if (stdout_opts.isatty) {
+    if (player->delay != 0) {
+      usleep((useconds_t)(1e6*player->delay));
+    }
+    
     if (command[strlen(command)-1] != '?') {
       printf("%s<-- %s%s%s\n", stdout_opts.yellow, stdout_opts.green, command, stdout_opts.reset);
     } else {

@@ -100,11 +100,13 @@ int deal_card(void) {
       LL_FOREACH(blackjack_ini.arranged_cards, card) {
         blackjack.n_arranged_cards++;
       }
-      blackjack.arranged_cards_array = calloc(blackjack.n_arranged_cards, sizeof(int));
+      if (blackjack.n_arranged_cards != 0) {
+        blackjack.arranged_cards_array = calloc(blackjack.n_arranged_cards, sizeof(int));
       
-      i = 0;
-      LL_FOREACH(blackjack_ini.arranged_cards, card) {
-        blackjack.arranged_cards_array[i++] = card->tag;
+        i = 0;
+        LL_FOREACH(blackjack_ini.arranged_cards, card) {
+          blackjack.arranged_cards_array[i++] = card->tag;
+        }
       }
       
 #ifdef HAVE_LIBGSL

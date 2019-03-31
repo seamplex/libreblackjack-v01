@@ -269,7 +269,7 @@ int bjinit(char *cmdline_file_path) {
   blackjack_ini.hit_soft_17 = -1;
   blackjack_ini.max_invalid_commands = -1;
   blackjack_ini.shuffle_every_hand = -1;
-        
+  
   // leemos el ini
   ini_file_path = strdup((cmdline_file_path == NULL) ? INI_FILE_PATH : cmdline_file_path);
   if ((ini_file = fopen(ini_file_path, "r")) != NULL) {
@@ -303,6 +303,11 @@ int bjinit(char *cmdline_file_path) {
   // si no hay ningun player, creamos uno
   if ((blackjack.current_player = blackjack.players) == NULL) {
     blackjack.current_player = new_player("player");
+  }
+  
+  // el delay es solo para stdout por tty
+  if (blackjack.current_player->delay == 0) {
+    blackjack.current_player->delay = 0.4;
   }
   
   if (blackjack_ini.rng_seed == 0) {
