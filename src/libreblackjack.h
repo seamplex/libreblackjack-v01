@@ -215,9 +215,13 @@ struct player_t {
     card_tag,         // integer between 1--52: tag = 13*suit + rank
   } token_type;
 
+  
   ipc_t dealer2player;
-  ipc_t player2dealer;  
+  ipc_t player2dealer;
 
+  int (*write)(player_t *, const char *);
+  int (*read)(player_t *, char *);
+  
   // statistics
   unsigned long int number_of_hands;
   unsigned long int total_money_waged;
@@ -283,8 +287,8 @@ extern int dealer_action(void);
 extern int dealer_process_input(player_t *player, char *command);
 
 // stdinout.c
-extern int dealer_to_stdout(const char *command);
-extern int player_from_stdin(char *buffer);
+extern int dealer_to_stdout(player_t *, const char *command);
+extern int player_from_stdin(player_t *, char *buffer);
 extern void free_rl_stdin(void);
 
 // bjinit.c
@@ -298,8 +302,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
 
 // commands.c
 extern int send_command_card(player_t *player, char *command, card_t *card);
-extern int send_command(player_t *player, const char *fmt, ...);
-extern int receive_command(player_t *player, char *command);
+extern int write_formatted(player_t *player, const char *fmt, ...);
 
 // fifo.c
 int create_fifo(const char *name);
@@ -329,5 +332,9 @@ int player_from_shmem(player_t *player, char *buffer);
 int create_mqueue(const char *name, mqd_t *mq);
 int dealer_to_mqueue(player_t *player, const char *command);
 int player_from_mqueue(player_t *player, char *buffer);
+
+// internal.c
+extern int dealer_to_internal(player_t *player, const char *command);
+extern int player_from_internal(player_t *player, char *buffer);
 
 #endif

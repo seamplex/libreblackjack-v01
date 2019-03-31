@@ -200,17 +200,31 @@ int main(int argc, char** argv) {
       do {
         
         if (outputbuffer[0] != '\0') {
-          send_command(blackjack.current_player, outputbuffer);
+          if (blackjack.current_player->write(blackjack.current_player, outputbuffer) != 0) {
+            blackjack_pop_errors();
+            return 1;
+          }
+          
+          if (blackjack_ini.log != NULL) {
+            fprintf(blackjack_ini.log, "-> %s\n", outputbuffer);
+            fflush(blackjack_ini.log);
+          }
         }
-        if (receive_command(blackjack.current_player, inputbuffer) != 0) {
+        
+        if (blackjack.current_player->read(blackjack.current_player, inputbuffer) != 0) {
           blackjack_pop_errors();
           return 1;
         }
+        if (blackjack_ini.log != NULL) {
+          fprintf(blackjack_ini.log, "<- %s\n", inputbuffer);
+          fflush(blackjack_ini.log);
+        }
+        
         if (blackjack_ini.max_invalid_commands != 0 && current_invalid_command++ > blackjack_ini.max_invalid_commands) {
-          send_command(blackjack.current_player, "max_incorrect_commands");
+          blackjack.current_player->write(blackjack.current_player, "max_incorrect_commands");
           blackjack_push_error_message("maximum allowed incorrect commands (%d)", blackjack_ini.max_invalid_commands);
           blackjack_pop_errors();
-          send_command(blackjack.current_player, "bye");
+          blackjack.current_player->write(blackjack.current_player, "bye");
           exit(1);
         }
       } while (dealer_process_input(blackjack.current_player, inputbuffer) <= 0);
@@ -223,7 +237,7 @@ int main(int argc, char** argv) {
   
   // cleanup
   LL_FOREACH_SAFE(blackjack.players, player, tmp) {
-    send_command(player, "bye");
+    blackjack.current_player->write(player, "bye");
     write_yaml_report(blackjack.players);
     destroy_player(player);
   }

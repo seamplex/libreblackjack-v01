@@ -38,76 +38,25 @@ int send_command_card(player_t *player, char *command, card_t *card) {
   } else {
     snprintf(full_command, BUF_SIZE-1, "%s %s #%d", command, card->token[player->token_type], player->current_hand->id);
   }
-  send_command(player, full_command);
+  player->write(player, full_command);
    
   return 0;
 }
 
-int send_command(player_t *player, const char *fmt, ...) {
+int write_formatted(player_t *player, const char *fmt, ...) {
   va_list ap;
   char command[BUF_SIZE];
-  
-  if (player->delay != 0) {
-    usleep((useconds_t)(1e6*player->delay));
-  }
   
   va_start(ap, fmt);
   vsnprintf(command, BUF_SIZE, fmt, ap);
   va_end(ap);
   
-  switch (player->dealer2player.ipc_type) {
-    case ipc_none:
-      bjcall(dealer_to_stdout(command));
-    break;
-    case ipc_fifo:
-      bjcall(dealer_to_fifo(player, command));
-    break;
-    case ipc_shmem:
-      bjcall(dealer_to_shmem(player, command));
-    break;
-    case ipc_mqueue:
-      bjcall(dealer_to_mqueue(player, command));
-    break;
-    case ipc_internal:
-      bjcall(dealer_to_internal(player, command));
-    break;
-  }
+  bjcall(blackjack.current_player->write(player, command));
   
   if (blackjack_ini.log != NULL) {
     fprintf(blackjack_ini.log, "-> %s\n", command);
     fflush(blackjack_ini.log);
   }
   
-  return 0;
-}
-
-int receive_command(player_t *player, char *command) {
-
-  
-  // TODO: function pointers?
-  
-  switch (player->player2dealer.ipc_type) {
-    case ipc_none:
-      bjcall(player_from_stdin(inputbuffer));
-    break;
-    case ipc_fifo:
-      bjcall(player_from_fifo(player, inputbuffer));
-    break;
-    case ipc_shmem:
-      bjcall(player_from_shmem(player, command));
-    break;
-    case ipc_mqueue:
-      bjcall(player_from_mqueue(player, command));
-    break;
-    case ipc_internal:
-      bjcall(player_from_internal(player, command));
-    break;
-  }
-  
-  if (blackjack_ini.log != NULL) {
-    fprintf(blackjack_ini.log, "<- %s\n", command);
-    fflush(blackjack_ini.log);
-  }
-
   return 0;
 }

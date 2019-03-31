@@ -260,6 +260,7 @@ int bjinit(char *cmdline_file_path) {
   FILE *ini_file;
   FILE *devrandom;
   int suit, rank, tag;
+  player_t *player;
 
   // las cosas que pueden ser cero arrancan en menos uno
   blackjack_ini.no_negative_bankroll = -1;
@@ -419,6 +420,46 @@ int bjinit(char *cmdline_file_path) {
   sprintf(blackjack.card[50].token[card_utf8_single], "🃛");
   sprintf(blackjack.card[51].token[card_utf8_single], "🃝");
   sprintf(blackjack.card[52].token[card_utf8_single], "🃞");
+
+  
+  // function pointers
+  LL_FOREACH(blackjack.players, player) {
+    
+    switch (player->dealer2player.ipc_type) {
+      case ipc_none:
+        player->write = dealer_to_stdout;
+      break;
+      case ipc_fifo:
+        player->write = dealer_to_fifo;
+      break;
+      case ipc_shmem:
+        player->write = dealer_to_shmem;
+      break;
+      case ipc_mqueue:
+        player->write = dealer_to_mqueue;
+      break;
+      case ipc_internal:
+        player->write = dealer_to_internal;
+      break;
+    }    
+    switch (player->player2dealer.ipc_type) {
+      case ipc_none:
+        player->read = player_from_stdin;
+      break;
+      case ipc_fifo:
+        player->read = player_from_fifo;
+      break;
+      case ipc_shmem:
+        player->read = player_from_shmem;
+      break;
+      case ipc_mqueue:
+        player->read = player_from_mqueue;
+      break;
+      case ipc_internal:
+        player->read = player_from_internal;
+      break;
+    }
+  }
 
   return 0;
 }
