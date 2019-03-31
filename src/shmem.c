@@ -72,7 +72,7 @@ int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **
   return 0;
 }
 
-int write_to_shmem(player_t *player, const char *command) {
+int dealer_to_shmem(player_t *player, const char *command) {
   
   static int first = 1;
   
@@ -101,7 +101,7 @@ int write_to_shmem(player_t *player, const char *command) {
 }
 
 
-int read_from_shmem(player_t *player, char *buffer) {
+int player_from_shmem(player_t *player, char *buffer) {
   
   static int first = 1;
   

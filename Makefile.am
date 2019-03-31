@@ -28,6 +28,7 @@ libreblackjack_SOURCES = \
  src/error.c \
  src/report.c \
  src/player.c \
+ src/internal.c \
  src/shmem.c \
  src/mqueue.c
 

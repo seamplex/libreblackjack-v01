@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-int write_to_stdout(const char *command) {
+int dealer_to_stdout(const char *command) {
   // TODO: choose colors
   if (stdout_opts.isatty) {
     if (command[strlen(command)-1] != '?') {
@@ -51,7 +51,7 @@ char *line_read = (char *)NULL;
 char prompt[32];
 #endif
   
-int read_from_stdin(char *buffer) {
+int player_from_stdin(char *buffer) {
   if (stdout_opts.isatty) {
 #ifdef HAVE_LIBREADLINE
     if (prompt[0] == '\0') {

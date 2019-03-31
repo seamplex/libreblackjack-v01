@@ -43,7 +43,7 @@ int create_fifo(const char *name) {
   return 0;
 }
 
-int write_to_fifo(player_t *player, const char *command) {
+int dealer_to_fifo(player_t *player, const char *command) {
   
   if (player->dealer2player.buffered) {
     if (player->dealer2player.fp == NULL) {
@@ -89,7 +89,7 @@ int write_to_fifo(player_t *player, const char *command) {
   
 }
 
-int read_from_fifo(player_t *player, char *buffer) {
+int player_from_fifo(player_t *player, char *buffer) {
 
   int error;
   char *newline;

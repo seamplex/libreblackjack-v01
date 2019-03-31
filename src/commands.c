@@ -51,23 +51,25 @@ int send_command(player_t *player, const char *fmt, ...) {
     usleep((useconds_t)(1e6*player->delay));
   }
   
-  // TODO: check overflow
   va_start(ap, fmt);
-  vsprintf(command, fmt, ap);
+  vsnprintf(command, BUF_SIZE, fmt, ap);
   va_end(ap);
   
   switch (player->dealer2player.ipc_type) {
     case ipc_none:
-      bjcall(write_to_stdout(command));
+      bjcall(dealer_to_stdout(command));
     break;
     case ipc_fifo:
-      bjcall(write_to_fifo(player, command));
+      bjcall(dealer_to_fifo(player, command));
     break;
     case ipc_shmem:
-      bjcall(write_to_shmem(player, command));
+      bjcall(dealer_to_shmem(player, command));
     break;
     case ipc_mqueue:
-      bjcall(write_to_mqueue(player, command));
+      bjcall(dealer_to_mqueue(player, command));
+    break;
+    case ipc_internal:
+      bjcall(dealer_to_internal(player, command));
     break;
   }
   
@@ -86,16 +88,19 @@ int receive_command(player_t *player, char *command) {
   
   switch (player->player2dealer.ipc_type) {
     case ipc_none:
-      bjcall(read_from_stdin(inputbuffer));
+      bjcall(player_from_stdin(inputbuffer));
     break;
     case ipc_fifo:
-      bjcall(read_from_fifo(player, inputbuffer));
+      bjcall(player_from_fifo(player, inputbuffer));
     break;
     case ipc_shmem:
-      bjcall(read_from_shmem(player, command));
+      bjcall(player_from_shmem(player, command));
     break;
     case ipc_mqueue:
-      bjcall(read_from_mqueue(player, command));
+      bjcall(player_from_mqueue(player, command));
+    break;
+    case ipc_internal:
+      bjcall(player_from_internal(player, command));
     break;
   }
   

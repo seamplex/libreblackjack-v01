@@ -51,7 +51,7 @@ int create_mqueue(const char *name, mqd_t *mq) {
   return 0;
 }
 
-int write_to_mqueue(player_t *player, const char *command) {
+int dealer_to_mqueue(player_t *player, const char *command) {
 
   static int first = 1;
   
@@ -76,7 +76,7 @@ int write_to_mqueue(player_t *player, const char *command) {
   return 0;
 }
 
-int read_from_mqueue(player_t *player, char *buffer) {
+int player_from_mqueue(player_t *player, char *buffer) {
 
   static int first = 1;
   

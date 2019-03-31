@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 jeremy theler
+ *  Copyright (C) 2016,2019 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -224,17 +224,25 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
       ipc->ipc_type = ipc_shmem;
     } else if (strcmp(token, "mq") == 0 || strcmp(token, "mqueue") == 0) {
       ipc->ipc_type = ipc_mqueue;
+    } else if (strcmp(token, "internal") == 0) {
+      ipc->ipc_type = ipc_internal;
     } else {
       blackjack_push_error_message("unkown ipc type '%s'", token);
       return 0;
     }
     
-    // the object name
-    if ((token = strtok(NULL, INI_TOKEN_SEPARATORS)) == NULL) {
-      blackjack_push_error_message("expected object name after ipc type");
-      return 0;
+    if (ipc->ipc_type == ipc_internal) {
+      // at least one internal means the other one is also internal
+      player->player2dealer.ipc_type = ipc_internal;
+      player->dealer2player.ipc_type = ipc_internal;
+    } else {
+      // otherwise we need an object name
+      if ((token = strtok(NULL, INI_TOKEN_SEPARATORS)) == NULL) {
+        blackjack_push_error_message("expected object name after ipc type");
+        return 0;
+      }
+      ipc->name = strdup(token);
     }
-    ipc->name = strdup(token);
     
     
     free(tokens);

@@ -76,6 +76,7 @@ struct ipc_t {
     ipc_fifo,
     ipc_shmem,
     ipc_mqueue,
+    ipc_internal,
   } ipc_type;
 
   int buffered;
@@ -282,8 +283,8 @@ extern int dealer_action(void);
 extern int dealer_process_input(player_t *player, char *command);
 
 // stdinout.c
-extern int write_to_stdout(const char *command);
-extern int read_from_stdin(char *buffer);
+extern int dealer_to_stdout(const char *command);
+extern int player_from_stdin(char *buffer);
 extern void free_rl_stdin(void);
 
 // bjinit.c
@@ -302,8 +303,8 @@ extern int receive_command(player_t *player, char *command);
 
 // fifo.c
 int create_fifo(const char *name);
-int write_to_fifo(player_t *player, const char *command);
-int read_from_fifo(player_t *player, char *buffer);
+int dealer_to_fifo(player_t *player, const char *command);
+int player_from_fifo(player_t *player, char *buffer);
 // version.c
 void libreblackjack_shortversion(void);
 void libreblackjack_copyright(void);
@@ -320,13 +321,13 @@ void blackjack_signal_handler(int sig_num);
 // shmem.c
 
 int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **sem_read);
-int write_to_shmem(player_t *player, const char *command);
-int read_from_shmem(player_t *player, char *buffer);
+int dealer_to_shmem(player_t *player, const char *command);
+int player_from_shmem(player_t *player, char *buffer);
 
 
 // mqueue.c
 int create_mqueue(const char *name, mqd_t *mq);
-int write_to_mqueue(player_t *player, const char *command);
-int read_from_mqueue(player_t *player, char *buffer);
+int dealer_to_mqueue(player_t *player, const char *command);
+int player_from_mqueue(player_t *player, char *buffer);
 
 #endif
