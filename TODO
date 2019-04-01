@@ -6,6 +6,8 @@ be able to use a non-gsl rng
 readline autocomplete
 check there is only one stdout player
 
+detailed commands (reduces speed but allows to count cards)
+
 ini:
 bankroll_history_file_path
 removed_cards

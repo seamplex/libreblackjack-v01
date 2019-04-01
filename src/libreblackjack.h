@@ -301,7 +301,7 @@ extern int bjinit(char *cmdline_file_path);
 int fbj_ini_handler(void* user, const char* section, const char* name, const char* value);
 
 // commands.c
-extern int send_command_card(player_t *player, char *command, card_t *card);
+extern int write_formatted_card(player_t *player, char *command, card_t *card);
 extern int write_formatted(player_t *player, const char *fmt, ...);
 
 // fifo.c

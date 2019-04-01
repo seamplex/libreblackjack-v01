@@ -30,7 +30,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int send_command_card(player_t *player, char *command, card_t *card) {
+int write_formatted_card(player_t *player, char *command, card_t *card) {
   char full_command[BUF_SIZE];
   
   if (player->has_split == 0) {
