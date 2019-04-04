@@ -53,8 +53,10 @@ int write_yaml_report(player_t *player) {
 //  card_t *arranged_cards;
 //  FILE *command_log;
   
-  fprintf(file, "  penetration:            %g\n", blackjack_ini.penetration);
-  fprintf(file, "  penetration_sigma:      %g\n", blackjack_ini.penetration_sigma);
+  if (blackjack_ini.decks > 0) {
+    fprintf(file, "  penetration:            %g\n", blackjack_ini.penetration);
+    fprintf(file, "  penetration_sigma:      %g\n", blackjack_ini.penetration_sigma);
+  }
   fprintf(file, "  blackjack_pays:         %g\n", blackjack_ini.blackjack_pays);
 
   // TODO

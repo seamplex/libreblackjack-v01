@@ -25,7 +25,7 @@
 #include <ctype.h>
 
 int count;
-char dummy[32];
+char dummy[16];
 char *response;
 
 char *hit = "h";
@@ -47,7 +47,56 @@ int internal_init(void) {
   char line[256];
   int type, count;
   char *data;
+
+  // initialize strategy
+  //                             23456789TA
+  strncpy(strategy[HARD][19]+2, "ssssssssss", 12); 
+  strncpy(strategy[HARD][18]+2, "ssssssssss", 12); 
+  strncpy(strategy[HARD][17]+2, "ssssssssss", 12); 
+  strncpy(strategy[HARD][16]+2, "ssssshhhhh", 12);
+  strncpy(strategy[HARD][15]+2, "ssssshhhhh", 12);
+  strncpy(strategy[HARD][14]+2, "ssssshhhhh", 12);
+  strncpy(strategy[HARD][13]+2, "ssssshhhhh", 12);
+  strncpy(strategy[HARD][12]+2, "hhssshhhhh", 12); 
+  strncpy(strategy[HARD][11]+2, "dddddddddd", 12);
+  strncpy(strategy[HARD][10]+2, "ddddddddhh", 12);
+  strncpy(strategy[HARD][9]+2,  "hddddhhhhh", 12);
+  strncpy(strategy[HARD][8]+2,  "hhhhhhhhhh", 12);
+  strncpy(strategy[HARD][7]+2,  "hhhhhhhhhh", 12);
+  strncpy(strategy[HARD][6]+2,  "hhhhhhhhhh", 12);
+  strncpy(strategy[HARD][5]+2,  "hhhhhhhhhh", 12);
   
+  //                             23456789TA
+  strncpy(strategy[SOFT][20]+2, "ssssssssss", 12);
+  strncpy(strategy[SOFT][19]+2, "ssssdsssss", 12);
+  strncpy(strategy[SOFT][18]+2, "dddddsshhh", 12);
+  strncpy(strategy[SOFT][17]+2, "hddddhhhhh", 12);
+  strncpy(strategy[SOFT][16]+2, "hhdddhhhhh", 12);
+  strncpy(strategy[SOFT][15]+2, "hhdddhhhhh", 12);
+  strncpy(strategy[SOFT][14]+2, "hhhddhhhhh", 12);
+  strncpy(strategy[SOFT][13]+2, "hhhddhhhhh", 12);
+
+  //                             23456789TA
+  strncpy(strategy[PAIR][11]+2, "pppppppppp", 12);
+  strncpy(strategy[PAIR][10]+2, "ssssssssss", 12);
+  strncpy(strategy[PAIR][9]+2,  "pppppsppss", 12);
+  strncpy(strategy[PAIR][8]+2,  "pppppppppp", 12);
+  strncpy(strategy[PAIR][7]+2,  "pppppphhhh", 12);
+  strncpy(strategy[PAIR][6]+2,  "ppppphhhhh", 12);
+  strncpy(strategy[PAIR][5]+2,  "ddddddddhh", 12);
+  strncpy(strategy[PAIR][4]+2,  "hhhpphhhhh", 12);
+  strncpy(strategy[PAIR][3]+2,  "pppppphhhh", 12);
+  strncpy(strategy[PAIR][2]+2,  "pppppphhhh", 12);
+  
+//  hard 4  = pair of 2
+  memcpy(strategy[HARD][4], strategy[PAIR][2], 16*sizeof(char));
+//  pair of T = hard 20 
+  memcpy(strategy[HARD][20], strategy[PAIR][10], 16*sizeof(char));
+//  pair of A = soft 12
+  memcpy(strategy[SOFT][12], strategy[PAIR][11], 16*sizeof(char));
+
+  
+  // read the bs.txt file  
   if ((file = fopen("bs.txt", "r")) != NULL) {
     while (fgets(line, 255, file) != NULL) {
       switch (line[0]) {
@@ -123,13 +172,8 @@ int internal_init(void) {
         } else if (type == PAIR && count == 11) {
           memcpy(strategy[SOFT][12], strategy[type][count], 16*sizeof(char));
         }
-        
-        
       }
-      
-      
     }
-  
     fclose(file);
   }
   
@@ -162,7 +206,7 @@ int dealer_to_internal(player_t *player, const char *command) {
 
     response = &strategy[type][count][blackjack.dealer_hand->cards->value];
 
-    // if strategy calls for double but we are not allowed, hit
+    // if strategy calls for double but we are not allowed, then hit
     if (response[0] == 'd' && player->current_hand->n_cards != 2) {
       response = hit;
     }
