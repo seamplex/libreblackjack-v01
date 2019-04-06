@@ -287,7 +287,8 @@ int bjinit(char *cmdline_file_path) {
   free(ini_file_path);
 
   // non-zero defaults
-  if (blackjack_ini.decks == 0) {  blackjack_ini.decks = 1; }
+  if (blackjack_ini.decks == 0) {  blackjack_ini.decks = 6; }
+  if (blackjack_ini.hands == 0) {  blackjack_ini.hands = 1e6; }
   if (blackjack_ini.no_negative_bankroll == -1) { blackjack_ini.no_negative_bankroll = 0; }
   if (blackjack_ini.max_bet == -1) { blackjack_ini.max_bet = 0; }
   if (blackjack_ini.double_after_split == -1) { blackjack_ini.double_after_split = 1; }
@@ -297,7 +298,7 @@ int bjinit(char *cmdline_file_path) {
   if (blackjack_ini.shuffle_every_hand == -1) { blackjack_ini.shuffle_every_hand = 0; }
   
 //  blackjack_inirng_type = gsl_rng_mt19937;
-  if (blackjack_ini.penetration == 0) { blackjack_ini.penetration = 0.7; }
+  if (blackjack_ini.penetration == 0) { blackjack_ini.penetration = 0.75; }
   if (blackjack_ini.penetration_sigma ==  0) { blackjack_ini.penetration_sigma = 0.05; }
   
   // si no hay ningun player, creamos uno
@@ -311,7 +312,7 @@ int bjinit(char *cmdline_file_path) {
   }
   
   if (blackjack_ini.rng_seed == 0) {
-    assert(devrandom = fopen("/dev/urandom", "r"));
+    assert((devrandom = fopen("/dev/urandom", "r")));
     assert(fread(&blackjack_ini.rng_seed, sizeof(blackjack_ini.rng_seed), 1, devrandom));
     fclose(devrandom);
   }
@@ -351,17 +352,17 @@ int bjinit(char *cmdline_file_path) {
         snprintf(blackjack.card[tag].text, 32, "%s%s", numbername[rank], suitletter[suit]);
       }
 
-      snprintf(blackjack.card[tag].token[card_tag],   8, "%d", tag);
-      snprintf(blackjack.card[tag].token[card_ascii], 8, "%s%s", numbername[rank], suitletter[suit]);
-      snprintf(blackjack.card[tag].token[card_utf8],  8, "%s%s", numbername[rank], suitcode[suit]);
-      snprintf(blackjack.card[tag].token[card_value], 8, "%d", value[rank]);
+      snprintf(blackjack.card[tag].token[card_tag],   CARD_SIZE, "%d", tag);
+      snprintf(blackjack.card[tag].token[card_ascii], CARD_SIZE, "%s%s", numbername[rank], suitletter[suit]);
+      snprintf(blackjack.card[tag].token[card_utf8],  CARD_SIZE, "%s%s", numbername[rank], suitcode[suit]);
+      snprintf(blackjack.card[tag].token[card_value], CARD_SIZE, "%d", value[rank]);
 
-      snprintf(blackjack.card[tag].art[0], 12, " _____ ");
-      snprintf(blackjack.card[tag].art[1], 12, "|%s    |", numbername[rank]);
-      snprintf(blackjack.card[tag].art[2], 12, "|     |");
-      snprintf(blackjack.card[tag].art[3], 12, "|  %s  |", suitcode[suit]);
-      snprintf(blackjack.card[tag].art[4], 12, "|     |");
-      snprintf(blackjack.card[tag].art[5], 12, "|____%s|", numbername[rank]);
+      snprintf(blackjack.card[tag].art[0], CARD_SIZE, " _____ ");
+      snprintf(blackjack.card[tag].art[1], CARD_SIZE, "|%s    |", numbername[rank]);
+      snprintf(blackjack.card[tag].art[2], CARD_SIZE, "|     |");
+      snprintf(blackjack.card[tag].art[3], CARD_SIZE, "|  %s  |", suitcode[suit]);
+      snprintf(blackjack.card[tag].art[4], CARD_SIZE, "|     |");
+      snprintf(blackjack.card[tag].art[5], CARD_SIZE, "|____%s|", numbername[rank]);
     }
   }
   

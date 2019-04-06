@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 jeremy theler
+ *  Copyright (C) 2016,2019 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -49,12 +49,13 @@ int main(int argc, char** argv) {
     { "version",     no_argument,       NULL, 'v'},
     { "decks",       required_argument, NULL, 'd'},
     { "hands",       required_argument, NULL, 'n'},
+    { "internal",    no_argument,       NULL, 'i'},
     { "flatbet",     optional_argument, NULL, 'f'},
     { NULL, 0, NULL, 0 }
   };    
 
   opterr = 0;
-  while ((optc = getopt_long_only(argc, argv, "hvd:n:f:", longopts, &option_index)) != -1) {
+  while ((optc = getopt_long_only(argc, argv, "hvd:n:if:", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
         show_help = 1;
@@ -63,28 +64,22 @@ int main(int argc, char** argv) {
         show_version = 1;
         break;
       case 'd':
-        if (fbj_ini_handler(NULL, "", "decks", optarg) <= 0) {
-          blackjack_pop_errors();
-          return 1;
-        }
+        bjcallpop(fbj_ini_handler(NULL, "", "decks", optarg));
         break;
       case 'n':
-        if (fbj_ini_handler(NULL, "", "hands", optarg) <= 0) {
-          blackjack_pop_errors();
-          return 1;
-        }
+        bjcallpop(fbj_ini_handler(NULL, "", "hands", optarg));
+        break;
+      case 'i':
+        bjcallpop(fbj_ini_handler(NULL, "", "player2dealer", "internal"));
+        bjcallpop(fbj_ini_handler(NULL, "", "dealer2player", "internal"));
+        bjcallpop(fbj_ini_handler(NULL, "", "flat_bet", "1"));
+        bjcallpop(fbj_ini_handler(NULL, "", "no_insurance", "1"));
         break;
       case 'f':
         if (optarg != NULL) {
-          if (fbj_ini_handler(NULL, "", "flat_bet", optarg) <= 0) {
-            blackjack_pop_errors();
-            return 1;
-          }
+          bjcallpop(fbj_ini_handler(NULL, "", "flat_bet", optarg));
         } else {
-          if (fbj_ini_handler(NULL, "", "flat_bet", "1") <= 0) {
-            blackjack_pop_errors();
-            return 1;
-          }
+          bjcallpop(fbj_ini_handler(NULL, "", "flat_bet", "1"));
         }
         break;
       case '?':

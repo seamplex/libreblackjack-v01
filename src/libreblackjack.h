@@ -34,6 +34,7 @@
 #include "utlist.h"
 
 #define bjcall(function)   if ((function) != 0) return -1
+#define bjcallpop(function)   if ((function) <= 0) { blackjack_pop_errors(); return 1; }
 
 #define INI_FILE_PATH "libreblackjack.ini"
 
@@ -118,14 +119,15 @@ struct {
 
 #define CARD_ART_LINES 6
 #define CARD_TYPES     5
+#define CARD_SIZE      16
 
 struct card_t {
   int tag;
   int value;
 
-  char token[CARD_TYPES][8];  
+  char token[CARD_TYPES][CARD_SIZE];  
   char text[32];  
-  char art[CARD_ART_LINES][12];
+  char art[CARD_ART_LINES][CARD_SIZE];
   
   card_t *next;
 };

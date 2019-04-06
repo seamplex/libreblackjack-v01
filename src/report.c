@@ -37,18 +37,17 @@ int write_yaml_report(player_t *player) {
   }
   
   // TODO: elegir que se agreguen comentarios con explicaciones
-  
+  fprintf(file, "---\n");  
   fprintf(file, "rules:\n");
   fprintf(file, "  decks:                  %d\n", blackjack_ini.decks);
   fprintf(file, "  hands:                  %ld\n", blackjack.hand);
-//  fprintf(file, "suma:                   %ld\n", player->doubled_wins + player->blackjack_wins + player->plain_wins + player->pushes + player->losses);
+  fprintf(file, "  hit_soft_17:            %d\n", blackjack_ini.hit_soft_17);
+  fprintf(file, "  double_after_split:     %d\n", blackjack_ini.double_after_split);
+  fprintf(file, "  blackjack_pays:         %g\n", blackjack_ini.blackjack_pays);
   fprintf(file, "  rng_seed:               %d\n", blackjack_ini.rng_seed);
   fprintf(file, "  number_of_burnt_cards:  %d\n", blackjack_ini.number_of_burnt_cards);
   fprintf(file, "  no_negative_bankroll:   %d\n", blackjack_ini.no_negative_bankroll);
   fprintf(file, "  max_bet:                %d\n", blackjack_ini.max_bet);
-  fprintf(file, "  double_after_split:     %d\n", blackjack_ini.double_after_split);
-  fprintf(file, "  hit_soft_17:            %d\n", blackjack_ini.hit_soft_17);
-//  fprintf(file, "max_incorrect_commands: %d\n", blackjack_ini.max_invalid_commands);
   
 //  card_t *arranged_cards;
 //  FILE *command_log;
@@ -57,7 +56,6 @@ int write_yaml_report(player_t *player) {
     fprintf(file, "  penetration:            %g\n", blackjack_ini.penetration);
     fprintf(file, "  penetration_sigma:      %g\n", blackjack_ini.penetration_sigma);
   }
-  fprintf(file, "  blackjack_pays:         %g\n", blackjack_ini.blackjack_pays);
 
   // TODO
   if (getrusage(RUSAGE_SELF, &usage) == 0) {
@@ -108,6 +106,7 @@ int write_yaml_report(player_t *player) {
   fprintf(file, "  deviation:          % g\n", sqrt(player->variance));
   fprintf(file, "  error:              % g\n", sqrt(player->variance / (double)(blackjack.hand)));
   fprintf(file, "  result:             \"(%+.2f ± %.2f) %%\"\n", 100.0*expected_return, 100*sqrt(player->variance / (double)(blackjack.hand)));
+  fprintf(file, "...\n");  
   
   return 0;
 }

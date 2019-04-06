@@ -1,1 +1,1 @@
-../../libreblackjack
+../../libreblackjack -i
