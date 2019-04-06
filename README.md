@@ -46,12 +46,12 @@ These automatic players can range from simple no-bust or mimic-the-dealer hitter
 
 
 ```
-$ git clone git@github.com:seamplex/libreblackjack.git
-$ cd libreblackjack
-$ ./autogen.sh
-$ ./configure
-$ make
-# make install
+git clone git@github.com:seamplex/libreblackjack.git
+cd libreblackjack
+./autogen.sh
+./configure
+make
+sudo make install
 ```
 
 Note that LibreBlackjack depends on two optional GNU libraries:
@@ -82,7 +82,7 @@ Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII mo
 
 ![ASCII playing](doc/ascii.png){.img-responsive}\ 
 
-Type `help` to get it.
+Edit the file `libreblackjack.ini` to set up rules, arranged shoes and other options. Type `help` at the prompt to get it.
 
 # Automatic playing
 
@@ -115,7 +115,7 @@ LibreBlackjack is free software; you can redistribute it and/or modify it under 
 # Further information
 
 Home page: <https://www.seamplex.com/libreblackjack>  
-Repository: <git@github.com:seamplex/libreblackjack.git>  
+Repository: <https://github.com/seamplex/libreblackjack>  
 Mailing list and bug reports: <wasora@seamplex.com>  (you need to subscribe first at <wasora+subscribe@seamplex.com>)  
 Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA) [LinkedIn](https://www.linkedin.com/company/seamplex/) [Bitbucket](https://bitbucket.org/seamplex/)
 
