@@ -10,7 +10,7 @@
  * TCP (web)sockets (using netcat or gwsocket), or
  * dynamically loaded from shared objects.
   
-These players can be actual human players playing in real-time through a front-end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play [#play](ASCII blackjack).
+These players can be actual human players playing in real-time through a front-end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive ASCII blackjack (see [#play]).
 
 ## Why
 
@@ -84,7 +84,7 @@ Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII mo
 
 Edit the file `libreblackjack.ini` to set up rules, arranged shoes and other options. Type `help` at the prompt to get it.
 
-# Automatic playing
+## Automatic playing
 
 See the directory `players` for examples of how to write players in
 
