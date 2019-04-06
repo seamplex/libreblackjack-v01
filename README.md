@@ -10,7 +10,7 @@
  * TCP (web)sockets (using netcat or gwsocket), or
  * dynamically loaded from shared objects.
   
-These players can be actual human players playing in real-time through a front-end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive ASCII blackjack (see [#play]).
+These players can be actual human players playing in real-time through a front-end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive [ASCII blackjack](#play).
 
 ## Why
 
@@ -46,7 +46,7 @@ These automatic players can range from simple no-bust or mimic-the-dealer hitter
 
 
 ```
-git clone git@github.com:seamplex/libreblackjack.git
+git clone https://github.com/seamplex/libreblackjack.git
 cd libreblackjack
 ./autogen.sh
 ./configure
