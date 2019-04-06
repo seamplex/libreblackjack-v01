@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README
 #doc/libreblackjack.texi
 
-TESTS = 00-internal 02-always-stand 05-no-bust 08-mimic-the-dealer 22-strategy-from-file
+TESTS = 00-internal 02-always-stand 05-no-bust 08-mimic-the-dealer
 LOG_COMPILER = players/check.sh
 EXTRA_DIST = players src/version.sh $(TESTS)
 

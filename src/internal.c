@@ -30,6 +30,7 @@ char *response;
 
 char *hit = "h";
 char *stand = "s";
+char *none = "";
 
 #define COMMENT -1
 #define HARD     0
@@ -211,7 +212,7 @@ int dealer_to_internal(player_t *player, const char *command) {
       response = hit;
     }
   } else {
-    return -1;
+    response = none;
   }
   
   return 0;

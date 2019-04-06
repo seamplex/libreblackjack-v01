@@ -20,11 +20,10 @@ fi
 
 # expected results
 declare -A expected=(\
-["00-always-stand"]="-0.15" \
+["00-internal"]="-0.005" \
+["02-always-stand"]="-0.15" \
 ["05-no-bust"]="-0.075" \
-["08-mimic-the-dealer"]="-0.055" \
-["14-internal"]="-0.005" \
-["22-strategy-from-file"]="-0.005")
+["08-mimic-the-dealer"]="-0.055")
 
 # allowed deviation
 sigma=0.02
