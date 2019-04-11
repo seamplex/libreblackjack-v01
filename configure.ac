@@ -38,5 +38,6 @@ cat << EOF > src/version-conf.h
 EOF
 cd src; ./version.sh; cd ..
 
-AC_CONFIG_FILES([Makefile doc/Makefile])
+#AC_CONFIG_FILES([Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
