@@ -1,3 +1,47 @@
+verbose dealer/quiet dealer
+motivation: bs flaw, check changes in strategy, AI for beating the dealer, switch casinos to free sw
+first qurstions: 1. how to play? 2. what is the ev? p41 griffin opt
+mimic the dealer -5.5% single s17
+referencias en griffin chapter 2 a historia de bs
+definition of bs p42
+uses bjinit & uthash & yaml
+ascii utf8
+thorp wiki/page
+remove cards from deck
+ojo! el arranged sirve para decks infinitos, para finitos hay que poner shuffle after deal
++10 par de 5, 12 hard 12, -12 par de aces
+eric farmer
+https://www.qfit.com/book/ModernBlackjackPage68.htm
+markdowns de players
+basic strategy
+https://www.qfit.com/book/ModernBlackjackPage44.htm
+shared-object player
+bankroll history, group by 10, 100, 1000, etc
+betting systems, positive, negatice, martingale fibonacci
+kelly when ev is pos
+histograma de ev cada 100 manos
+analizar martingala, bankroll para no arruinarse el 90% y 95% de las veces
+impossibilty of gambling systems, von mises
+modelar shuffle master
+https://www.beatblackjack.org/en/simulate/
+https://www.blackjackinfo.com/free-blackjack-combinatorial-analyzer/
+http://www.blackjack-scams.com/html/prog__systems.html
+https://curlie.org/Games/Gambling/Blackjack
+https://www.blackjackincolor.com/
+https://www.blackjackinfo.com/
+https://www.gnu.org/help/evaluation.html 
+re-calcular resultados del wizard
+generar la basic strategy desde cero, mandar al wizzard
+https://github.com/imneme/pcg-c
+martingale and positive progression
+https://wizardofodds.com/gambling/betting-systems/cancellation/appendix/
+basic strategy vs horrible player
+split eights http://centronsoftware.com/john_patrick/tips.asp?id=10
+http://centronsoftware.com/john_patrick/tips.asp?id=9
+websockets ux con sini
+hacer torneos
+
+
 doc de ini dentro del source de bjinit.c
 http://mikefarah.github.io/yq/
 https://gist.github.com/pkuczynski/8665367

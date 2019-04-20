@@ -28,8 +28,11 @@ int count;
 char dummy[16];
 char *response;
 
+char *bet = "1";
 char *hit = "h";
 char *stand = "s";
+char *split = "p";
+char *no = "no";
 char *none = "";
 
 #define COMMENT -1
@@ -51,6 +54,7 @@ int internal_init(void) {
 
   // initialize strategy
   //                             23456789TA
+  strncpy(strategy[HARD][20]+2, "ssssssssss", 12); 
   strncpy(strategy[HARD][19]+2, "ssssssssss", 12); 
   strncpy(strategy[HARD][18]+2, "ssssssssss", 12); 
   strncpy(strategy[HARD][17]+2, "ssssssssss", 12); 
@@ -66,6 +70,7 @@ int internal_init(void) {
   strncpy(strategy[HARD][7]+2,  "hhhhhhhhhh", 12);
   strncpy(strategy[HARD][6]+2,  "hhhhhhhhhh", 12);
   strncpy(strategy[HARD][5]+2,  "hhhhhhhhhh", 12);
+  strncpy(strategy[HARD][4]+2,  "hhhhhhhhhh", 12);
   
   //                             23456789TA
   strncpy(strategy[SOFT][20]+2, "ssssssssss", 12);
@@ -76,26 +81,19 @@ int internal_init(void) {
   strncpy(strategy[SOFT][15]+2, "hhdddhhhhh", 12);
   strncpy(strategy[SOFT][14]+2, "hhhddhhhhh", 12);
   strncpy(strategy[SOFT][13]+2, "hhhddhhhhh", 12);
+  strncpy(strategy[SOFT][12]+2, "hhhhhhhhhh", 12);
 
   //                             23456789TA
-  strncpy(strategy[PAIR][11]+2, "pppppppppp", 12);
-  strncpy(strategy[PAIR][10]+2, "ssssssssss", 12);
-  strncpy(strategy[PAIR][9]+2,  "pppppsppss", 12);
-  strncpy(strategy[PAIR][8]+2,  "pppppppppp", 12);
-  strncpy(strategy[PAIR][7]+2,  "pppppphhhh", 12);
-  strncpy(strategy[PAIR][6]+2,  "ppppphhhhh", 12);
-  strncpy(strategy[PAIR][5]+2,  "ddddddddhh", 12);
-  strncpy(strategy[PAIR][4]+2,  "hhhpphhhhh", 12);
-  strncpy(strategy[PAIR][3]+2,  "pppppphhhh", 12);
-  strncpy(strategy[PAIR][2]+2,  "pppppphhhh", 12);
-  
-//  hard 4  = pair of 2
-  memcpy(strategy[HARD][4], strategy[PAIR][2], 16*sizeof(char));
-//  pair of T = hard 20 
-  memcpy(strategy[HARD][20], strategy[PAIR][10], 16*sizeof(char));
-//  pair of A = soft 12
-  memcpy(strategy[SOFT][12], strategy[PAIR][11], 16*sizeof(char));
-
+  strncpy(strategy[PAIR][11]+2, "yyyyyyyyyy", 12);
+  strncpy(strategy[PAIR][10]+2, "nnnnnnnnnn", 12);
+  strncpy(strategy[PAIR][9]+2,  "yyyyynyynn", 12);
+  strncpy(strategy[PAIR][8]+2,  "yyyyyyyyyy", 12);
+  strncpy(strategy[PAIR][7]+2,  "yyyyyynnnn", 12);
+  strncpy(strategy[PAIR][6]+2,  "yyyyynnnnn", 12);
+  strncpy(strategy[PAIR][5]+2,  "nnnnnnnnnn", 12);
+  strncpy(strategy[PAIR][4]+2,  "nnnyynnnnn", 12);
+  strncpy(strategy[PAIR][3]+2,  "yyyyyynnnn", 12);
+  strncpy(strategy[PAIR][2]+2,  "yyyyyynnnn", 12);
   
   // read the bs.txt file  
   if ((file = fopen("bs.txt", "r")) != NULL) {
@@ -151,28 +149,6 @@ int internal_init(void) {
               &strategy[type][count][11]) != 10) {
           return -1;
         }
-        
-        // special cases
-        // h4 = p2
-        if (type == HARD && count == 4) {
-          memcpy(strategy[PAIR][2], strategy[type][count], 16*sizeof(char));
-        } else if (type == PAIR && count == 2) {
-          memcpy(strategy[HARD][4], strategy[type][count], 16*sizeof(char));
-        }
-        
-        // h20 = pT
-        if (type == HARD && count == 20) {
-          memcpy(strategy[PAIR][10], strategy[type][count], 16*sizeof(char));
-        } else if (type == PAIR && count == 10) {
-          memcpy(strategy[HARD][20], strategy[type][count], 16*sizeof(char));
-        }
-
-        // s12 = pA
-        if (type == SOFT && count == 12) {
-          memcpy(strategy[PAIR][11], strategy[type][count], 16*sizeof(char));
-        } else if (type == PAIR && count == 11) {
-          memcpy(strategy[SOFT][12], strategy[type][count], 16*sizeof(char));
-        }
       }
     }
     fclose(file);
@@ -194,23 +170,33 @@ int dealer_to_internal(player_t *player, const char *command) {
   }
   
   if (strncmp(command, "play?", 5) == 0) {
+    response = NULL;   
     if (player->current_hand->n_cards == 2 && player->current_hand->cards->value == player->current_hand->cards->next->value) {
-      type = PAIR;
-      count = player->current_hand->cards->value;
-    } else if (player->current_hand->soft) {
-      type = SOFT;
-      count = player->current_hand->count;
-    } else {
-      type = HARD;
-      count = player->current_hand->count;
+      if (strategy[PAIR][player->current_hand->cards->value][blackjack.dealer_hand->cards->value] == 'y') {
+        response = split;
+      }
     }
-
-    response = &strategy[type][count][blackjack.dealer_hand->cards->value];
+    
+    if (response == NULL) {
+      if (player->current_hand->soft) {
+        type = SOFT;
+        count = player->current_hand->count;
+      } else {
+        type = HARD;
+        count = player->current_hand->count;
+      }
+      response = &strategy[type][count][blackjack.dealer_hand->cards->value];
+    }
+    
 
     // if strategy calls for double but we are not allowed, then hit
     if (response[0] == 'd' && player->current_hand->n_cards != 2) {
       response = hit;
     }
+  } else if (strncmp(command, "bet?", 4) == 0) {
+    response = bet;
+  } else if (strncmp(command, "insurance?", 10) == 0) {
+    response = no;
   } else {
     response = none;
   }

@@ -20,7 +20,7 @@ fi
 
 # expected results
 declare -A expected=(\
-["00-internal"]="-0.005" \
+["00-internal"]="-0.004" \
 ["02-always-stand"]="-0.15" \
 ["05-no-bust"]="-0.075" \
 ["08-mimic-the-dealer"]="-0.055")

@@ -1,42 +1,34 @@
-# h4 = p2
-# h20 = pT
-# s12 = pA
-
-#    2  3  4  5  6  7  8  9  T  A
-h19  s  s  s  s  s  s  s  s  s  s 
-h18  s  s  s  s  s  s  s  s  s  s 
-h17  s  s  s  s  s  s  s  s  s  s 
-h16  s  s  s  s  s  h  h  h  h  h
-h15  s  s  s  s  s  h  h  h  h  h
-h14  s  s  s  s  s  h  h  h  h  h
-h13  s  s  s  s  s  h  h  h  h  h
-h12  h  h  s  s  s  h  h  h  h  h 
-h11  d  d  d  d  d  d  d  d  d  d
-h10  d  d  d  d  d  d  d  d  h  h
-h9   h  d  d  d  d  h  h  h  h  h
-h8   h  h  h  h  h  h  h  h  h  h
-h7   h  h  h  h  h  h  h  h  h  h
-h6   h  h  h  h  h  h  h  h  h  h
-h5   h  h  h  h  h  h  h  h  h  h
-
-#    2  3  4  5  6  7  8  9  T  A
+h20  s s s s s s s s s s 
+h19  s s s s s s s s s s 
+h18  s s s s s s s s s s 
+h17  s s s s s s s s s s 
+h16  s s s s s h h h s h 
+h15  s s s s s h h h h h 
+h14  s s s s s h h h h h 
+h13  s s s s s h h h h h 
+h12  h h s s s h h h h h 
+h11  d d d d d d d d d h 
+h10  d d d d d d d d h h 
+h9  h h d d d h h h h h 
+h8  h h h h d h h h h h 
+h7  h h h h h h h h h h 
+h6  h h h h h h h h h h 
+h5  h h h h h h h h h h 
 s20  s  s  s  s  s  s  s  s  s  s
-s19  s  s  s  s  d  s  s  s  s  s
-s18  d  d  d  d  d  s  s  h  h  h
-s17  h  d  d  d  d  h  h  h  h  h
-s16  h  h  d  d  d  h  h  h  h  h
-s15  h  h  d  d  d  h  h  h  h  h
-s14  h  h  h  d  d  h  h  h  h  h
-s13  h  h  h  d  d  h  h  h  h  h
-
-#    2  3  4  5  6  7  8  9  T  A
-pA   p  p  p  p  p  p  p  p  p  p 
-pT   s  s  s  s  s  s  s  s  s  s 
-p9   p  p  p  p  p  s  p  p  s  s 
-p8   p  p  p  p  p  p  p  p  p  p 
-p7   p  p  p  p  p  p  h  h  h  h 
-p6   p  p  p  p  p  h  h  h  h  h 
-p5   d  d  d  d  d  d  d  d  h  h 
-p4   h  h  h  p  p  h  h  h  h  h 
-p3   p  p  p  p  p  p  h  h  h  h 
-p2   p  p  p  p  p  p  h  h  h  h 
+s19  s  s  s  s  s  s  s  s  s  s
+s18  s  s  s  s  s  s  s  s  s  s
+s17  s  s  s  s  s  s  s  s  s  s
+s16  s  s  s  s  s  s  s  s  s  s
+s15  s  s  s  s  s  s  s  s  s  s
+s14  s  s  s  s  s  s  s  s  s  s
+s13  s  s  s  s  s  s  s  s  s  s
+pA   n  n  n  n  n  n  n  n  n  n 
+pT   n  n  n  n  n  n  n  n  n  n 
+p9   n  n  n  n  n  n  n  n  n  n 
+p8   n  n  n  n  n  n  n  n  n  n 
+p7   n  n  n  n  n  n  n  n  n  n 
+p6   n  n  n  n  n  n  n  n  n  n 
+p5   n  n  n  n  n  n  n  n  n  n 
+p4   n  n  n  n  n  n  n  n  n  n 
+p3   n  n  n  n  n  n  n  n  n  n 
+p2   n  n  n  n  n  n  n  n  n  n 

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016 jeremy theler
+ *  Copyright (C) 2016,2019 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -69,7 +69,8 @@ int dealer_action(void) {
       
       if (blackjack.last_pass) {
         
-//        bjcall(blackjack.current_player->write(player, "shuffling"));
+///        
+        bjcall(blackjack.current_player->write(player, "shuffling"));
         // mezclamos las cartas
         shuffle_shoe();
         // TODO: reset card counting systems
@@ -91,8 +92,9 @@ int dealer_action(void) {
       } else {
         blackjack.next_dealer_action = ASK_FOR_BETS;
       }
-      
-//      bjcall(blackjack.current_player->write(player, "new_hand"));
+
+///      
+      bjcall(blackjack.current_player->write(player, "new_hand"));
     break;
 
     case ASK_FOR_BETS:
@@ -456,12 +458,14 @@ int dealer_process_input(player_t *player, char *command) {
           player->total_money_waged += player->current_hand->bet;
           
           card = deal_card_to_hand(player->current_hand);
-//          bjcall(write_formatted_card(player, "card_player", card));
+///          
+          bjcall(write_formatted_card(player, "card_player", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
           if (stdout_opts.isatty) { printf("player's count is %s%d\n", player->current_hand->soft?"soft ":"", player->current_hand->count); }
 
           if (player->current_hand->busted) {
-//            bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
+///            
+            bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
             if (stdout_opts.isatty) { printf("player busted with %d\n", player->current_hand->count); }
             player->current_result -= player->current_hand->bet;
             player->bankroll -= player->current_hand->bet;
@@ -505,14 +509,16 @@ int dealer_process_input(player_t *player, char *command) {
           
           // le damos una carta en la primera
           card = deal_card_to_hand(player->current_hand);
-//          bjcall(write_formatted_card(player, "card_player_second", card));
+///          
+          bjcall(write_formatted_card(player, "card_player_second", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
           
           // los aces piden una sola carta (y si saco 21 tambien)
           if (player->current_hand->cards->value == 11 || player->current_hand->count == 21) {
             if ((player->current_hand = player->current_hand->next) != NULL) {
               card = deal_card_to_hand(player->current_hand);
-//              bjcall(write_formatted_card(player, "card_player_second", card));
+///              
+              bjcall(write_formatted_card(player, "card_player_second", card));
               if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
               
               // si tenia as o saco 21 ya esta bien
@@ -539,11 +545,12 @@ int dealer_process_input(player_t *player, char *command) {
         
       } else if (strcmp(command, "hit") == 0 || strcmp(command, "h") == 0) {
         card = deal_card_to_hand(player->current_hand);
-//        bjcall(write_formatted_card(player, "card_player", card));
+///        
+        bjcall(write_formatted_card(player, "card_player", card));
         if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
 
         if (player->current_hand->busted) {
-//          bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
+          bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
           if (stdout_opts.isatty) { printf("player busted with %d\n", player->current_hand->count); }
           player->current_result -= player->current_hand->bet;
           player->bankroll -= player->current_hand->bet;

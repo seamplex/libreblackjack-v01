@@ -29,8 +29,8 @@
 int write_yaml_report(player_t *player) {
   FILE *file;
   struct rusage usage;
-  double expected_return;
   double wall;
+  double ev, error;
   
   if ((file = blackjack_ini.yaml_report) == NULL) {
     file = stderr;
@@ -40,7 +40,7 @@ int write_yaml_report(player_t *player) {
   fprintf(file, "---\n");  
   fprintf(file, "rules:\n");
   fprintf(file, "  decks:                  %d\n", blackjack_ini.decks);
-  fprintf(file, "  hands:                  %ld\n", blackjack.hand);
+  fprintf(file, "  hands:                  %g\n", (double)blackjack.hand);
   fprintf(file, "  hit_soft_17:            %d\n", blackjack_ini.hit_soft_17);
   fprintf(file, "  double_after_split:     %d\n", blackjack_ini.double_after_split);
   fprintf(file, "  blackjack_pays:         %g\n", blackjack_ini.blackjack_pays);
@@ -99,13 +99,17 @@ int write_yaml_report(player_t *player) {
   fprintf(file, "  final_bankroll:     %g\n", (double)player->bankroll);  
   
   // return is a keyword!
-  expected_return = (double)player->bankroll/(double)player->number_of_hands;
+//  ev = (double)player->bankroll/player->total_money_waged;
+  ev = (double)player->bankroll/(double)blackjack.hand;
+
+//  error = sqrt(player->variance / (double)(player->total_money_waged))
+  error = sqrt(player->variance / (double)(blackjack.hand));
   
-  fprintf(file, "  return:             %+g\n", expected_return);
+  fprintf(file, "  return:             %+g\n", ev);
   fprintf(file, "  variance:           % g\n", player->variance);
   fprintf(file, "  deviation:          % g\n", sqrt(player->variance));
   fprintf(file, "  error:              % g\n", sqrt(player->variance / (double)(blackjack.hand)));
-  fprintf(file, "  result:             \"(%+.2f ± %.2f) %%\"\n", 100.0*expected_return, 100*sqrt(player->variance / (double)(blackjack.hand)));
+  fprintf(file, "  result:             \"(%+.2f ± %.2f) %%\"\n", 100.0*ev, 100*error);
   fprintf(file, "...\n");  
   
   return 0;

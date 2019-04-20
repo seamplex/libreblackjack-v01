@@ -1,0 +1,5 @@
+*.yaml
+*.str
+*.result
+*.log
+libreblackjack.ini

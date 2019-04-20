@@ -226,6 +226,8 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
       ipc->ipc_type = ipc_mqueue;
     } else if (strcmp(token, "internal") == 0) {
       ipc->ipc_type = ipc_internal;
+      player->flat_bet = 1;
+      player->no_insurance = 1;
     } else {
       blackjack_push_error_message("unkown ipc type '%s'", token);
       return 0;
