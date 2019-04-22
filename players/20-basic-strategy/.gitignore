@@ -2,5 +2,7 @@
 *.str
 *.result
 *.log
+hard.txt
+soft.txt
 bs.txt
 libreblackjack.ini
