@@ -1,7 +1,3 @@
-# h4 = p2
-# h20 = pT
-# s12 = pA
-
 #    2  3  4  5  6  7  8  9  T  A
 h19  s  s  s  s  s  s  s  s  s  s 
 h18  s  s  s  s  s  s  s  s  s  s 
@@ -18,6 +14,7 @@ h8   h  h  h  h  h  h  h  h  h  h
 h7   h  h  h  h  h  h  h  h  h  h
 h6   h  h  h  h  h  h  h  h  h  h
 h5   h  h  h  h  h  h  h  h  h  h
+h4   h  h  h  h  h  h  h  h  h  h
 
 #    2  3  4  5  6  7  8  9  T  A
 s20  s  s  s  s  s  s  s  s  s  s
@@ -28,6 +25,7 @@ s16  h  h  d  d  d  h  h  h  h  h
 s15  h  h  d  d  d  h  h  h  h  h
 s14  h  h  h  d  d  h  h  h  h  h
 s13  h  h  h  d  d  h  h  h  h  h
+s12  h  h  h  h  h  h  h  h  h  h
 
 #    2  3  4  5  6  7  8  9  T  A
 pA   p  p  p  p  p  p  p  p  p  p 

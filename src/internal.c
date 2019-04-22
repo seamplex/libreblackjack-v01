@@ -25,7 +25,7 @@
 #include <ctype.h>
 
 int count;
-char dummy[16];
+char buffer[16];
 char *response;
 
 char *bet = "1";
@@ -185,7 +185,8 @@ int dealer_to_internal(player_t *player, const char *command) {
         type = HARD;
         count = player->current_hand->count;
       }
-      response = &strategy[type][count][blackjack.dealer_hand->cards->value];
+      snprintf(buffer, 16, "%c", strategy[type][count][blackjack.dealer_hand->cards->value]);
+      response = buffer;
     }
     
 

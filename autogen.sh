@@ -7,7 +7,7 @@
 #
 
 # check for needed tools
-for i in git autoreconf m4 fmt; do
+for i in git autoreconf make m4 fmt; do
   if test -z "`which $i`"; then
     echo "error: $i no not installed"
     exit 1
