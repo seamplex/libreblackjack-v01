@@ -112,17 +112,17 @@ int dealer_action(void) {
       
       // aca cada jugador tiene una sola mano
       card = deal_card_to_hand(player->current_hand);
-      bjcall(write_formatted_card(player, "card_player_first", card));
+      bjcall(write_formatted_card(player, 0,  "card_player_first", card));
       
       // paso 4. se da la upcard
       card = deal_card_to_hand(blackjack.dealer_hand);
-      bjcall(write_formatted_card(player, "card_dealer_up", card));
+      bjcall(write_formatted_card(player, 0,  "card_dealer_up", card));
       if (stdout_opts.isatty) { print_card_art(card); }
       
       // paso 5. da la segunda carta a cada jugador
       // aca cada jugador tiene una sola mano
       card = deal_card_to_hand(player->current_hand);
-      bjcall(write_formatted_card(player, "card_player_second", card));
+      bjcall(write_formatted_card(player, 0,  "card_player_second", card));
       if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
 
       // si no es ENHC miramos ahora
@@ -165,7 +165,7 @@ int dealer_action(void) {
     case CHECK_FOR_BLACKJACKS:
       // paso 7. mira si hay blackjacks
       if (blackjack.dealer_hand->blackjack) {
-        bjcall(write_formatted_card(player, "card_dealer_hole", blackjack.dealer_holecard));
+        bjcall(write_formatted_card(player, 0,  "card_dealer_hole", blackjack.dealer_holecard));
         bjcall(blackjack.current_player->write(player, "blackjack_dealer"));
         player->dealer_blackjacks++;
         if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
@@ -180,12 +180,19 @@ int dealer_action(void) {
         if (player->current_hand->blackjack) {
           bjcall(blackjack.current_player->write(player, "blackjack_player_also"));
           player->player_blackjacks++;
-          bjcall(write_formatted(player, "player_pushes %d", player->current_hand->bet));
+          if (player->has_split) {
+            bjcall(write_formatted(player, "player_pushes %d #%d", player->current_hand->bet, player->current_hand->id));
+          } else {
+            bjcall(write_formatted(player, "player_pushes %d", player->current_hand->bet));
+          }
           player->pushes++;
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
         } else {
-          // TODO: poner el #n si el tipo hizo split
-          bjcall(write_formatted(player, "player_loses %d", player->current_hand->bet));
+          if (player->has_split) {
+            bjcall(write_formatted(player, "player_losses %d #%d", player->current_hand->bet, player->current_hand->id));
+          } else {
+            bjcall(write_formatted(player, "player_losses %d", player->current_hand->bet));
+          }
           player->current_result -= player->current_hand->bet;
           player->bankroll -= player->current_hand->bet;
           if (player->bankroll < player->worst_bankroll) {
@@ -230,9 +237,9 @@ int dealer_action(void) {
         player->current_hand = player->current_hand->next;
         card = deal_card_to_hand(player->current_hand);
         if (player->has_split && player->current_hand->n_cards == 2) {
-          bjcall(write_formatted_card(player, "card_player_second", card));
+          bjcall(write_formatted_card(player, 0,  "card_player_second", card));
         } else {
-          bjcall(write_formatted_card(player, "card_player", card));
+          bjcall(write_formatted_card(player, 0,  "card_player", card));
         }
         if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
         
@@ -256,7 +263,7 @@ int dealer_action(void) {
         
         if (player->busted_all_hands) {
           if (stdout_opts.isatty) { printf("player busted all hands\n"); }
-          bjcall(write_formatted_card(player, "card_dealer_hole", blackjack.dealer_holecard));
+          bjcall(write_formatted_card(player, 0,  "card_dealer_hole", blackjack.dealer_holecard));
           blackjack.holecard_shown = 1;
           if (stdout_opts.isatty) { printf("dealer hand was \n"); }
           if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
@@ -270,8 +277,7 @@ int dealer_action(void) {
     
     break;
     case HIT_DEALERS_HAND:
-      player->has_split = 0;  // para que no aparezca #n
-      bjcall(write_formatted_card(player, "card_dealer_hole", blackjack.dealer_holecard));
+      bjcall(write_formatted_card(player, 1,  "card_dealer_hole", blackjack.dealer_holecard));
       blackjack.holecard_shown = 1;
       if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
       if (stdout_opts.isatty) { printf("dealer's count is %s%d\n", blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
@@ -279,7 +285,7 @@ int dealer_action(void) {
       // hit if count is less than 17 (or equalt to soft 17 if hit_soft_17 is true)
       while (((blackjack.dealer_hand->count < 17 || (blackjack_ini.hit_soft_17 && blackjack.dealer_hand->count == 17 && blackjack.dealer_hand->soft))) && blackjack.dealer_hand->busted == 0) {
         card = deal_card_to_hand(blackjack.dealer_hand);
-        bjcall(write_formatted_card(player, "card_dealer", card));
+        bjcall(write_formatted_card(player, 1, "card_dealer", card));
         if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
         if (stdout_opts.isatty) { printf("dealer's count is %s%d\n", blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
       }
@@ -289,7 +295,11 @@ int dealer_action(void) {
         player->dealer_busts++;
         LL_FOREACH(player->hands, hand) {
           if (hand->busted == 0) {
-            bjcall(write_formatted(player, "player_wins %d", hand->bet));
+            if (player->has_split) {
+              bjcall(write_formatted(player, "player_wins %d #%d", hand->bet, hand->id));
+            } else {
+              bjcall(write_formatted(player, "player_wins %d", hand->bet));
+            }
             player->current_result += hand->bet;
             player->bankroll += hand->bet;
             player->wins++;
@@ -302,26 +312,42 @@ int dealer_action(void) {
         }
       } else {
         LL_FOREACH(player->hands, hand) {
-          if (blackjack.dealer_hand->count > hand->count) {
-            bjcall(write_formatted(player, "player_loses %d", hand->bet));
-            player->current_result -= hand->bet;
-            player->bankroll -= hand->bet;
-            if (player->bankroll < player->worst_bankroll) {
-              player->worst_bankroll = player->bankroll;
-            }
-            player->losses++;
-          } else if (blackjack.dealer_hand->count == hand->count) {
-            bjcall(write_formatted(player, "player_pushes hand #%d", hand->id));
-            player->pushes++;
-          } else {
-            bjcall(write_formatted(player, "player_wins %d", hand->bet));
-            player->current_result += hand->bet;
-            player->bankroll += hand->bet;
-            player->wins++;
-            if (player->doubled) {
-              player->doubled_wins++;
+          if (hand->busted == 0) {  // busted hands have already been solved
+            if (blackjack.dealer_hand->count > hand->count) {
+              if (player->has_split) {
+                bjcall(write_formatted(player, "player_losses %d #%d", hand->bet, hand->id));
+              } else {
+                bjcall(write_formatted(player, "player_losses %d", hand->bet));
+              }
+              player->current_result -= hand->bet;
+              player->bankroll -= hand->bet;
+              if (player->bankroll < player->worst_bankroll) {
+                player->worst_bankroll = player->bankroll;
+              }
+              player->losses++;
+            } else if (blackjack.dealer_hand->count == hand->count) {
+              if (player->has_split) {
+                bjcall(write_formatted(player, "player_pushes #%d", hand->id));
+              } else {
+                bjcall(write_formatted(player, "player_pushes"));
+              }
+              player->pushes++;
             } else {
-              player->plain_wins++;
+              if (player->has_split) {
+                bjcall(write_formatted(player, "player_wins %d #%d", hand->bet, hand->id));
+              } else {
+                bjcall(write_formatted(player, "player_wins %d", hand->bet));
+              }
+              player->current_result += hand->bet;
+              player->bankroll += hand->bet;
+              player->wins++;
+              
+              // TODO: this does not work for split hand
+              if (player->doubled) {
+                player->doubled_wins++;
+              } else {
+                player->plain_wins++;
+              }
             }
           }
         }
@@ -464,7 +490,7 @@ int dealer_process_input(player_t *player, char *command) {
           
           card = deal_card_to_hand(player->current_hand);
 ///          
-          bjcall(write_formatted_card(player, "card_player", card));
+          bjcall(write_formatted_card(player, 0,  "card_player", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
           if (stdout_opts.isatty) { printf("player's count is %s%d\n", player->current_hand->soft?"soft ":"", player->current_hand->count); }
 
@@ -487,9 +513,10 @@ int dealer_process_input(player_t *player, char *command) {
           return -1;
         }
       } else if (strcmp(command, "split") == 0 || strcmp(command, "p") == 0) {
-        if (player->current_hand->n_cards == 2 && player->current_hand->cards->value == player->current_hand->cards->next->value) {
+        if (player->has_split < 3 &&  // up to three splits (i.e. four hands) TODO: option
+            player->current_hand->n_cards == 2 && player->current_hand->cards->value == player->current_hand->cards->next->value) {
           // marcamos que hicimos un split para poners ids en las manos
-          player->has_split = 1;
+          player->has_split++;
           
           // a la primera mano le ponemos id 1, y despues empezamos a sumar de a uno
           if (player->current_hand == player->hands) {
@@ -515,7 +542,7 @@ int dealer_process_input(player_t *player, char *command) {
           // le damos una carta en la primera
           card = deal_card_to_hand(player->current_hand);
 ///          
-          bjcall(write_formatted_card(player, "card_player_second", card));
+          bjcall(write_formatted_card(player, 0,  "card_player_second", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
           
           // los aces piden una sola carta (y si saco 21 tambien)
@@ -523,7 +550,7 @@ int dealer_process_input(player_t *player, char *command) {
             if ((player->current_hand = player->current_hand->next) != NULL) {
               card = deal_card_to_hand(player->current_hand);
 ///              
-              bjcall(write_formatted_card(player, "card_player_second", card));
+              bjcall(write_formatted_card(player, 0,  "card_player_second", card));
               if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
               
               // si tenia as o saco 21 ya esta bien
@@ -551,7 +578,7 @@ int dealer_process_input(player_t *player, char *command) {
       } else if (strcmp(command, "hit") == 0 || strcmp(command, "h") == 0) {
         card = deal_card_to_hand(player->current_hand);
 ///        
-        bjcall(write_formatted_card(player, "card_player", card));
+        bjcall(write_formatted_card(player, 0,  "card_player", card));
         if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
 
         if (player->current_hand->busted) {

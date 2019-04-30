@@ -14,10 +14,16 @@ declare -A ev
 declare -A min
 min["hard"]=4   # from 20 to 4 in hards
 min["soft"]=12  # from 20 to 12 in softs
+
 # --------------------------------------------------------------
 # start with standing
 cp hard-stand.txt hard.txt
 cp soft-stand.txt soft.txt
+
+cat << EOF > table.md
+| Hand | \$n\$ | Stand | Double | Hit |
+| ---- | ----- | ----- | ------ | --- |
+EOF
 
 for type in hard soft; do
  for hand in `seq 20 -1 ${min[${type}]}`; do
@@ -152,6 +158,7 @@ EOF
     fi
    done
  
+   echo "| ${t}${hand}-${upcard} | ${n} | ${ev_s} (${error_s}) | ${ev_d} (${error_d}) | ${ev_h} (${error_h}) |" >> table.md
    strategy[${t}${hand},${upcard}]=${best}
    
    # save the strategy again with the best strategy
@@ -169,6 +176,14 @@ EOF
  done
 done
 
+
+cat << EOF >> table.md
+| ---- | ----- | ----- | ------ | --- |
+
+
+| Hand | \$n\$ |  Yes  |  No  |
+| ---- | ----- | ----- | ---- |
+EOF
 
 # --------------------------------------------------------------------
 # pairs
@@ -284,7 +299,10 @@ EOF
     echo -e "\tuncertain"
    fi
   done
- 
+
+  echo "| ${t}${hand}-${upcard} | ${n} | ${ev_y} (${error_y}) | ${ev_n} (${error_n}) |" >> table.md
+  
+  
   strategy[${t}${hand},${upcard}]=${best}
    
   # save the strategy again with the best strategy
@@ -298,6 +316,8 @@ EOF
   done
  done
 done
+
+echo "| ---- | ----- | ----- | ---- |" >> table.md
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt

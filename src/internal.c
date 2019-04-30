@@ -171,7 +171,9 @@ int dealer_to_internal(player_t *player, const char *command) {
   
   if (strncmp(command, "play?", 5) == 0) {
     response = NULL;   
-    if (player->current_hand->n_cards == 2 && player->current_hand->cards->value == player->current_hand->cards->next->value) {
+    if (player->has_split < 1 &&
+        player->current_hand->n_cards == 2 &&
+        player->current_hand->cards->value == player->current_hand->cards->next->value) {
       if (strategy[PAIR][player->current_hand->cards->value][blackjack.dealer_hand->cards->value] == 'y') {
         response = split;
       }

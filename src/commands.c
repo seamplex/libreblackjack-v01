@@ -30,10 +30,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int write_formatted_card(player_t *player, char *command, card_t *card) {
+int write_formatted_card(player_t *player, int dealer, char *command, card_t *card) {
   char full_command[BUF_SIZE];
   
-  if (player->has_split == 0) {
+  if (player->has_split == 0 || dealer != 0) {
     snprintf(full_command, BUF_SIZE-1, "%s %s", command, card->token[player->token_type]);
   } else {
     snprintf(full_command, BUF_SIZE-1, "%s %s #%d", command, card->token[player->token_type], player->current_hand->id);
