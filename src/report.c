@@ -31,6 +31,8 @@ int write_yaml_report(player_t *player) {
   struct rusage usage;
   double wall;
   double ev, error;
+  int precision;
+  char format[32];
   
   if ((file = blackjack_ini.yaml_report) == NULL) {
     file = stderr;
@@ -105,11 +107,21 @@ int write_yaml_report(player_t *player) {
 //  error = sqrt(player->variance / (double)(player->total_money_waged))
   error = sqrt(player->variance / (double)(blackjack.hand));
   
+  precision = (int)(ceil(-log10(error)))-2;
+  if (precision >= 0) {
+    snprintf(format, 32, ("%%+.%df ± %%.%df"), precision, precision);
+  } else {
+    snprintf(format, 32, ("%%+.0f ± %%.0f"));
+  }
+  
+  
   fprintf(file, "  return:             %+g\n", ev);
   fprintf(file, "  variance:           % g\n", player->variance);
   fprintf(file, "  deviation:          % g\n", sqrt(player->variance));
   fprintf(file, "  error:              % g\n", sqrt(player->variance / (double)(blackjack.hand)));
-  fprintf(file, "  result:             \"(%+.2f ± %.2f) %%\"\n", 100.0*ev, 100*error);
+  fprintf(file, "  result:             \"("),
+      fprintf(file, format, 100.0*ev, 100*error);
+                          fprintf(file, ") %%\"\n");
   fprintf(file, "...\n");  
   
   return 0;

@@ -236,7 +236,12 @@ int dealer_action(void) {
         }
         if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
         
-        blackjack.next_dealer_action = ASK_FOR_PLAY;
+        if (player->current_hand->count == 21) {
+          blackjack.next_dealer_action = MOVE_ON_TO_NEXT_HAND;
+        } else {
+          blackjack.next_dealer_action = ASK_FOR_PLAY;
+        } 
+          
         
       } else {
         // TODO: ver si ya terminamos con todos los jugadores

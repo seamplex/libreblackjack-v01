@@ -1,8 +1,14 @@
+---
+title: LibreBlackjack, a free blackjack back-end
+lang: en-US
+...
+
+
 # LibreBlackjack
 
 > A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back-end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
 
-[LibreBlackjack](https:/www.seamplex.com/libreblackjack) is a blackjack engine that emulates a dealer, deals cards and understands commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or automated way through
+[LibreBlackjack](https:/www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals cards and understands commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or automated way through
  
  * the standard input,
  * named pipes,
@@ -14,18 +20,20 @@ These players can be actual human players playing in real-time through a front-e
 
 ## Why
 
-> I am often surprised that when people drive down two-lane roads, they will trust complete strangers in the oncoming lane not to swerve into their lane causing a head-on collision; but they will not trust mathematicians to create the correct strategy for Blackjack.
+:::{.alert .alert-light}
+> “I am often surprised that when people drive down two-lane roads, they will trust complete strangers in the oncoming lane not to swerve into their lane causing a head-on collision; but they will not trust mathematicians to create the correct strategy for Blackjack.”
 >
-> _Norman Wattenberger, Modern Blackjack, 2009_
+> [Norman Wattenberger, Modern Blackjack, 2009]{.blockquote-footer}
+:::
 
-With LibreBlackjack you do not have to trust other people anymore. You have a free blacjack engine which you can
+With LibreBlackjack you do not have to trust other people anymore. You have a free blackjack engine which you can
 
  0. run as you wish, to see the results of billions of blackjack hands,
  1. study to see how it works and change it if you do not like it,
  2. share it with your friends and colleagues, and
- 3. distribuite copies of your modified versions.
+ 3. distribute copies of your modified versions.
 
-If you do not know how to program, you have the _freedom_ to hire a programmer to do it for you. That is why [LibreBlackjack](https:/www.seamplex.com/libreblackjack) is [free software](https://www.gnu.org/philosophy/free-sw.html).
+If you do not know how to program, you have the _freedom_ to hire a programmer to do it for you. That is why [LibreBlackjack](https:/www.seamplex.com/blackjack) is [free software](https://www.gnu.org/philosophy/free-sw.html).
 
 
 ## How 
@@ -68,7 +76,7 @@ Run as test suite to check the code work as expected.
 $ make check
 ```
 
-The subdirectory `players` contains some automatic players that play against LibreBlackjack. These players are coded in different languages and communicate with LibreBlackjack in a variery of ways in order to illustrate the design basis:
+The subdirectory `players` contains some automatic players that play against LibreBlackjack. These players are coded in different languages and communicate with LibreBlackjack in a variety of ways in order to illustrate the design basis:
 
  * `00-internal-player` uses the internal player that defaults to playing one million hands of basic strategy
  * `02-always-stand`, using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to libreblackjack’s standard input) no matter what the cards are
@@ -114,8 +122,8 @@ LibreBlackjack is free software; you can redistribute it and/or modify it under 
 
 # Further information
 
-Home page: <https://www.seamplex.com/libreblackjack>  
-Repository: <https://github.com/seamplex/libreblackjack>  
+Home page: <https://www.seamplex.com/blackjack>  
+Repository: <https://github.com/seamplex/blackjack>  
 Mailing list and bug reports: <wasora@seamplex.com>  (you need to subscribe first at <wasora+subscribe@seamplex.com>)  
 Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA) [LinkedIn](https://www.linkedin.com/company/seamplex/) [Bitbucket](https://bitbucket.org/seamplex/)
 
@@ -125,4 +133,4 @@ libreblackjack is copyright (C) 2016,2019 Jeremy Theler
 libreblackjack is licensed under [GNU GPL version 3](http://www.gnu.org/copyleft/gpl.html) or (at your option) any later version.  
 libreblackjack is free software: you are free to change and redistribute it.  
 There is NO WARRANTY, to the extent permitted by law.  
-See the file [`COPYING`](https://bitbucket.org/seamplex/libreblackjack/src/default/COPYING) for copying conditions.  
+See the file `COPYING` for copying conditions.  

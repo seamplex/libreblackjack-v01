@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
   }
 
   // TODO: ver  
-  if (stdout_opts.isatty || blackjack.players->dealer2player.ipc_type != ipc_none) {
+  if (stdout_opts.isatty) {
     libreblackjack_shortversion();
     libreblackjack_copyright();
   }
