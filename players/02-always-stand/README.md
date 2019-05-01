@@ -12,8 +12,8 @@ The UNIX command `yes stand` writes the string `stand` repeteadly to the standar
 
 The `/dev/null` part is important, otherwise libreblackjack will think that there is a human at the other side of the table and will
 
-  a. go slower, and
-  b. give all the details of the dealt hands in the terminal as ASCII (actually UTF-8) art
+  1. run slower, and
+  2. give all the details of the dealt hands in the terminal as ASCII (actually UTF-8) art
 
 This example is only one-way (i.e. the player ignores what the dealer says) so it is better to redirect the standard output to `/dev/null` to save execution time. The results are written as a [YAML](http://yaml.org/)-formatted data to `stderr` by default once the hands are over, so they will show up in the terminal nevertheless. This format is human-friendly (far more than JSON) so it can be easily parsed, but it also allows complex objects to be represented (arrays, lists, etc.).
 
