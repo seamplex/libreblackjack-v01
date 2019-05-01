@@ -1,4 +1,4 @@
-## Mimic the dealer
+# Mimic the dealer
 
 > Difficulty: 08/100
 

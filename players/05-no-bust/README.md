@@ -1,4 +1,4 @@
-## No-bust strategy
+# No-bust strategy
 
 > Difficulty: 05/100
 
@@ -54,7 +54,7 @@ The very same player may be implemented as a shell script:
 ```
 #!/bin/sh
 
-while command=`line`
+while read command
 do
   if test "${command}" = 'bye'; then
     exit
@@ -62,10 +62,10 @@ do
     echo 1  
   elif test "${command}" = 'insurance?'; then
     echo "no"
-  elif test "${command}" = 'play?'; then
+  elif test "`echo ${command} | cut -c-5`" = 'play?'; then
     echo "count"
-    count=`line`
-    play=`line`      # libreblackjack will ask again for 'play?'
+    read count
+    read play      # libreblackjack will ask again for 'play?'
     if test ${count} -lt 12; then
       echo "hit"
     else
@@ -73,6 +73,7 @@ do
     fi
   fi
 done
+
 ```
 
 To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
@@ -81,16 +82,20 @@ To check these two players give the same results, make them play agains librebla
 $ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
 $ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
 $ diff perl.yml shell.yml 
-15,17c15,17
-< cpu_user:               0.024
-< cpu_system:             0.024
-< cpu_wall:               0.095334
+15,19c15,19
+<   user:             0.005079
+<   system:           0.015238
+<   wall:             0.029194
+<   second_per_hand:  2.9e-05
+<   hands_per_second: 3.4e+04
 ---
-> cpu_user:               0.06
-> cpu_system:             0.04
-> cpu_wall:               5.64883
+>   user:             0.128252
+>   system:           0.119702
+>   wall:             12.7548
+>   second_per_hand:  1.3e-02
+>   hands_per_second: 7.8e+01
 ```
 
-As expected, the reports are the same. They just differ in the wall time because the shell script is orders of magnitude slower than its Perl-based counterpart. 
+As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
 
 > Exercise: modifiy the players so they always insure aces and see if it improves or degrades the result.

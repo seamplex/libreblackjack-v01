@@ -1,6 +1,6 @@
 #!/bin/sh
 
-while command=`line`
+while read command
 do
   if test "${command}" = 'bye'; then
     exit
@@ -10,8 +10,8 @@ do
     echo "no"
   elif test "`echo ${command} | cut -c-5`" = 'play?'; then
     echo "count"
-    count=`line`
-    play=`line`      # libreblackjack will ask again for 'play?'
+    read count
+    read play      # libreblackjack will ask again for 'play?'
     if test ${count} -lt 12; then
       echo "hit"
     else

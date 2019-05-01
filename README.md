@@ -78,17 +78,18 @@ $ make check
 
 The subdirectory `players` contains some automatic players that play against LibreBlackjack. These players are coded in different languages and communicate with LibreBlackjack in a variety of ways in order to illustrate the design basis:
 
- * `00-internal-player` uses the internal player that defaults to playing one million hands of basic strategy
- * `02-always-stand`, using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to libreblackjack’s standard input) no matter what the cards are
- * `05-no-bust` is a PERL-based player does not bust (i.e. hits if the hard total is less than twelve) that receives tha cards through the standard input but draws or stands using a FIFO to talk back to the dealer
- * `08-mimic-the-dealer` does tha same the dealer do (hits soft seventeens). It is implemented in AWK using two FIFOs.
+ * [`00-internal`](players/00-internal) uses the internal player that defaults to playing one million hands of basic strategy
+ * [`02-always-stand`](players/02-always-stand), using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to libreblackjack’s standard input) no matter what the cards are
+ * [`05-no-bust`](players/05-no-bust) is a PERL-based player does not bust (i.e. hits if the hard total is less than twelve) that receives tha cards through the standard input but draws or stands using a FIFO to talk back to the dealer
+ * [`08-mimic-the-dealer`](players/08-mimic-the-dealer) does tha same the dealer do (hits soft seventeens). It is implemented in AWK using two FIFOs.
+ * [`20-basic-strategy`](players/20-basic-strategy) derives the basic strategy from scratch in less than one minute.
 
 
 # Play
 
-Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII mode
+Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII (actually UTF-8) mode
 
-![ASCII playing](doc/ascii.png){.img-responsive}\ 
+![ASCII (UTF-8) playing!](doc/ascii.png){.img-fluid}
 
 Edit the file `libreblackjack.ini` to set up rules, arranged shoes and other options. Type `help` at the prompt to get it.
 
