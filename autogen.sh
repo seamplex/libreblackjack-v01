@@ -8,8 +8,8 @@
 
 # check for needed tools
 for i in git autoreconf make m4 fmt; do
-  if test -z "`which $i`"; then
-    echo "error: $i no not installed"
+  if test -z "`which ${i}`"; then
+    echo "error: ${i} is not installed"
     exit 1
   fi
 done
@@ -31,10 +31,10 @@ if test ${vcs} = "git"; then
  branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
  commitdate=`git log -1 --pretty=format:"%ad"`
  cat << EOF > src/version-vcs.h
-#define WASORA_VCS_BRANCH    "${branch}"
-#define WASORA_VCS_VERSION   "${version}"
-#define WASORA_VCS_DATE      "${commitdate}"
-#define WASORA_VCS_CLEAN     `git status --porcelain | wc -l`
+#define LIBREBLACKJACK_VCS_BRANCH    "${branch}"
+#define LIBREBLACKJACK_VCS_VERSION   "${version}"
+#define LIBREBLACKJACK_VCS_DATE      "${commitdate}"
+#define LIBREBLACKJACK_VCS_CLEAN     `git status --porcelain | wc -l`
 EOF
 
 else
@@ -51,8 +51,7 @@ if [ ! -z "`which pandoc`" ]; then
 #   cd ..
 else
   fmt README.md > README
-  cd doc
-  touch libreblackjack.texi
+  touch doc/libreblackjack.texi
 fi
 
 # touch ChangeLog
