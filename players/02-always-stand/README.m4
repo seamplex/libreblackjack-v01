@@ -1,17 +1,17 @@
-
+define(case_title, Always stand)
 ...
-title: Always stand
+title: case_title
 ---
 
-# Always stand
+# case_title
 # 
 
-> Difficulty: 02/100
+> Difficulty: case_difficulty/100
 
 To play libreblackjack as an “always-stander” run the following command:
 
 ```
-yes stand | libreblackjack -n1e5 --flat_bet --no_insurance > /dev/null
+esyscmd(sed s_../../libreblackjack_libreblackjack_ run.sh)dnl
 ```
 
 The UNIX command `yes stand` writes the string “stand” repeteadly to the standard output, which is piped to the executable `libreblackjack` (assumed to be installed system-wide). The arguments tell libreblackjack to play one thousand hundred hands (`-n1e5`) using a flat bet (`flat_bet`, it defaults to a unit bet in each hand) and without asking for insurance if the dealer shows an ace (`no_insurance`). As there is no `libreblackjack.ini` file, the rules are---as expected---the default ones (see the documentation for details).
@@ -26,7 +26,4 @@ This example is only one-way (i.e. the player ignores what the dealer says) so i
 
 As an exercise, verify that the analytical probability of getting a natural playing with a single deck (for both the dealer and the player) is 32/663 = 0.04826546...
 
--------
-:::{.text-center}
-[Previous](../00-internal) | [Index](../) | [Next](../05-no-bust)
-:::
+case_nav
