@@ -1,11 +1,11 @@
-
+define(case_title, Mimic the dealer)
 ...
-title: Mimic the dealer
+title: case_title
 ---
 
-# Mimic the dealer
+# case_title
 
-> Difficulty: 08/100
+> Difficulty: case_difficulty/100
 
 This example implements a “mimic-the-dealer strategy,” i.e. hits if the hand totals less than seventeen and stands on eighteen or more. The player stands on hard seventeen but hits on soft seventeen. 
 
@@ -37,46 +37,15 @@ In another terminal run the player
 Both dealer and player may be run in the same terminal putting the first one on the background:
 
 ```
-mkfifo mimic_d2p mimic_p2d
-libreblackjack &
-./mimic-the-dealer.awk < mimic_d2p > mimic_p2d
+esyscmd(sed s_../../libreblackjack_libreblackjack_ run.sh)dnl
 ```
 
 To understand the decisions taken by the player, we have to remember that when libreblackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
 
 ```
-#!/usr/bin/gawk -f
-function abs(x){return ( x >= 0 ) ? x : -x } 
-
-/bet\?/ {
-  print "1";
-  fflush();
-}
-
-/insurance\?/ {
-  print "no";
-  fflush();
-}
-
-/play\?/ {
-  count = $2
-  # mimic the dealer: hit until 17 (hit soft 17)
-  if (abs(count) < 17 || count == -17) {   # soft hands are negative
-    print "hit";
-  } else {
-    print "stand";
-  }
-  fflush();  
-}
-
-/bye/ {
-  exit;
-}
+include(mimic-the-dealer.awk)dnl
 ```
 
 > Exercise: modify the player and the ini file so both the dealer and the player may stand on soft seventeen. Analyze the four combinations (player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer h17, player s17 - dealer s17)
 
--------
-:::{.text-center}
-[Previous](../05-no-bust) | [Index](../) | [Next](../20-basic-strategy)
-:::
+case_nav

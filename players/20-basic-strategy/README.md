@@ -1,6 +1,11 @@
+
+...
+title: Derivation of the basic strategy
+---
+
 # Derivation of the basic strategy
 
-> Difficulty: 08/100
+> Difficulty: 20/100
 
 ## Quick run
 
@@ -32,13 +37,12 @@ h13  s  s  s  s  s  h  h  h  h  h
 h12  h  h  s  s  s  h  h  h  h  h  
 h11  d  d  d  d  d  d  d  d  d  d  
 h10  d  d  d  d  d  d  d  d  h  h  
-h9   h  d  d  d  d  h  h  h  h  h  
-h8   h  h  h  h  h  h  h  h  h  h  
-h7   h  h  h  h  h  h  h  h  h  h  
-h6   h  h  h  h  h  h  h  h  h  h  
-h5   h  h  h  h  h  h  h  h  h  h  
-h4   h  h  h  h  h  h  h  h  h  h  
-
+h9  h  d  d  d  d  h  h  h  h  h  
+h8  h  h  h  h  h  h  h  h  h  h  
+h7  h  h  h  h  h  h  h  h  h  h  
+h6  h  h  h  h  h  h  h  h  h  h  
+h5  h  h  h  h  h  h  h  h  h  h  
+h4  h  h  h  h  h  h  h  h  h  h  
 #    2  3  4  5  6  7  8  9  T  A
 s20  s  s  s  s  s  s  s  s  s  s  
 s19  s  s  s  s  d  s  s  s  s  s  
@@ -49,7 +53,6 @@ s15  h  h  d  d  d  h  h  h  h  h
 s14  h  h  h  h  d  h  h  h  h  h  
 s13  h  h  h  h  d  h  h  h  h  h  
 s12  h  h  h  h  d  h  h  h  h  h  
-
 #    2  3  4  5  6  7  8  9  T  A
 pA   y  y  y  y  y  y  y  y  y  y  
 pT   n  n  n  n  n  n  n  n  n  n  
@@ -64,11 +67,15 @@ p2   y  y  y  y  y  y  n  n  n  n
 ```
 
 
-## Detailed exaplanation
+## Detailed explanation
 
 We want to derive the basic strategy from scratch, i.e. without assuming anything. What we are going to do is to play a large (more on what _large_ means below) number of hands by fixing our first two cards and the dealer upcard and sequentially standing, doubling or hitting the first card. Then we will compare the results for the three cases and select as the proper strategy the better one.
 
 Standing and doubling are easy plays, because after we stand or double the dealer plays accordingly to the rules. She hits until seventeen (either soft or hard). But if we hit on our hand, we might need to make another decision wether to stand or hit again. As we do not want to assume anything, we have to play in such an order that if we do need to make another decision, we already know which is the better one. 
 
-TO BE COMPLETED
+**TO BE COMPLETED**
 
+-------
+:::{.text-center}
+[Previous](../08-mimic-the-dealer) | [Index](../) | [Next](../)
+:::

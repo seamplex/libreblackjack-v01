@@ -4,7 +4,6 @@ title: case_title
 ---
 
 # case_title
-# 
 
 > Difficulty: case_difficulty/100
 

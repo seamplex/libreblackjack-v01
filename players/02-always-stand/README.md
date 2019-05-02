@@ -4,7 +4,6 @@ title: Always stand
 ---
 
 # Always stand
-# 
 
 > Difficulty: 02/100
 
