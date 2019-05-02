@@ -1,7 +1,7 @@
 
-...
-title: Derivation of the basic strategy
 ---
+title: Derivation of the basic strategy
+...
 
 # Derivation of the basic strategy
 
@@ -35,7 +35,7 @@ h15  s  s  s  s  s  h  h  h  h  h
 h14  s  s  s  s  s  h  h  h  h  h  
 h13  s  s  s  s  s  h  h  h  h  h  
 h12  h  h  s  s  s  h  h  h  h  h  
-h11  d  d  d  d  d  d  d  d  d  d  
+h11  d  d  d  d  d  d  d  d  d  h  
 h10  d  d  d  d  d  d  d  d  h  h  
 h9  h  d  d  d  d  h  h  h  h  h  
 h8  h  h  h  h  h  h  h  h  h  h  
@@ -50,7 +50,7 @@ s18  d  d  d  d  d  s  s  h  h  h
 s17  h  d  d  d  d  h  h  h  h  h  
 s16  h  h  d  d  d  h  h  h  h  h  
 s15  h  h  d  d  d  h  h  h  h  h  
-s14  h  h  h  h  d  h  h  h  h  h  
+s14  h  h  h  d  d  h  h  h  h  h  
 s13  h  h  h  h  d  h  h  h  h  h  
 s12  h  h  h  h  d  h  h  h  h  h  
 #    2  3  4  5  6  7  8  9  T  A

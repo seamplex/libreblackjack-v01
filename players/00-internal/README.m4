@@ -1,7 +1,7 @@
 define(case_title, Internal player)
-...
-title: case_title
 ---
+title: case_title
+...
 
 # case_title
 

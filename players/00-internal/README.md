@@ -1,7 +1,7 @@
 
-...
-title: Internal player
 ---
+title: Internal player
+...
 
 # Internal player
 

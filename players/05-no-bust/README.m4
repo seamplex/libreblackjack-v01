@@ -1,6 +1,11 @@
-# No-bust strategy
+define(case_title, No-bust strategy)
+---
+title: case_title
+...
 
-> Difficulty: 05/100
+# case_title
+
+> Difficulty: case_difficulty/100
 
 This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with libreblackjack. The communication between the player and the backend is through standard input and output. The player reads from its standard input libreblackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
 
@@ -11,69 +16,19 @@ $ mkfifo fifo
 Then we execute libreblackjack, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
 
 ```
-../../libreblackjack -n1e5 < fifo | ./no-bust.pl > fifo
+esyscmd(sed s_../../libreblackjack_libreblackjack_ run.sh)dnl
 ```
 
 As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
 
-```
-#!/usr/bin/perl
-# this is needed to avoid deadlock with the fifo
-STDOUT->autoflush(1);
-
-while ($command ne "bye") {
-  # do not play more than a number of commands
-  # if the argument -n was not passed to libreblackjack
-  if ($i++ == 123456789) {
-    print "quit\n";
-    exit;
-  }
-  
-  # read and process the commands
-  chomp($command = <STDIN>);
-  
-  if ($command eq "bet?") {
-    print "1\n";
-  } elsif ($command eq "insurance?") {
-    print "no\n";
-  } elsif ($command eq "play?") {
-    print "count\n";
-    chomp($count = <STDIN>); # the count
-    chomp($play = <STDIN>);  # again the "play?" query
-    if ($count < 12) {
-      print "hit\n";
-    } else {
-      print "stand\n";
-    }
-  }
-}
+```perl
+include(no-bust.pl)dnl
 ```
 
 The very same player may be implemented as a shell script:
 
-```
-#!/bin/sh
-
-while read command
-do
-  if test "${command}" = 'bye'; then
-    exit
-  elif test "${command}" = 'bet?'; then
-    echo 1  
-  elif test "${command}" = 'insurance?'; then
-    echo "no"
-  elif test "`echo ${command} | cut -c-5`" = 'play?'; then
-    echo "count"
-    read count
-    read play      # libreblackjack will ask again for 'play?'
-    if test ${count} -lt 12; then
-      echo "hit"
-    else
-      echo "stand"
-    fi
-  fi
-done
-
+```bash
+include(no-bust.sh)
 ```
 
 To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
@@ -82,20 +37,11 @@ To check these two players give the same results, make them play agains librebla
 $ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
 $ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
 $ diff perl.yml shell.yml 
-15,19c15,19
-<   user:             0.005079
-<   system:           0.015238
-<   wall:             0.029194
-<   second_per_hand:  2.9e-05
-<   hands_per_second: 3.4e+04
----
->   user:             0.128252
->   system:           0.119702
->   wall:             12.7548
->   second_per_hand:  1.3e-02
->   hands_per_second: 7.8e+01
+esyscmd(diff perl.yml shell.yml)dnl
 ```
 
 As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
 
 > Exercise: modifiy the players so they always insure aces and see if it improves or degrades the result.
+
+case_nav

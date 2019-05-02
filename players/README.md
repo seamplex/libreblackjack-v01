@@ -1,6 +1,6 @@
-...
-title: Example players for LibreBlackjack
 ---
+title: Example players for LibreBlackjack
+...
 
 # Example players for LibreBlackjack
 

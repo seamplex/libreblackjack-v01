@@ -1,7 +1,7 @@
 define(case_title, Mimic the dealer)
-...
-title: case_title
 ---
+title: case_title
+...
 
 # case_title
 
@@ -42,7 +42,7 @@ esyscmd(sed s_../../libreblackjack_libreblackjack_ run.sh)dnl
 
 To understand the decisions taken by the player, we have to remember that when libreblackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
 
-```
+```awk
 include(mimic-the-dealer.awk)dnl
 ```
 

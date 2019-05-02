@@ -321,3 +321,4 @@ echo "| ---- | ----- | ----- | ---- |" >> table.md
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt
+./clean.sh

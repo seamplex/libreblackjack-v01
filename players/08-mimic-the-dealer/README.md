@@ -1,7 +1,7 @@
 
-...
-title: Mimic the dealer
 ---
+title: Mimic the dealer
+...
 
 # Mimic the dealer
 
@@ -44,7 +44,7 @@ libreblackjack &
 
 To understand the decisions taken by the player, we have to remember that when libreblackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
 
-```
+```awk
 #!/usr/bin/gawk -f
 function abs(x){return ( x >= 0 ) ? x : -x } 
 

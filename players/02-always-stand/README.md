@@ -1,7 +1,7 @@
 
-...
-title: Always stand
 ---
+title: Always stand
+...
 
 # Always stand
 

@@ -1,7 +1,7 @@
 define(case_title, Derivation of the basic strategy)
-...
-title: case_title
 ---
+title: case_title
+...
 
 # case_title
 

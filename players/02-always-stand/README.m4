@@ -1,7 +1,7 @@
 define(case_title, Always stand)
-...
-title: case_title
 ---
+title: case_title
+...
 
 # case_title
 

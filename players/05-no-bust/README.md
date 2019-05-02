@@ -1,3 +1,8 @@
+
+---
+title: No-bust strategy
+...
+
 # No-bust strategy
 
 > Difficulty: 05/100
@@ -11,12 +16,15 @@ $ mkfifo fifo
 Then we execute libreblackjack, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
 
 ```
-../../libreblackjack -n1e5 < fifo | ./no-bust.pl > fifo
+if test ! -e fifo; then
+ mkfifo fifo
+fi
+libreblackjack -n1e5 < fifo | ./no-bust.pl > fifo
 ```
 
 As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
 
-```
+```perl
 #!/usr/bin/perl
 # this is needed to avoid deadlock with the fifo
 STDOUT->autoflush(1);
@@ -36,7 +44,7 @@ while ($command ne "bye") {
     print "1\n";
   } elsif ($command eq "insurance?") {
     print "no\n";
-  } elsif ($command eq "play?") {
+  } elsif ($comm eq "play?") {
     print "count\n";
     chomp($count = <STDIN>); # the count
     chomp($play = <STDIN>);  # again the "play?" query
@@ -51,7 +59,7 @@ while ($command ne "bye") {
 
 The very same player may be implemented as a shell script:
 
-```
+```bash
 #!/bin/sh
 
 while read command
@@ -99,3 +107,8 @@ $ diff perl.yml shell.yml
 As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
 
 > Exercise: modifiy the players so they always insure aces and see if it improves or degrades the result.
+
+-------
+:::{.text-center}
+[Previous](../02-always-stand) | [Index](../) | [Next](../08-mimic-the-dealer)
+:::

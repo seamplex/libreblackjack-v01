@@ -7,7 +7,6 @@ current_prev=""
 i=1
 for dir in *; do
  if [ -e ${dir}/README.m4 ]; then
-  echo $dir
   cases[${i}]=$dir
   next[$((${i} - 1))]=$dir
   prev[${i}]=$current_prev
