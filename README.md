@@ -87,7 +87,7 @@ The subdirectory `players` contains some automatic players that play against Lib
 
 # Play
 
-Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII (actually UTF-8) mode
+Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII (actually UTF-8) mode.
 
 ![ASCII (UTF-8) playing!](doc/ascii.png){.img-fluid}
 
@@ -95,11 +95,13 @@ Edit the file `libreblackjack.ini` to set up rules, arranged shoes and other opt
 
 ## Automatic playing
 
-See the directory `players` for examples of how to write players in
+The differential value of LibreBlackjack is that players can be programmed to play employing different strategies, card-counting techniques or even state-of-the-art AI algorithms.
 
- * a pure UNIX way using the `yes` tool
- * Perl
- * Awk
+See the directory [`players`](players) for examples of how to write players in
+
+ * [a pure UNIX way using the `yes` tool](players/02-always-stand)
+ * [Perl](players/05-no-bust)
+ * [Awk](players/08-mimic-the-dealer)
  * Python
  * C
  
