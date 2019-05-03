@@ -5,7 +5,7 @@ dist_doc_DATA = README
 
 TESTS = 00-internal 02-always-stand 05-no-bust 08-mimic-the-dealer
 LOG_COMPILER = players/check.sh
-EXTRA_DIST = players src/version.sh src/version-vcs.h $(TESTS)
+EXTRA_DIST = libreblackjack.ini  src/version.sh src/version-vcs.h $(TESTS)
 
 # ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 bin_PROGRAMS = libreblackjack
