@@ -7,6 +7,7 @@ for i in grep cut bc awk; do
  fi
 done
 
+debug=0
 
 declare -A strategy
 declare -A ev
@@ -14,6 +15,8 @@ declare -A ev
 declare -A min
 min["hard"]=4   # from 20 to 4 in hards
 min["soft"]=12  # from 20 to 12 in softs
+
+rm -f hard.html soft.html pair.html
 
 # --------------------------------------------------------------
 # start with standing
@@ -24,6 +27,7 @@ cat << EOF > table.md
 | Hand | \$n\$ | Stand | Double | Hit |
 | ---- | ----- | ----- | ------ | --- |
 EOF
+
 
 for type in hard soft; do
  for hand in `seq 20 -1 ${min[${type}]}`; do
@@ -43,9 +47,19 @@ for type in hard soft; do
    card1=1
    card2=$((${hand} - 10 - ${card1}))
   fi
+
+  cat << EOF >> ${type}.html
+ <tr>
+  <td>${t}${hand}</td>
+  <td>
+   <div class="text-right">s<span class="d-none d-lg-inline">tand</span></div>
+   <div class="text-right">h<span class="d-none d-lg-inline">it</span></div>
+   <div class="text-right">d<span class="d-none d-lg-inline">ouble</span></div>
+  </td>
+EOF
   
   for upcard in `seq 2 9` T A; do
- 
+  
    if [ "$upcard" = "T" ]; then
      upcard_n=10
    elif [ "$upcard" = "A" ]; then
@@ -95,7 +109,12 @@ EOF
      rm -f ${type}.txt
      for h in `seq 20 -1 ${min[${type}]}`; do
       echo -n "${t}${h}  " >> ${type}.txt
-      # TODO: extra space if h < 10
+      
+      # extra space if h < 10
+      if [ ${h} -lt 10 ]; then
+       echo -n " " >> ${type}.txt
+      fi 
+      
       for u in `seq 2 9` T A; do
        echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
       done
@@ -103,7 +122,9 @@ EOF
      done
      
      # debug, comment for production
-#      cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
+     if [ "${debug}" != "0" ]; then
+      cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
+     fi
     
      # ensamble the full bs.txt with no pairing
      cat hard.txt soft.txt pair-no.txt > bs.txt
@@ -157,28 +178,49 @@ EOF
      echo -e "\tuncertain"
     fi
    done
- 
-   echo "| ${t}${hand}-${upcard} | ${n} | ${ev_s} (${error_s}) | ${ev_d} (${error_d}) | ${ev_h} (${error_h}) |" >> table.md
+
    strategy[${t}${hand},${upcard}]=${best}
+   
+   
+   
+   echo "| ${t}${hand}-${upcard} | ${n} | ${ev_s} (${error_s}) | ${ev_h} (${error_h}) | ${ev_d} (${error_d}) |" >> table.md
+   
+   echo " <!-- ${upcard} -->" >> ${type}.html
+   echo " <td>" >> ${type}.html
+   echo ${ev_s} ${error_s} | awk -f cell.awk >> ${type}.html
+   echo ${ev_h} ${error_h} | awk -f cell.awk >> ${type}.html
+   echo ${ev_d} ${error_d} | awk -f cell.awk >> ${type}.html
+   echo " </td>" >> ${type}.html
+   
    
    # save the strategy again with the best strategy
    rm -f ${type}.txt
    for h in `seq 20 -1 ${min[${type}]}`; do
     echo -n "${t}${h}  " >> ${type}.txt
-    # TODO: extra space if h < 10
+    
+    # extra space if h < 10
+    if [ ${h} -lt 10 ]; then
+     echo -n " " >> ${type}.txt
+    fi 
+    
     for u in `seq 2 9` T A; do
      echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
     done
+    
     echo >> ${type}.txt
+    
    done
-  
   done
+  
+  echo "</tr>" >> ${type}.html
+  
  done
 done
 
 
 cat << EOF >> table.md
 | ---- | ----- | ----- | ------ | --- |
+
 
 
 | Hand | \$n\$ |  Yes  |  No  |
@@ -199,6 +241,15 @@ for hand in A T `seq 9 -1 2`; do
  else
   pair=$((${hand}))
  fi
+  
+ cat << EOF >> ${type}.html
+ <tr>
+  <td>${t}${hand}</td>
+  <td>
+   <div class="text-right">y<span class="d-none d-lg-inline">es</span></div>
+   <div class="text-right">n<span class="d-none d-lg-inline">o</span></div>
+  </td>
+EOF
   
  for upcard in `seq 2 9` T A; do
   if [ "$upcard" = "T" ]; then
@@ -256,8 +307,9 @@ EOF
      echo >> ${type}.txt
     done
      
-    # debug, comment for production
-#     cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
+    if [ "${debug}" != "0" ]; then
+     cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
+    fi  
     
     # ensamble the full bs.txt
     cat hard.txt soft.txt pair.txt > bs.txt
@@ -268,6 +320,7 @@ EOF
     # evaluate the results
     ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
     error[${t}${hand},${upcard},${play}]=`grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}'`
+    
    done
    
    # choose the best one
@@ -302,6 +355,12 @@ EOF
 
   echo "| ${t}${hand}-${upcard} | ${n} | ${ev_y} (${error_y}) | ${ev_n} (${error_n}) |" >> table.md
   
+  echo " <!-- ${upcard} -->" >> ${type}.html
+  echo " <td>" >> ${type}.html
+  echo ${ev_y} ${error_y} | awk -f cell.awk >> ${type}.html
+  echo ${ev_n} ${error_n} | awk -f cell.awk >> ${type}.html
+  echo " </td>" >> ${type}.html
+  
   
   strategy[${t}${hand},${upcard}]=${best}
    
@@ -321,4 +380,9 @@ echo "| ---- | ----- | ----- | ---- |" >> table.md
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt
-./clean.sh
+if [ "${debug}" == "0" ]; then
+ rm -f *.yaml
+ rm -f *.str
+ rm -f *.log
+fi
+ 

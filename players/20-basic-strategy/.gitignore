@@ -1,9 +1,10 @@
 *.yaml
 *.str
-*.result
 *.log
 hard.txt
 soft.txt
 pair.txt
+bs.txt
+*.html
 table.md
 libreblackjack.ini

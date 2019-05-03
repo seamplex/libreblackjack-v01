@@ -101,10 +101,7 @@ int write_yaml_report(player_t *player) {
   fprintf(file, "  final_bankroll:     %g\n", (double)player->bankroll);  
   
   // return is a keyword!
-//  ev = (double)player->bankroll/player->total_money_waged;
   ev = (double)player->bankroll/(double)blackjack.hand;
-
-//  error = sqrt(player->variance / (double)(player->total_money_waged))
   error = sqrt(player->variance / (double)(blackjack.hand));
   
   precision = (int)(ceil(-log10(error)))-2;

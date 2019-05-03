@@ -28,6 +28,49 @@ A new text file called `bs.txt` with the strategy should be created from scratch
 include(bs.txt)dnl
 ```
 
+## Full table with results
+
+The script computes the expected value of each combination
+
+ 1. Player’s hand (hard, soft and pair)
+ 2. Dealer upcard
+ 3. Hit, soft and stand (for hards and softs) and splitting or not (for pairs)
+ 
+The results are given as the expected value in percentage with the uncertainty (one standard deviation) in the last significant digit.
+ 
+
+define(table_head,
+ <thead>
+  <tr>
+   <th class="text-center" width="10%" colspan="2">Hand</th>
+   <th class="text-center" width="9%">2</th>
+   <th class="text-center" width="9%">3</th>
+   <th class="text-center" width="9%">4</th>
+   <th class="text-center" width="9%">5</th>
+   <th class="text-center" width="9%">6</th>
+   <th class="text-center" width="9%">7</th>
+   <th class="text-center" width="9%">8</th>
+   <th class="text-center" width="9%">9</th>
+   <th class="text-center" width="9%">T</th>
+   <th class="text-center" width="9%">A</th>
+  </tr>
+ </thead> 
+)
+ 
+<table class="table table-sm table-responsive table-hover small w-100">
+ table_head
+ <tbody> 
+include(hard.html)
+ </tbody>
+ table_head
+ <tbody> 
+include(soft.html)
+ </tbody>
+ table_head
+ <tbody> 
+include(pair.html)
+ </tbody>
+</table>
 
 ## Detailed explanation
 
@@ -36,5 +79,6 @@ We want to derive the basic strategy from scratch, i.e. without assuming anythin
 Standing and doubling are easy plays, because after we stand or double the dealer plays accordingly to the rules. She hits until seventeen (either soft or hard). But if we hit on our hand, we might need to make another decision wether to stand or hit again. As we do not want to assume anything, we have to play in such an order that if we do need to make another decision, we already know which is the better one. 
 
 **TO BE COMPLETED**
+
 
 case_nav
