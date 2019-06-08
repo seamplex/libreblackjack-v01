@@ -8,7 +8,7 @@ lang: en-US
 
 > A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back-end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
 
-[LibreBlackjack](https:/www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals cards and understands commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or automated way through
+[LibreBlackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals cards and understands commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or automated way through
  
  * the standard input,
  * named pipes,
