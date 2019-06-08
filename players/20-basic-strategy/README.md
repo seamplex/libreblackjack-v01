@@ -1516,15 +1516,7 @@ When dealing with pairs, we have to decide wether to split or not. When we do no
 
 ### Number of hands
 
-The output is the expected value~$e$ of the bankroll, which is a random variable with an associated uncertainty~$\Delta e$ (i.e. a certain numbers of standard deviations). For example, if we received only blackjacks, the expected value would be 1.5 (provided blackjacks pay 3 to 2). If we busted all of our hands without doubling or splitting, the expected value would be -1. In order to say that the best strategy is, let’s say stand and not hitting or doubling, we have to make sure that
-
-\[ e_h-\Delta e_h > e_s+\Delta e_s \]
-
-and
-
-\[ e_h-\Delta e_h > e_d+\Delta e_d \]
-
-If there is no play that can give a better expected value than the other two taking into account the uncertainties, then we have to play more hands in order to reduce the random uncertainty.
+The output is the expected value\ $e$ of the bankroll, which is a random variable with an associated uncertainty\ $\Delta e$ (i.e. a certain numbers of standard deviations). For example, if we received only blackjacks, the expected value would be 1.5 (provided blackjacks pay 3 to 2). If we busted all of our hands without doubling or splitting, the expected value would be -1. In order to say that the best strategy is, let’s say stand and not hitting or doubling, we have to make sure that $e_h-\Delta e_h > e_s+\Delta e_s$ and $e_h-\Delta e_h > e_d+\Delta e_d$. If there is no play that can give a better expected value than the other two taking into account the uncertainties, then we have to play more hands in order to reduce the random uncertainty.
 
 
 ## Implementation
