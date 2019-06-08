@@ -5,10 +5,8 @@ mimic the dealer -5.5% single s17
 referencias en griffin chapter 2 a historia de bs
 definition of bs p42
 uses bjinit & uthash & yaml
-ascii utf8
 thorp wiki/page
 remove cards from deck
-ojo! el arranged sirve para decks infinitos, para finitos hay que poner shuffle after deal
 +10 par de 5, 12 hard 12, -12 par de aces
 eric farmer
 https://www.qfit.com/book/ModernBlackjackPage68.htm

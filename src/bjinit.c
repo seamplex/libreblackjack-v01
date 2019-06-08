@@ -109,6 +109,9 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
   } else if (MATCH("", "max_incorrect_commands")) {
     if (blackjack_ini.max_invalid_commands == -1 ) { blackjack_ini.max_invalid_commands = atoi(value); }
 
+  } else if (MATCH("", "error_standard_deviations")) {
+    if (blackjack_ini.error_standard_deviations == -1 ) { blackjack_ini.error_standard_deviations = atof(value); }
+    
   } else if (MATCH("", "log")) {
     if (blackjack_ini.log == NULL ) {
       if ((blackjack_ini.log = fopen(value, "w")) == NULL) {
@@ -296,6 +299,7 @@ int bjinit(char *cmdline_file_path) {
   if (blackjack_ini.double_after_split == -1) { blackjack_ini.double_after_split = 1; }
   if (blackjack_ini.hit_soft_17 == -1) { blackjack_ini.hit_soft_17 = 1; }
   if (blackjack_ini.blackjack_pays == 0) { blackjack_ini.blackjack_pays = 3.0/2.0; }
+  if (blackjack_ini.error_standard_deviations == 0) { blackjack_ini.error_standard_deviations = 2.0; }
   if (blackjack_ini.max_invalid_commands == -1) { blackjack_ini.max_invalid_commands = 100; }
   if (blackjack_ini.shuffle_every_hand == -1) { blackjack_ini.shuffle_every_hand = 0; }
   

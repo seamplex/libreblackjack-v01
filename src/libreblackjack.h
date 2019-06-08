@@ -97,7 +97,6 @@ struct {
   int decks;                     // -1 for infinite
   unsigned long int hands;       // max hands (read from ini or commandline)
   int rng_seed;                  // zero = read from /dev/urandom
-  // TODO: take new seeds every N decks
   int number_of_burnt_cards;     // number of burnt cards after shuffling
   int no_negative_bankroll;      // do not allow negative bankrolls
   int max_bet;
@@ -113,6 +112,7 @@ struct {
   double penetration;
   double penetration_sigma;
   double blackjack_pays;
+  double error_standard_deviations;
   
 } blackjack_ini;
 

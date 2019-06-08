@@ -102,7 +102,7 @@ int write_yaml_report(player_t *player) {
   
   // return is a keyword!
   ev = (double)player->bankroll/(double)blackjack.hand;
-  error = sqrt(player->variance / (double)(blackjack.hand));
+  error = blackjack_ini.error_standard_deviations * sqrt(player->variance / (double)(blackjack.hand));
   
   precision = (int)(ceil(-log10(error)))-2;
   if (precision >= 0) {

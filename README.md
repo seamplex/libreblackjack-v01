@@ -102,8 +102,9 @@ See the directory [`players`](players) for examples of how to write players in
  * [a pure UNIX way using the `yes` tool](players/02-always-stand)
  * [Perl](players/05-no-bust)
  * [Awk](players/08-mimic-the-dealer)
- * Python
+ * [Bash](players/20-basic-strategy)
  * C
+ * Python
  
 ## TCP Sockets
 
