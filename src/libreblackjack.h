@@ -170,6 +170,8 @@ struct {
 #ifdef HAVE_LIBGSL
   gsl_rng_type *rng_type;
   gsl_rng *rng;  
+#else
+  void gsl_rng *rng;
 #endif  
 
 } blackjack;
