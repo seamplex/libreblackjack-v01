@@ -1,3 +1,12 @@
+change name and move to savannah
+use gnulib or glib?
+remove parse_yaml
+manual -> texinfo
+gettext
+--help
+formatting https://www.gnu.org/prep/standards/standards.html#Formatting
+
+
 verbose dealer/quiet dealer
 motivation: bs flaw, check changes in strategy, AI for beating the dealer, switch casinos to free sw
 first qurstions: 1. how to play? 2. what is the ev? p41 griffin opt

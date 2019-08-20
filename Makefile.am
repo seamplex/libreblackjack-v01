@@ -1,3 +1,8 @@
+# Copyright (C) 2019 jeremy theler
+# This file is part of libreblackjack.
+# This file is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
 # SUBDIRS = doc
 AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README
@@ -5,7 +10,7 @@ dist_doc_DATA = README
 
 TESTS = 00-internal 02-always-stand 05-no-bust 08-mimic-the-dealer
 LOG_COMPILER = players/check.sh
-EXTRA_DIST = libreblackjack.ini  src/version.sh src/version-vcs.h $(TESTS)
+EXTRA_DIST = libreblackjack.ini  src/version.sh src/version-vcs.h players $(TESTS)
 
 # ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 bin_PROGRAMS = libreblackjack

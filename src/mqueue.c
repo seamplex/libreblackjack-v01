@@ -43,6 +43,7 @@ int create_mqueue(const char *name, mqd_t *mq) {
   
   if (((*mq) = mq_open(posix_name, O_RDWR | O_CREAT, 0666, &attr)) == -1) {
     blackjack_push_error_message("'%s' opening message queue '%s'", strerror(errno), name);
+    free(posix_name);
     return -1;
   }
   

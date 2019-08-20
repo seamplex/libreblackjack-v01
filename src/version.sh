@@ -1,3 +1,8 @@
+# Copyright (C) 2019 jeremy theler
+# This file is part of libreblackjack.
+# This file is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
 rm -f version.h
 
 if test -e ../.git -a ! -z "`which git`"; then
@@ -7,6 +12,12 @@ if test -e ../.git -a ! -z "`which git`"; then
  branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
  date=`git log --pretty=format:"%ad" | head -n1`
  cat << EOF > version-vcs.h
+/* Copyright (C) 2019 jeremy theler
+ * This file is part of libreblackjack.
+ * This file is free software: you are free to change and redistribute it.
+ * There is NO WARRANTY, to the extent permitted by law.
+ */
+
 #define LIBREBLACKJACK_VCS_BRANCH    "${branch}"
 #define LIBREBLACKJACK_VCS_VERSION   "${version}"
 #define LIBREBLACKJACK_VCS_DATE      "${date}"
