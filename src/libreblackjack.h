@@ -22,9 +22,11 @@
 #ifndef _LIBREBLACKJACK_H_
 #define _LIBREBLACKJACK_H_
 
-#include <gsl/gsl_types.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
+#ifdef HAVE_LIBGSL
+ #include <gsl/gsl_types.h>
+ #include <gsl/gsl_rng.h>
+ #include <gsl/gsl_randist.h>
+#endif 
 
 #include <semaphore.h>
 #include <mqueue.h>
