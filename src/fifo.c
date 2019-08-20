@@ -79,8 +79,12 @@ int dealer_to_fifo(player_t *player, const char *command) {
       printf("ok!\n");
     }
   
-    write(player->dealer2player.fd, command, strlen(command));
-    write(player->dealer2player.fd, "\n", 1);
+    if (write(player->dealer2player.fd, command, strlen(command)) == 0) {
+      return -1;
+    }
+    if (write(player->dealer2player.fd, "\n", 1) == 0) {
+      return -1;
+    }
     
   }
   
@@ -109,7 +113,9 @@ int player_from_fifo(player_t *player, char *buffer) {
       printf("ok!\n");
       fflush(stdout);
     }
-    fgets(buffer, BUF_SIZE-1, player->player2dealer.fp);
+    if (fgets(buffer, BUF_SIZE-1, player->player2dealer.fp) == NULL) {
+      return -1;
+    }
         
   } else {
     if (player->player2dealer.fd == 0) {
