@@ -28,6 +28,7 @@
  #include <gsl/gsl_randist.h>
 #endif 
 
+#include <stdio.h>
 #include <semaphore.h>
 #include <mqueue.h>
 
