@@ -78,7 +78,9 @@ int player_from_stdin(player_t *player, char *buffer) {
     char *newline;
 
     printf(" %s>%s ", stdout_opts.cyan, stdout_opts.reset);
-    fgets(buffer, BUF_SIZE-1, stdin);
+    if (fgets(buffer, BUF_SIZE-1, stdin) == NULL) {
+      return -1;
+    }
     // strip \n
     newline = strchr(buffer, '\n');
     if (newline != NULL) {
@@ -88,7 +90,9 @@ int player_from_stdin(player_t *player, char *buffer) {
   } else {
     char *newline;
     
-    fgets(buffer, BUF_SIZE-1, stdin);
+    if (fgets(buffer, BUF_SIZE-1, stdin) == NULL) {
+      return -1;
+    }
     // strip \n
     newline = strchr(buffer, '\n');
     if (newline != NULL) {

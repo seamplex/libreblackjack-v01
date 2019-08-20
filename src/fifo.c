@@ -140,7 +140,9 @@ int player_from_fifo(player_t *player, char *buffer) {
     if (error == -1) {
       blackjack_push_error_message("selecting unbuffered fifo '%s'", player->player2dealer.name);
     }
-    read(player->player2dealer.fd, buffer, BUF_SIZE-1);
+    if (read(player->player2dealer.fd, buffer, BUF_SIZE-1) == 0) {
+      return -1;
+    }
   }
 
   // strip \n
