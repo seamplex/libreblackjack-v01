@@ -20,7 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "libreblackjack.h"
-#include "version.h"
+#include "version-vcs.h"
 
 #include <string.h>
 

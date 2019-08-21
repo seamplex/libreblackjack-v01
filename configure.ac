@@ -36,7 +36,6 @@ cat << EOF > src/version-conf.h
 #define COMPILER_VERSION     "`$CC --version | head -n1`"
 #define COMPILER_CFLAGS      "$CFLAGS"
 EOF
-cd src; ./version.sh; cd ..
 
 #AC_CONFIG_FILES([Makefile doc/Makefile])
 AC_CONFIG_FILES([Makefile])
