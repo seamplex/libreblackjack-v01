@@ -8,8 +8,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README
 #doc/libreblackjack.texi
 
-TESTS = 00-internal 02-always-stand 05-no-bust 08-mimic-the-dealer
-LOG_COMPILER = players/check.sh
+TESTS = check-internal.sh check-stand.sh
 EXTRA_DIST = libreblackjack.ini players $(TESTS)
 
 # ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
