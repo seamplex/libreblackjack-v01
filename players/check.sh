@@ -1,21 +1,18 @@
 #!/bin/bash
 
-if [ -z "`which awk`" ]; then
-  echo "error: awk is not installed"
+if [ -z "`which gawk`" ]; then
+  echo "error: gawk is not installed"
   exit 1
-fi
+fi      
 
 # get into the correct PWD
-if [ ! -f ./parse_yaml.sh ]; then
+if [ ! -f ./header.m4 ]; then
   cd players
 fi
-if [ ! -f ./parse_yaml.sh ]; then
+if [ ! -f ./header.m4 ]; then
   echo "error: call me from the players directory"
   exit 1
 fi
-
-# include parse_yaml function
-. ./parse_yaml.sh
 
 
 # expected results
@@ -41,10 +38,14 @@ for i in $player; do
   if test -d $i -a -x $i/run.sh; then
     cd $i
     echo -ne ${i}' | '${expected["$i"]}' | '
-    ./run.sh 1>/dev/null 2>../$i.yaml
-    eval $(parse_yaml ../$i.yaml "result_")
-    echo -ne ${result_player_return}' | '${result_player_error}' | '${result_cpu_hands_per_second}' | '
-    echo ${result_player_return} | awk -v e=${expected["$i"]} -v s=${sigma} 'END {ok = ($1>(e-s)&&$1<(e+s)); print ok?"ok":"failed"; exit !ok }'
+    ./run.sh 1>/dev/null 2> ../$i.yaml
+    
+    return=`grep return ../${i}.yaml | awk '{print $2}'`
+    error=`grep error ../${i}.yaml | awk '{print $2}'`
+    hands_per_second=`grep hands_per_second ../${i}.yaml | awk '{print $2}'`
+    
+    echo -ne ${return}' | '${error}' | '${hands_per_second}' | '
+    echo ${return} | awk -v e=${expected["$i"]} -v s=${sigma} 'END {ok = ($1>(e-s)&&$1<(e+s)); print ok?"ok":"failed"; exit !ok }'
     result=$?
     cd ..
   else

@@ -56,6 +56,7 @@ These automatic players can range from simple no-bust or mimic-the-dealer hitter
 
 
 ```
+sudo apt-get install git autoconf make gcc
 git clone https://github.com/seamplex/libreblackjack.git
 cd libreblackjack
 ./autogen.sh

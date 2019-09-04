@@ -1,6 +1,5 @@
 change name and move to savannah
 use gnulib or glib?
-remove parse_yaml
 manual -> texinfo
 gettext
 --help
@@ -13,7 +12,6 @@ first qurstions: 1. how to play? 2. what is the ev? p41 griffin opt
 mimic the dealer -5.5% single s17
 referencias en griffin chapter 2 a historia de bs
 definition of bs p42
-uses bjinit & uthash & yaml
 thorp wiki/page
 remove cards from deck
 +10 par de 5, 12 hard 12, -12 par de aces
