@@ -33,6 +33,9 @@
 #include <semaphore.h>
 #include <mqueue.h>
 
+#include <locale.h>
+#include <libintl.h>
+#define _(string) gettext (string)
 
 // https://github.com/troydhanson/uthash
 #include "utlist.h"

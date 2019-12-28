@@ -34,7 +34,7 @@
 int create_fifo(const char *name) {
   if (mkfifo(name, 0666) != 0) {
     if (errno != EEXIST)  {
-      blackjack_push_error_message("'%s' creating fifo '%s'", strerror(errno), name);
+      blackjack_push_error_message(_("'%s' creating fifo '%s'"), strerror(errno), name);
       return -1;
     }
   }
@@ -51,10 +51,10 @@ int dealer_to_fifo(player_t *player, const char *command) {
         return -1;
       }
 
-      printf("waiting for dealer2player buffered fifo '%s'...", player->dealer2player.name);
+      printf(_("waiting for dealer2player buffered fifo '%s'..."), player->dealer2player.name);
       fflush(stdout);
       if ((player->dealer2player.fp = fopen(player->dealer2player.name, "w")) == NULL) {
-        blackjack_push_error_message("opening buffered fifo '%s' for writing: %s", player->dealer2player.name, strerror(errno));
+        blackjack_push_error_message(_("opening buffered fifo '%s' for writing: %s"), player->dealer2player.name, strerror(errno));
         return -1;
       }
       printf("ok!\n");
@@ -70,13 +70,13 @@ int dealer_to_fifo(player_t *player, const char *command) {
       if (create_fifo(player->dealer2player.name) != 0) {
         return -1;
       }
-      printf("waiting for dealer2player unbuffered fifo '%s'...", player->dealer2player.name);
+      printf(_("waiting for dealer2player unbuffered fifo '%s'..."), player->dealer2player.name);
       fflush(stdout);
       if ((player->dealer2player.fd = open(player->dealer2player.name, O_WRONLY)) == -1) {
-        blackjack_push_error_message("opening unbuffered fifo '%s' for writing: %s", player->dealer2player.name, strerror(errno));
+        blackjack_push_error_message(_("opening unbuffered fifo '%s' for writing: %s"), player->dealer2player.name, strerror(errno));
         return -1;
       }
-      printf("ok!\n");
+      printf(_("ok!\n"));
     }
   
     if (write(player->dealer2player.fd, command, strlen(command)) == 0) {
@@ -104,10 +104,10 @@ int player_from_fifo(player_t *player, char *buffer) {
       if (create_fifo(player->player2dealer.name) != 0) {
         return -1;
       }
-      printf("waiting for player2dealer buffered fifo '%s'...", player->player2dealer.name);
+      printf(_("waiting for player2dealer buffered fifo '%s'... "), player->player2dealer.name);
       fflush(stdout);
       if ((player->player2dealer.fp = fopen(player->player2dealer.name, "r")) == NULL) {
-        blackjack_push_error_message("reading buffered fifo '%s': %s", player->player2dealer.name, strerror(errno));
+        blackjack_push_error_message(_("reading buffered fifo '%s': %s"), player->player2dealer.name, strerror(errno));
         return -1;
       }
       printf("ok!\n");
@@ -123,13 +123,13 @@ int player_from_fifo(player_t *player, char *buffer) {
       if (create_fifo(player->player2dealer.name) != 0) {
         return -1;
       }
-      printf("waiting for player2dealer unbuffered fifo '%s'...", player->player2dealer.name);
+      printf(_("waiting for player2dealer unbuffered fifo '%s'..."), player->player2dealer.name);
       fflush(stdout);
       if ((player->player2dealer.fd = open(player->player2dealer.name, O_RDONLY)) == -1) {
-        blackjack_push_error_message("reading unbuffered fifo '%s': %s", player->player2dealer.name, strerror(errno));
+        blackjack_push_error_message(_("reading unbuffered fifo '%s': %s"), player->player2dealer.name, strerror(errno));
         return -1;
       }
-      printf("ok!\n");
+      printf(_("ok!\n"));
       fflush(stdout);
     }
 
@@ -138,7 +138,7 @@ int player_from_fifo(player_t *player, char *buffer) {
     FD_SET(player->player2dealer.fd, &fds);
     error = select(player->player2dealer.fd+1, &fds, NULL, NULL, NULL);
     if (error == -1) {
-      blackjack_push_error_message("selecting unbuffered fifo '%s'", player->player2dealer.name);
+      blackjack_push_error_message(_("selecting unbuffered fifo '%s'"), player->player2dealer.name);
     }
     if (read(player->player2dealer.fd, buffer, BUF_SIZE-1) == 0) {
       return -1;

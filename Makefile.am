@@ -9,7 +9,7 @@ dist_doc_DATA = README
 #doc/libreblackjack.texi
 
 TESTS = check-internal.sh check-stand.sh
-EXTRA_DIST = libreblackjack.ini players $(TESTS)
+EXTRA_DIST = config.rpath m4/ChangeLog  libreblackjack.ini players $(TESTS)
 
 # ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 bin_PROGRAMS = libreblackjack
@@ -36,3 +36,7 @@ libreblackjack_SOURCES = \
  src/internal.c \
  src/shmem.c \
  src/mqueue.c
+
+SUBDIRS = po
+
+ACLOCAL_AMFLAGS = -I m4

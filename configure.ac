@@ -29,6 +29,7 @@ AC_CHECK_LIB([readline], [readline])
 
 AC_FUNC_MALLOC
 
+AM_GNU_GETTEXT([external])
 
 AC_MSG_NOTICE([creating version-conf.h])
 cat << EOF > src/version-conf.h
@@ -38,5 +39,5 @@ cat << EOF > src/version-conf.h
 EOF
 
 #AC_CONFIG_FILES([Makefile doc/Makefile])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile po/Makefile.in])
 AC_OUTPUT

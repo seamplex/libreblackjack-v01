@@ -58,7 +58,7 @@ void blackjack_pop_errors(void) {
 
   fprintf(stderr, "error: ");
   if (blackjack.error_level == 0) {
-    fprintf(stderr, "unspecified error\n");
+    fprintf(stderr, _("unspecified error\n"));
   } else {
     while (blackjack.error_level > 0) {
       fprintf(stderr, "%s%s", blackjack.error[blackjack.error_level-1], (blackjack.error_level != 1)?" ":"\n");
@@ -72,7 +72,7 @@ void blackjack_pop_errors(void) {
 
 void blackjack_signal_handler(int sig_num) {
 
-  fprintf(stderr, "\npid %d: signal #%d caught, finnishing... ", getpid(), sig_num);
+  fprintf(stderr, _("\npid %d: signal #%d caught, finnishing... "), getpid(), sig_num);
   fflush(stderr);
 
   blackjack.done = 1;

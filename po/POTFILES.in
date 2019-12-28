@@ -1,0 +1,8 @@
+# List of source files which contain translatable strings.
+src/bjinit.c
+src/dealer.c
+src/fifo.c
+src/main.c
+src/mqueue.c
+src/shmem.c
+src/version.c

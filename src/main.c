@@ -54,6 +54,10 @@ int main(int argc, char** argv) {
     { NULL, 0, NULL, 0 }
   };    
 
+  setlocale (LC_ALL, "");
+  bindtextdomain (PACKAGE,  "/usr/share/locale/");
+  textdomain (PACKAGE);
+
   opterr = 0;
   while ((optc = getopt_long_only(argc, argv, "hvd:n:if:", longopts, &option_index)) != -1) {
     switch (optc) {
@@ -86,15 +90,15 @@ int main(int argc, char** argv) {
         argument_for_ini = strdup(argv[optind-1]);
         if ((equal_sign = strchr(argument_for_ini, '=')) == NULL) {
           if (fbj_ini_handler(NULL, "", argument_for_ini+2, "") <= 0) {
-            fprintf(stderr, "Unkown option '%s'.\n", argument_for_ini);
-            fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
+            fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
+            fprintf(stderr, _("Try '%s --help' for more information.\n)"), argv[0]);
             return 1;
           }
         } else {
           *equal_sign = '\0';
           if (fbj_ini_handler(NULL, "", argument_for_ini+2, equal_sign+1) <= 0) {
-            fprintf(stderr, "Unkown option '%s'.\n", argument_for_ini);
-            fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
+            fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
+            fprintf(stderr, _("Try '%s --help' for more information.\n"), argv[0]);
             return 1;
           }
         }
@@ -217,7 +221,7 @@ int main(int argc, char** argv) {
         
         if (blackjack_ini.max_invalid_commands != 0 && current_invalid_command++ > blackjack_ini.max_invalid_commands) {
           blackjack.current_player->write(blackjack.current_player, "max_incorrect_commands");
-          blackjack_push_error_message("maximum allowed incorrect commands (%d)", blackjack_ini.max_invalid_commands);
+          blackjack_push_error_message(_("reached the maximum number of allowed incorrect commands (%d)"), blackjack_ini.max_invalid_commands);
           blackjack_pop_errors();
           blackjack.current_player->write(blackjack.current_player, "bye");
           exit(1);

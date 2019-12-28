@@ -39,16 +39,16 @@ int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **
   // TODO: hacer posix name (voy a tener que acordarme del posix name para hacer el free)
   
   if ((fd = shm_open(name, O_RDWR | O_CREAT, 0666)) == -1) {
-    blackjack_push_error_message("'%s' opening shared memory object '%s'", strerror(errno), name);
+    blackjack_push_error_message(_("'%s' opening shared memory object '%s'"), strerror(errno), name);
     return -1;
   }
 
   if (ftruncate(fd, BUF_SIZE-1) != 0) {
-    blackjack_push_error_message("'%s' truncating shared memory object '%s'", strerror(errno), name);
+    blackjack_push_error_message(_("'%s' truncating shared memory object '%s'"), strerror(errno), name);
     return -1;
   }
   if ((*pointer = mmap(NULL, BUF_SIZE-1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
-    blackjack_push_error_message("'%s' maping shared memory object '%s'", strerror(errno), name);
+    blackjack_push_error_message(_("'%s' maping shared memory object '%s'"), strerror(errno), name);
     return -1;
   }
 
@@ -58,13 +58,13 @@ int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **
   buff = malloc(strlen(name) + 16);
   sprintf(buff, "%s_written", name);
   if ((*sem_written = sem_open(buff, O_CREAT, 0666, 0)) == SEM_FAILED) {
-    blackjack_push_error_message("'%s' opening semaphore '%s'", strerror(errno), name);
+    blackjack_push_error_message(_("'%s' opening semaphore '%s'"), strerror(errno), name);
     return -1;
   }
   
   sprintf(buff, "%s_read", name);
   if ((*sem_read = sem_open(buff, O_CREAT, 0666, 0)) == SEM_FAILED) {
-    blackjack_push_error_message("'%s' opening semaphore '%s'", strerror(errno), name);
+    blackjack_push_error_message(_("'%s' opening semaphore '%s'"), strerror(errno), name);
     return -1;
   }
   free(buff);
@@ -86,14 +86,14 @@ int dealer_to_shmem(player_t *player, const char *command) {
   sem_post(player->dealer2player.sem_written);
 
   if (first) {
-    printf("waiting for dealer2player semaphore '%s_read'...", player->dealer2player.name);
+    printf(_("waiting for dealer2player semaphore '%s_read'..."), player->dealer2player.name);
     fflush(stdout);
   }
   
   sem_wait(player->dealer2player.sem_read);
   
   if (first) {
-    printf("ok!\n");
+    printf(_("ok!\n"));
     first = 0;
   }
   
@@ -109,14 +109,14 @@ int player_from_shmem(player_t *player, char *buffer) {
     if (create_shmem(player->player2dealer.name, &player->player2dealer.shmem, &player->player2dealer.sem_written, &player->player2dealer.sem_read)) {
       return -1;
     }
-    printf("waiting for player2dealer semaphore '%s_written'...", player->player2dealer.name);
+    printf(_("waiting for player2dealer semaphore '%s_written'..."), player->player2dealer.name);
     fflush(stdout);
   }
   
   sem_wait(player->player2dealer.sem_written);
   
   if (first) {
-    printf("ok!\n");
+    printf(_("ok!\n"));
     first = 0;
   }
   memcpy(buffer, player->player2dealer.shmem, BUF_SIZE-1);

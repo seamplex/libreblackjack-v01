@@ -42,7 +42,7 @@ int create_mqueue(const char *name, mqd_t *mq) {
   // ojo con el destroy por el posix name; 
   
   if (((*mq) = mq_open(posix_name, O_RDWR | O_CREAT, 0666, &attr)) == -1) {
-    blackjack_push_error_message("'%s' opening message queue '%s'", strerror(errno), name);
+    blackjack_push_error_message(_("'%s' opening message queue '%s'"), strerror(errno), name);
     free(posix_name);
     return -1;
   }
@@ -60,12 +60,12 @@ int dealer_to_mqueue(player_t *player, const char *command) {
     if (player->dealer2player.mq == 0) {
       bjcall(create_mqueue(player->dealer2player.name, &player->dealer2player.mq));
     }
-    printf("writing into player2dealer message queue '%s'...", player->dealer2player.name);
+    printf(_("writing into player2dealer message queue '%s'... "), player->dealer2player.name);
     fflush(stdout);
   }
 
   if (mq_send(player->dealer2player.mq, command, strlen(command)+1, 0) == -1) {
-    blackjack_push_error_message("'%s' writing to message queue '%s'", strerror(errno), player->dealer2player.name);
+    blackjack_push_error_message(_("'%s' writing to message queue '%s'"), strerror(errno), player->dealer2player.name);
     return -1;
   }
 
@@ -85,12 +85,12 @@ int player_from_mqueue(player_t *player, char *buffer) {
     if (player->player2dealer.mq == 0) {
       bjcall(create_mqueue(player->player2dealer.name, &player->player2dealer.mq));
     }
-    printf("waiting for player2dealer message queue '%s'...", player->player2dealer.name);
+    printf(_("waiting for player2dealer message queue '%s'..."), player->player2dealer.name);
     fflush(stdout);
   }
 
   if (mq_receive(player->player2dealer.mq, buffer, BUF_SIZE-1, NULL) == -1) {
-    blackjack_push_error_message("'%s' reading from message queue '%s'", strerror(errno), player->player2dealer.name);
+    blackjack_push_error_message(_("'%s' reading from message queue '%s'"), strerror(errno), player->player2dealer.name);
     return -1;
   }
 

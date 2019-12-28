@@ -224,7 +224,7 @@ int dealer_action(void) {
       }
     break;
     case ASK_FOR_PLAY:
-      if (stdout_opts.isatty) { printf("player's count is %s%d\n", player->current_hand->soft?"soft ":"", player->current_hand->count); }
+      if (stdout_opts.isatty) { printf(_("player's count is %s%d\n"), player->current_hand->soft?"soft ":"", player->current_hand->count); }
       
       snprintf(outputbuffer, BUF_SIZE-1, "play? %d %d", player->current_hand->soft?-player->current_hand->count:player->current_hand->count, blackjack.dealer_hand->cards->value);
       blackjack.players_input_needed = PLAY;
@@ -262,10 +262,10 @@ int dealer_action(void) {
         }
         
         if (player->busted_all_hands) {
-          if (stdout_opts.isatty) { printf("player busted all hands\n"); }
+          if (stdout_opts.isatty) { printf(_("player busted all hands\n")); }
           bjcall(write_formatted_card(player, 0,  "card_dealer_hole", blackjack.dealer_holecard));
           blackjack.holecard_shown = 1;
-          if (stdout_opts.isatty) { printf("dealer hand was \n"); }
+          if (stdout_opts.isatty) { printf(_("dealer's hand was \n")); }
           if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
           blackjack.next_dealer_action = START_NEW_HAND;
           
@@ -280,14 +280,14 @@ int dealer_action(void) {
       bjcall(write_formatted_card(player, 1,  "card_dealer_hole", blackjack.dealer_holecard));
       blackjack.holecard_shown = 1;
       if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
-      if (stdout_opts.isatty) { printf("dealer's count is %s%d\n", blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
+      if (stdout_opts.isatty) { printf(_("dealer's count is %s%d\n"), blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
       
       // hit if count is less than 17 (or equalt to soft 17 if hit_soft_17 is true)
       while (((blackjack.dealer_hand->count < 17 || (blackjack_ini.hit_soft_17 && blackjack.dealer_hand->count == 17 && blackjack.dealer_hand->soft))) && blackjack.dealer_hand->busted == 0) {
         card = deal_card_to_hand(blackjack.dealer_hand);
         bjcall(write_formatted_card(player, 1, "card_dealer", card));
         if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
-        if (stdout_opts.isatty) { printf("dealer's count is %s%d\n", blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
+        if (stdout_opts.isatty) { printf(_("dealer's count is %s%d\n"), blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
       }
       
       if (blackjack.dealer_hand->busted) {
@@ -405,10 +405,11 @@ int dealer_process_input(player_t *player, char *command) {
   } else if (strcmp(command, "table") == 0 || strcmp(command, "t") == 0) {
     // TODO: give a command back
     // TODO: if table if empty, do not segfault
-    printf("\ncurrent table\n");
+    printf("\n");
+    printf(_("current table\n"));
     LL_FOREACH(blackjack.players, player) {
       LL_FOREACH(player->hands, hand) {
-        printf("%s's hand #%d: ", player->name, hand->id);
+        printf(_("%s's hand #%d: "), player->name, hand->id);
         LL_FOREACH(hand->cards, card) {
           printf(" ");
           print_card_unicode(card);
@@ -422,11 +423,11 @@ int dealer_process_input(player_t *player, char *command) {
     }
     
     if (blackjack.holecard_shown == 0) {
-      printf("dealer's upcard :  ");
+      printf(_("dealer's upcard :  "));
       print_card_unicode(blackjack.dealer_hand->cards);
       printf("\n");      
     } else {
-      printf("dealer's hand  :  ");
+      printf(_("dealer's hand  :  "));
       LL_FOREACH(blackjack.dealer_hand->cards, card) {
         printf(" ");
         print_card_unicode(card);
@@ -468,7 +469,7 @@ int dealer_process_input(player_t *player, char *command) {
         ;
       } else {
         bjcall(write_formatted(player, "invalid_command"));
-        if (stdout_opts.isatty) { printf("either answer yes or no to insurance\n"); }
+        if (stdout_opts.isatty) { printf(_("answer either yes or no to insurance\n")); }
         return -1;
       }
       blackjack.next_dealer_action = CHECK_FOR_BLACKJACKS;
@@ -480,7 +481,7 @@ int dealer_process_input(player_t *player, char *command) {
         return 1;
       } else if (strcmp(command, "double") == 0 || strcmp(command, "d") == 0) {
         if (player->current_hand->n_cards == 2) {
-          if (stdout_opts.isatty) { printf("doubling down, dealing only one card\n"); }
+          if (stdout_opts.isatty) { printf(_("doubling down, dealing only one card\n")); }
           
           // TODO: check bankroll
           player->current_hand->bet *= 2;
@@ -492,12 +493,12 @@ int dealer_process_input(player_t *player, char *command) {
 ///          
           bjcall(write_formatted_card(player, 0,  "card_player", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
-          if (stdout_opts.isatty) { printf("player's count is %s%d\n", player->current_hand->soft?"soft ":"", player->current_hand->count); }
+          if (stdout_opts.isatty) { printf(_("player's count is %s%d\n"), player->current_hand->soft?"soft ":"", player->current_hand->count); }
 
           if (player->current_hand->busted) {
 ///            
             bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
-            if (stdout_opts.isatty) { printf("player busted with %d\n", player->current_hand->count); }
+            if (stdout_opts.isatty) { printf(_("player busted with %d\n"), player->current_hand->count); }
             player->current_result -= player->current_hand->bet;
             player->bankroll -= player->current_hand->bet;
             player->player_busts++;
@@ -509,7 +510,7 @@ int dealer_process_input(player_t *player, char *command) {
 
         } else {
           bjcall(write_formatted(player, "invalid_command"));
-          if (stdout_opts.isatty) { printf("cannot double down now\n"); }
+          if (stdout_opts.isatty) { printf(_("cannot double down now\n")); }
           return -1;
         }
       } else if (strcmp(command, "split") == 0 || strcmp(command, "p") == 0) {
@@ -571,7 +572,7 @@ int dealer_process_input(player_t *player, char *command) {
           
         } else {
           bjcall(player->write(player, "invalid_command"));
-          if (stdout_opts.isatty) { printf("cannot split now\n"); }
+          if (stdout_opts.isatty) { printf(_("cannot split now\n")); }
           return -1;
         }
         
@@ -583,7 +584,7 @@ int dealer_process_input(player_t *player, char *command) {
 
         if (player->current_hand->busted) {
           bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
-          if (stdout_opts.isatty) { printf("player busted with %d\n", player->current_hand->count); }
+          if (stdout_opts.isatty) { printf(_("player busted with %d\n"), player->current_hand->count); }
           player->current_result -= player->current_hand->bet;
           player->bankroll -= player->current_hand->bet;
           player->player_busts++;

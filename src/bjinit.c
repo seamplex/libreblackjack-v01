@@ -92,7 +92,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
     }
 
     if (blackjack_ini.blackjack_pays <= 0) {
-      blackjack_push_error_message("blackjack_pays has to be positive, not '%s'", value);
+      blackjack_push_error_message(_("blackjack_pays has to be positive, not '%s'"), value);
       return -1;
     }
 
@@ -117,7 +117,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
   } else if (MATCH("", "log")) {
     if (blackjack_ini.log == NULL ) {
       if ((blackjack_ini.log = fopen(value, "w")) == NULL) {
-        blackjack_push_error_message("cannot open log file '%s': %s\n", value, strerror(errno));
+        blackjack_push_error_message(_("cannot open log file '%s': %s\n"), value, strerror(errno));
         return -1;
       }
     }
@@ -125,7 +125,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
   } else if (MATCH("", "yaml_report")) {
     if (blackjack_ini.yaml_report == NULL ) {
       if ((blackjack_ini.yaml_report = fopen(value, "w")) == NULL) {
-        blackjack_push_error_message("cannot open YAML report file '%s': %s\n", value, strerror(errno));
+        blackjack_push_error_message(_("cannot open YAML report file '%s': %s\n"), value, strerror(errno));
         return -1;
       }
     }
@@ -234,7 +234,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
       player->flat_bet = 1;
       player->no_insurance = 1;
     } else {
-      blackjack_push_error_message("unkown ipc type '%s'", token);
+      blackjack_push_error_message(_("unkown ipc type '%s'"), token);
       return 0;
     }
     
@@ -245,7 +245,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
     } else {
       // otherwise we need an object name
       if ((token = strtok(NULL, INI_TOKEN_SEPARATORS)) == NULL) {
-        blackjack_push_error_message("expected object name after ipc type");
+        blackjack_push_error_message(_("expected object name after ipc type"));
         return 0;
       }
       ipc->name = strdup(token);
@@ -255,7 +255,7 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
     free(tokens);
 
   } else {
-    blackjack_push_error_message("unknown keyword '%s'", name);
+    blackjack_push_error_message(_("unknown keyword '%s'"), name);
     return 0;  /* unknown section/name, error */
   }
   return 1;
@@ -288,7 +288,7 @@ int bjinit(char *cmdline_file_path) {
       return -1;
     }
   } else if (cmdline_file_path != NULL) {
-    blackjack_push_error_message("cannot open ini file '%s': %s\n", cmdline_file_path, strerror(errno));
+    blackjack_push_error_message(_("cannot open ini file '%s': %s\n"), cmdline_file_path, strerror(errno));
     return -1;
   }
   free(ini_file_path);
