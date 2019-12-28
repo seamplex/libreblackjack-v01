@@ -29,7 +29,6 @@ Makefile.in
 po-check-1
 po-check-2
 po/*.gmo
-po/*.pot
 po/.reference
 po/Makefile
 po/Makefile.in
@@ -42,10 +41,6 @@ src/.libs
 stamp-h1
 stamp.h*
 test-suite.log
-
-config.guess
-config.rpath
-config.sub
 
 .deps
 README
