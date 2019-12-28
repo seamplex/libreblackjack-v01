@@ -1,0 +1,265 @@
+# Spanish translations for libreblackjack package.
+# Copyright (C) 2019 Free Software Foundation, Inc.
+# This file is distributed under the same license as the libreblackjack package.
+# jeremy theler <jeremy@seamplex.com>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libreblackjack v0.1.55-g82976f6\n"
+"Report-Msgid-Bugs-To: jeremy@seamplex.com\n"
+"POT-Creation-Date: 2019-12-28 15:51-0300\n"
+"PO-Revision-Date: 2019-12-28 16:23-0300\n"
+"Last-Translator: jeremy theler <jeremy@seamplex.com>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/bjinit.c:95
+#, c-format
+msgid "blackjack_pays has to be positive, not '%s'"
+msgstr ""
+
+#: src/bjinit.c:120
+#, c-format
+msgid "cannot open log file '%s': %s\n"
+msgstr ""
+
+#: src/bjinit.c:128
+#, c-format
+msgid "cannot open YAML report file '%s': %s\n"
+msgstr ""
+
+#: src/bjinit.c:237
+#, c-format
+msgid "unkown ipc type '%s'"
+msgstr ""
+
+#: src/bjinit.c:248
+msgid "expected object name after ipc type"
+msgstr ""
+
+#: src/bjinit.c:258
+#, c-format
+msgid "unknown keyword '%s'"
+msgstr ""
+
+#: src/bjinit.c:291
+#, c-format
+msgid "cannot open ini file '%s': %s\n"
+msgstr ""
+
+#: src/dealer.c:227 src/dealer.c:496
+#, c-format
+msgid "player's count is %s%d\n"
+msgstr ""
+
+#: src/dealer.c:265
+#, c-format
+msgid "player busted all hands\n"
+msgstr ""
+
+#: src/dealer.c:268
+#, c-format
+msgid "dealer's hand was \n"
+msgstr ""
+
+#: src/dealer.c:283 src/dealer.c:290
+#, c-format
+msgid "dealer's count is %s%d\n"
+msgstr ""
+
+#: src/dealer.c:409
+#, c-format
+msgid "current table\n"
+msgstr ""
+
+#: src/dealer.c:412
+#, c-format
+msgid "%s's hand #%d: "
+msgstr ""
+
+#: src/dealer.c:426
+#, c-format
+msgid "dealer's upcard :  "
+msgstr ""
+
+#: src/dealer.c:430
+#, c-format
+msgid "dealer's hand  :  "
+msgstr ""
+
+#: src/dealer.c:472
+#, c-format
+msgid "answer either yes or no to insurance\n"
+msgstr ""
+
+#: src/dealer.c:484
+#, c-format
+msgid "doubling down, dealing only one card\n"
+msgstr ""
+
+#: src/dealer.c:501 src/dealer.c:587
+#, c-format
+msgid "player busted with %d\n"
+msgstr ""
+
+#: src/dealer.c:513
+#, c-format
+msgid "cannot double down now\n"
+msgstr ""
+
+#: src/dealer.c:575
+#, c-format
+msgid "cannot split now\n"
+msgstr ""
+
+#: src/fifo.c:37
+#, c-format
+msgid "'%s' creating fifo '%s'"
+msgstr ""
+
+#: src/fifo.c:54
+#, c-format
+msgid "waiting for dealer2player buffered fifo '%s'..."
+msgstr ""
+
+#: src/fifo.c:57
+#, c-format
+msgid "opening buffered fifo '%s' for writing: %s"
+msgstr ""
+
+#: src/fifo.c:73
+#, c-format
+msgid "waiting for dealer2player unbuffered fifo '%s'..."
+msgstr ""
+
+#: src/fifo.c:76
+#, c-format
+msgid "opening unbuffered fifo '%s' for writing: %s"
+msgstr ""
+
+#: src/fifo.c:79 src/fifo.c:132 src/shmem.c:96 src/shmem.c:119
+#, c-format
+msgid "ok!\n"
+msgstr ""
+
+#: src/fifo.c:107
+#, c-format
+msgid "waiting for player2dealer buffered fifo '%s'... "
+msgstr ""
+
+#: src/fifo.c:110
+#, c-format
+msgid "reading buffered fifo '%s': %s"
+msgstr ""
+
+#: src/fifo.c:126
+#, c-format
+msgid "waiting for player2dealer unbuffered fifo '%s'..."
+msgstr ""
+
+#: src/fifo.c:129
+#, c-format
+msgid "reading unbuffered fifo '%s': %s"
+msgstr ""
+
+#: src/fifo.c:141
+#, c-format
+msgid "selecting unbuffered fifo '%s'"
+msgstr ""
+
+#: src/main.c:93 src/main.c:100
+#, c-format
+msgid "Unkown option '%s'.\n"
+msgstr ""
+
+#: src/main.c:94
+#, c-format
+msgid ""
+"Try '%s --help' for more information.\n"
+")"
+msgstr ""
+
+#: src/main.c:101
+#, c-format
+msgid "Try '%s --help' for more information.\n"
+msgstr ""
+
+#: src/main.c:224
+#, c-format
+msgid "reached the maximum number of allowed incorrect commands (%d)"
+msgstr ""
+
+#: src/mqueue.c:45
+#, c-format
+msgid "'%s' opening message queue '%s'"
+msgstr ""
+
+#: src/mqueue.c:63
+#, c-format
+msgid "writing into player2dealer message queue '%s'... "
+msgstr ""
+
+#: src/mqueue.c:68
+#, c-format
+msgid "'%s' writing to message queue '%s'"
+msgstr ""
+
+#: src/mqueue.c:88
+#, c-format
+msgid "waiting for player2dealer message queue '%s'..."
+msgstr ""
+
+#: src/mqueue.c:93
+#, c-format
+msgid "'%s' reading from message queue '%s'"
+msgstr ""
+
+#: src/shmem.c:42
+#, c-format
+msgid "'%s' opening shared memory object '%s'"
+msgstr ""
+
+#: src/shmem.c:47
+#, c-format
+msgid "'%s' truncating shared memory object '%s'"
+msgstr ""
+
+#: src/shmem.c:51
+#, c-format
+msgid "'%s' maping shared memory object '%s'"
+msgstr ""
+
+#: src/shmem.c:61 src/shmem.c:67
+#, c-format
+msgid "'%s' opening semaphore '%s'"
+msgstr ""
+
+#: src/shmem.c:89
+#, c-format
+msgid "waiting for dealer2player semaphore '%s_read'..."
+msgstr ""
+
+#: src/shmem.c:112
+#, c-format
+msgid "waiting for player2dealer semaphore '%s_written'..."
+msgstr ""
+
+#: src/version.c:38
+#, c-format
+msgid "a free & open blackjack engine\n"
+msgstr "un motor de blackjack libre y abierto\n"
+
+#: src/version.c:44
+#, c-format
+msgid ""
+"copyright (c) %s jeremy theler.\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+"\n"
+msgstr ""
