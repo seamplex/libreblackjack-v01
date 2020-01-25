@@ -1,7 +1,6 @@
+remove uthash
 change name and move to savannah
-use gnulib or glib?
 manual -> texinfo
-gettext
 --help
 formatting https://www.gnu.org/prep/standards/standards.html#Formatting
 
