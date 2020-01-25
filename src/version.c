@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016,2019 jeremy theler
+ *  Copyright (C) 2016--2020 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -46,6 +46,6 @@ copyright (c) %s jeremy theler.\n\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\n"),
-             "2016,2020" );
+             "2016--2020" );
   return;
 }

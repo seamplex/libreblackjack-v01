@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016,2019 Jeremy Theler
+ *  Copyright (C) 2016--2020 Jeremy Theler
  * 
  *  This file is part of libreblackjack.
  *

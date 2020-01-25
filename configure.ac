@@ -11,6 +11,7 @@ dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 m4_include([version.m4])
 AC_INIT([libreblackjack],[libreblackjackversion],[jeremy@seamplex.com])
 AM_INIT_AUTOMAKE
+AM_GNU_GETTEXT([external])
 
 AC_CONFIG_SRCDIR([src/main.c])
 
@@ -28,8 +29,6 @@ AC_CHECK_HEADER([readline/readline.h])
 AC_CHECK_LIB([readline], [readline])
 
 AC_FUNC_MALLOC
-
-AM_GNU_GETTEXT([external])
 
 AC_MSG_NOTICE([creating version-conf.h])
 cat << EOF > src/version-conf.h

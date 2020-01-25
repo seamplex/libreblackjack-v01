@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  libreblackjack
  *
- *  Copyright (C) 2016,2019 jeremy theler
+ *  Copyright (C) 2016--2020 jeremy theler
  *
  *  This file is part of libreblackjack.
  *
@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <errno.h>
 
 #include "libreblackjack.h"
@@ -36,6 +37,31 @@ char suitcode[4][8]   = {"♠", "♥", "♦", "♣"};
 //char suitcode[4][8]   = {"\u2660", "\u2665", "\u2666", "\u2663"};
 char numbername[14][4] = {"X", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"};
 int value[14] = {0, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10};
+
+
+// saca los blancos de una cadena (inline)
+void bj_strip_blanks(char *string) {
+  int i = 0;
+  int j = 0;
+  // capaz se pueda hacer sin duplicar string, pero por
+  // si acaso vamos a lo seguro
+  char *buff;
+
+  buff = strdup(string);
+
+  for (i = 0; i < strlen(string); i++) {
+    if (!isspace((int)buff[i])) {
+      string[j++] = buff[i];
+    }
+  }
+
+  string[j] = '\0';
+
+  free(buff);
+
+  return;
+
+}
 
 
 int fbj_ini_handler(void* user, const char* section, const char* name, const char* value) {
@@ -263,6 +289,12 @@ int fbj_ini_handler(void* user, const char* section, const char* name, const cha
 
 int bjinit(char *cmdline_file_path) {
   
+  char buffer[BUF_SIZE];
+  char *keyword;
+  char *equal;
+  char *value;
+  char *comment_colon;
+  char *comment_hash;
   char *ini_file_path;
   FILE *ini_file;
   FILE *devrandom;
@@ -280,6 +312,39 @@ int bjinit(char *cmdline_file_path) {
   // leemos el ini
   ini_file_path = strdup((cmdline_file_path == NULL) ? INI_FILE_PATH : cmdline_file_path);
   if ((ini_file = fopen(ini_file_path, "r")) != NULL) {
+    
+    while (fgets(buffer, BUF_SIZE-1, ini_file)) {
+      
+      keyword = NULL;
+      value = NULL;
+      
+      comment_colon = strchr(buffer, ';');
+      comment_hash = strchr(buffer, '#');
+      if (comment_colon != NULL) {
+        *comment_colon = '\0';
+      }
+      if (comment_hash != NULL) {
+        *comment_hash = '\0';
+      }
+      if ((equal = strchr(buffer, '=')) != NULL) {
+        value = equal+1;
+        *equal = '\0';
+        keyword = buffer;
+      }
+
+      if (keyword != NULL && value != NULL) {
+        bj_strip_blanks(keyword);
+        bj_strip_blanks(value);
+        if (fbj_ini_handler(NULL, "", keyword, value) != 0) {
+//          blackjack_push_error_message("%s:%d: ", ini_file_path, error);
+          return -1;
+        }
+      }  
+      
+      
+    }
+    
+/*    
     fclose(ini_file);
     if (ini_parse(ini_file_path, fbj_ini_handler, NULL) != 0) {
       return -1;
@@ -287,6 +352,7 @@ int bjinit(char *cmdline_file_path) {
     if (blackjack.error_level != 0) {
       return -1;
     }
+*/
   } else if (cmdline_file_path != NULL) {
     blackjack_push_error_message(_("cannot open ini file '%s': %s\n"), cmdline_file_path, strerror(errno));
     return -1;
