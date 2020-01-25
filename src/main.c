@@ -68,35 +68,35 @@ int main(int argc, char** argv) {
         show_version = 1;
         break;
       case 'd':
-        bjcallpop(fbj_ini_handler(NULL, "", "decks", optarg));
+        bjcallpop(fbj_ini_handler("decks", optarg));
         break;
       case 'n':
-        bjcallpop(fbj_ini_handler(NULL, "", "hands", optarg));
+        bjcallpop(fbj_ini_handler("hands", optarg));
         break;
       case 'i':
-        bjcallpop(fbj_ini_handler(NULL, "", "player2dealer", "internal"));
-        bjcallpop(fbj_ini_handler(NULL, "", "dealer2player", "internal"));
-        bjcallpop(fbj_ini_handler(NULL, "", "flat_bet", "1"));
-        bjcallpop(fbj_ini_handler(NULL, "", "no_insurance", "1"));
+        bjcallpop(fbj_ini_handler("player2dealer", "internal"));
+        bjcallpop(fbj_ini_handler("dealer2player", "internal"));
+        bjcallpop(fbj_ini_handler("flat_bet", "1"));
+        bjcallpop(fbj_ini_handler("no_insurance", "1"));
         break;
       case 'f':
         if (optarg != NULL) {
-          bjcallpop(fbj_ini_handler(NULL, "", "flat_bet", optarg));
+          bjcallpop(fbj_ini_handler("flat_bet", optarg));
         } else {
-          bjcallpop(fbj_ini_handler(NULL, "", "flat_bet", "1"));
+          bjcallpop(fbj_ini_handler("flat_bet", "1"));
         }
         break;
       case '?':
         argument_for_ini = strdup(argv[optind-1]);
         if ((equal_sign = strchr(argument_for_ini, '=')) == NULL) {
-          if (fbj_ini_handler(NULL, "", argument_for_ini+2, "") <= 0) {
+          if (fbj_ini_handler(argument_for_ini+2, "") <= 0) {
             fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
             fprintf(stderr, _("Try '%s --help' for more information.\n)"), argv[0]);
             return 1;
           }
         } else {
           *equal_sign = '\0';
-          if (fbj_ini_handler(NULL, "", argument_for_ini+2, equal_sign+1) <= 0) {
+          if (fbj_ini_handler(argument_for_ini+2, equal_sign+1) <= 0) {
             fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
             fprintf(stderr, _("Try '%s --help' for more information.\n"), argv[0]);
             return 1;

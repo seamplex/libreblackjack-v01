@@ -309,7 +309,7 @@ extern player_t *get_player(const char *name);
 extern player_t *get_or_define_player(const char *name);
 extern player_t *player_from_section(const char *section);
 extern int bjinit(char *cmdline_file_path);
-int fbj_ini_handler(void* user, const char* section, const char* name, const char* value);
+int fbj_ini_handler(const char* name, const char* value);
 
 // commands.c
 extern int write_formatted_card(player_t *player, int dealer, char *command, card_t *card);

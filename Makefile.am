@@ -1,4 +1,4 @@
-# Copyright (C) 2019 jeremy theler
+# Copyright (C) 2016--2020 jeremy theler
 # This file is part of libreblackjack.
 # This file is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
@@ -24,8 +24,6 @@ libreblackjack_SOURCES = \
  src/cards.c \
  src/dealer.c \
  src/stdinout.c \
- src/ini.c \
- src/ini.h \
  src/bjinit.c \
  src/commands.c \
  src/version.c \

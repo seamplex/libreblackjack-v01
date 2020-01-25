@@ -143,16 +143,16 @@ player_t *player_from_section(const char *section) {
   player_t *player;
   char *name;
   
-  if (section[0] != '\0') {
+  if (section == NULL || section[0] == '\0') {
     name = strdup("player");
   } else {
     name = strdup(section);
   }
   
   if (blackjack.players == NULL) {
-    player = new_player(section);
+    player = new_player(name);
   } else {
-    player = get_or_define_player(section);
+    player = get_or_define_player(name);
   }
   
   free(name);
