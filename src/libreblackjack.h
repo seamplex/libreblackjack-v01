@@ -315,10 +315,10 @@ extern int write_formatted_card(player_t *player, int dealer, char *command, car
 extern int write_formatted(player_t *player, const char *fmt, ...);
 
 // lists.c
-extern void append_card(card_t *head, card_t *card);
-extern void delete_card(card_t *head, card_t *card);
-extern void append_hand(hand_t *head, hand_t *hand);
-extern void delete_hand(hand_t *head, hand_t *hand);
+extern void append_card(card_t **head, card_t *card);
+extern void delete_card(card_t **head, card_t *card);
+extern void append_hand(hand_t **head, hand_t *hand);
+extern void delete_hand(hand_t **head, hand_t *hand);
 
 // fifo.c
 int create_fifo(const char *name);

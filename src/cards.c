@@ -157,7 +157,7 @@ card_t *deal_card_to_hand(hand_t *hand) {
   card = calloc(1, sizeof(card_t));
   assert(card != NULL);
   memcpy(card, &blackjack.card[dealt_tag], sizeof(card_t));
-  append_card(hand->cards, card);
+  append_card(&hand->cards, card);
 
   compute_count(hand);
   
@@ -182,11 +182,11 @@ void destroy_hands(hand_t **hands) {
 
   for (hand = *hands; hand != NULL && (tmp = hand->next) != NULL; hand = tmp) { 
     for (card = hand->cards; card != NULL && (tmp2 = card->next) != NULL; card = tmp2) {   
-      delete_card(hand->cards, card);
+      delete_card(&hand->cards, card);
       free(card);
       card = NULL;
     }
-    delete_hand(*hands, hand);
+    delete_hand(hands, hand);
     free(hand);
     hand = NULL;
   }

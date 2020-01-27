@@ -25,40 +25,40 @@
 #define LL_FOREACH(h,e) for(e=h;e!=NULL;e=e->next)
 #define LL_FOREACH_SAFE(h,e,tmp) for(e=h;e!=NULL&&(tmp = e->next)!=NULL; e = tmp)
 
-void append_card(card_t *head, card_t *card) {
+void append_card(card_t **head, card_t *card) {
 
   card_t *last;
   card->next = NULL;
-  if (head != NULL) {
-    for (last = head; last-> next != NULL; last = last->next);
+  if (*head != NULL) {
+    for (last = *head; last-> next != NULL; last = last->next);
     last->next = card;
   } else {
-    head = card;
+    *head = card;
   }
   
   return;
 }
 
-void append_hand(hand_t *head, hand_t *hand) {
+void append_hand(hand_t **head, hand_t *hand) {
 
   hand_t *last;
   hand->next = NULL;
-  if (head != NULL) {
-    for (last = head; last-> next != NULL; last = last->next);
+  if (*head != NULL) {
+    for (last = *head; last-> next != NULL; last = last->next);
     last->next = hand;
   } else {
-    head = hand;
+    *head = hand;
   }
   
   return;
 }
 
-void delete_card(card_t *head, card_t *card) {
+void delete_card(card_t **head, card_t *card) {
   card_t *tmp;
-  if (head == card) {
-    head = head->next;
+  if (*head == card) {
+    *head = (*head)->next;
   } else {
-    for (tmp = head; tmp->next && tmp->next != card; tmp = tmp->next);
+    for (tmp = *head; tmp->next && tmp->next != card; tmp = tmp->next);
     if (tmp->next) {                                                                          \
       tmp->next = card->next;                                                              \
     }                                                                                          \
@@ -67,12 +67,12 @@ void delete_card(card_t *head, card_t *card) {
   return;  
 }
 
-void delete_hand(hand_t *head, hand_t *hand) {
+void delete_hand(hand_t **head, hand_t *hand) {
   hand_t *tmp;
-  if (head == hand) {
-    head = head->next;
+  if (*head == hand) {
+    head = &(*head)->next;
   } else {
-    for (tmp = head; tmp->next && tmp->next != hand; tmp = tmp->next);
+    for (tmp = *head; tmp->next && tmp->next != hand; tmp = tmp->next);
     if (tmp->next) {                                                                          \
       tmp->next = hand->next;                                                              \
     }                                                                                          \

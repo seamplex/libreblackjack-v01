@@ -53,7 +53,7 @@ int dealer_action(void) {
       // borramos la mano del dealer y creamos una nueva
       destroy_hands(&blackjack.dealer_hand);
       hand = calloc(1, sizeof(hand_t));
-      append_hand(blackjack.dealer_hand, hand);
+      append_hand(&blackjack.dealer_hand, hand);
       
       // marcamos que la holecard aun no se vio
       blackjack.holecard_shown = 0;
@@ -83,7 +83,7 @@ int dealer_action(void) {
 
       // creamos la mano principal
       hand = calloc(1, sizeof(hand_t));
-      append_hand(player->hands, hand);
+      append_hand(&player->hands, hand);
       player->current_hand = player->hands;   // la mano actual es la primera
       
       if (player->flat_bet != 0) {
@@ -529,16 +529,16 @@ int dealer_process_input(player_t *player, char *command) {
           hand->bet = player->current_hand->bet;
           player->total_money_waged += player->current_hand->bet;
           hand->id = player->current_hand->id + 1;
-          append_hand(player->hands, hand);
+          append_hand(&player->hands, hand);
           
           // llevamos la segunda carta a la segunda mano
           card = calloc(1, sizeof(card_t));
           memcpy(card, &blackjack.card[player->current_hand->cards->next->tag], sizeof(card_t));
           
           // borramos la carta de la primera
-          delete_card(player->current_hand->cards, player->current_hand->cards->next);
+          delete_card(&player->current_hand->cards, player->current_hand->cards->next);
           // y la ponemos en la segunda
-          append_card(hand->cards, card);
+          append_card(&hand->cards, card);
           
           // le damos una carta en la primera
           card = deal_card_to_hand(player->current_hand);
