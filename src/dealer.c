@@ -53,7 +53,7 @@ int dealer_action(void) {
       // borramos la mano del dealer y creamos una nueva
       destroy_hands(&blackjack.dealer_hand);
       hand = calloc(1, sizeof(hand_t));
-      LL_APPEND(blackjack.dealer_hand, hand);
+      append_hand(blackjack.dealer_hand, hand);
       
       // marcamos que la holecard aun no se vio
       blackjack.holecard_shown = 0;
@@ -83,7 +83,7 @@ int dealer_action(void) {
 
       // creamos la mano principal
       hand = calloc(1, sizeof(hand_t));
-      LL_APPEND(player->hands, hand);
+      append_hand(player->hands, hand);
       player->current_hand = player->hands;   // la mano actual es la primera
       
       if (player->flat_bet != 0) {
@@ -254,7 +254,7 @@ int dealer_action(void) {
         // TODO: ver si ya terminamos con todos los jugadores
         // suponemos que se paso en todas
         player->busted_all_hands = 1;
-        LL_FOREACH(player->hands, hand) {
+        for(hand = player->hands; hand != NULL; hand = hand->next) {
           // si no se paso en alguna ponemos cero
           if (hand->busted == 0) {
             player->busted_all_hands = 0;
@@ -293,7 +293,7 @@ int dealer_action(void) {
       if (blackjack.dealer_hand->busted) {
         bjcall(player->write(player, "busted_dealer"));
         player->dealer_busts++;
-        LL_FOREACH(player->hands, hand) {
+        for(hand = player->hands; hand != NULL; hand = hand->next) {
           if (hand->busted == 0) {
             if (player->has_split) {
               bjcall(write_formatted(player, "player_wins %d #%d", hand->bet, hand->id));
@@ -311,7 +311,7 @@ int dealer_action(void) {
           }
         }
       } else {
-        LL_FOREACH(player->hands, hand) {
+        for(hand = player->hands; hand != NULL; hand = hand->next) {
           if (hand->busted == 0) {  // busted hands have already been solved
             if (blackjack.dealer_hand->count > hand->count) {
               if (player->has_split) {
@@ -407,10 +407,10 @@ int dealer_process_input(player_t *player, char *command) {
     // TODO: if table if empty, do not segfault
     printf("\n");
     printf(_("current table\n"));
-    LL_FOREACH(blackjack.players, player) {
-      LL_FOREACH(player->hands, hand) {
+    for (player = blackjack.players; player != NULL; player = player->next) {
+      for (hand = player->hands; hand != NULL; hand = hand->next) {
         printf(_("%s's hand #%d: "), player->name, hand->id);
-        LL_FOREACH(hand->cards, card) {
+        for (card = hand->cards; card != NULL; card = card->next) {
           printf(" ");
           print_card_unicode(card);
         }
@@ -428,7 +428,7 @@ int dealer_process_input(player_t *player, char *command) {
       printf("\n");      
     } else {
       printf(_("dealer's hand  :  "));
-      LL_FOREACH(blackjack.dealer_hand->cards, card) {
+      for(card = blackjack.dealer_hand->cards; card != NULL; card = card->next) {
         printf(" ");
         print_card_unicode(card);
       }

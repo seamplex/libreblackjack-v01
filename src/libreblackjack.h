@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <semaphore.h>
 #include <mqueue.h>
 
@@ -37,8 +38,6 @@
 #include <libintl.h>
 #define _(string) gettext (string)
 
-// https://github.com/troydhanson/uthash
-#include "utlist.h"
 
 #define bjcall(function)   if ((function) != 0) return -1
 #define bjcallpop(function)   if ((function) <= 0) { blackjack_pop_errors(); return 1; }
@@ -314,6 +313,10 @@ int fbj_ini_handler(const char* name, const char* value);
 // commands.c
 extern int write_formatted_card(player_t *player, int dealer, char *command, card_t *card);
 extern int write_formatted(player_t *player, const char *fmt, ...);
+
+// lists.c
+extern void append_card(card_t *head, card_t *card);
+extern void delete_card(card_t *head, card_t *card);
 
 // fifo.c
 int create_fifo(const char *name);

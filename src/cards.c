@@ -21,6 +21,7 @@
  */
 #include <wchar.h>
 #include <string.h>
+#include <assert.h>
 #include <unistd.h>
 #include "libreblackjack.h"
 
@@ -37,7 +38,7 @@ void print_hand_art(hand_t *hand) {
   int i;
   card_t *card;
   for (i = 0; i < CARD_ART_LINES; i++) {
-    LL_FOREACH(hand->cards, card) {
+    for (card = hand->cards; card != NULL; card = card->next) {
       printf("%s%c", card->art[i], (card->next != NULL) ? ' ' : '\n');
     }
   }
@@ -65,7 +66,7 @@ int compute_count(hand_t *hand) {
   hand->n_cards = 0;
   hand->soft = 0; 
   hand->count = 0;
-  LL_FOREACH(hand->cards, card) {
+  for (card = hand->cards; card != NULL; card = card->next) {
     hand->count += card->value;
     hand->n_cards++;
     hand->soft += (card->value == 11);
@@ -95,14 +96,14 @@ int deal_card(void) {
       int i;
       
       blackjack.n_arranged_cards = 0;
-      LL_FOREACH(blackjack_ini.arranged_cards, card) {
+      for (card = blackjack_ini.arranged_cards; card != NULL; card = card->next) {
         blackjack.n_arranged_cards++;
       }
       if (blackjack.n_arranged_cards != 0) {
         blackjack.arranged_cards_array = calloc(blackjack.n_arranged_cards, sizeof(int));
       
         i = 0;
-        LL_FOREACH(blackjack_ini.arranged_cards, card) {
+        for (card = blackjack_ini.arranged_cards; card != NULL; card = card->next) {
           blackjack.arranged_cards_array[i++] = card->tag;
         }
       }
@@ -156,7 +157,7 @@ card_t *deal_card_to_hand(hand_t *hand) {
   card = calloc(1, sizeof(card_t));
   assert(card != NULL);
   memcpy(card, &blackjack.card[dealt_tag], sizeof(card_t));
-  LL_APPEND(hand->cards, card);
+  append_card(hand->cards, card);
 
   compute_count(hand);
   
@@ -178,10 +179,10 @@ hand_t *new_hand(hand_t **hands, int id, int bet) {
 void destroy_hands(hand_t **hands) {
   hand_t *hand, *tmp;
   card_t *card, *tmp2;
-  
-  LL_FOREACH_SAFE(*hands, hand, tmp) {
-    LL_FOREACH_SAFE(hand->cards, card, tmp2) {
-      LL_DELETE(hand->cards, card);
+
+  for (hand = *hands; hand != NULL && (tmp = hand->next) != NULL; hand = tmp) { 
+    for (card = hand->cards; card != NULL && (tmp2 = card->next) != NULL; card = tmp2) {   
+      delete_card(hand->cards, card);
       free(card);
       card = NULL;
     }
@@ -269,7 +270,7 @@ void shuffle_shoe(void) {
 
     // ponemos primero las que estan arregladas
     j = 0;
-    LL_FOREACH(blackjack_ini.arranged_cards, card) {
+    for (card = blackjack_ini.arranged_cards; card != NULL; card = card->next) {
       for (i = 52*(blackjack_ini.decks)-1; i > 0; i--) {
         if (blackjack.shoe[i] == card->tag) {
           blackjack.shoe[i] = blackjack.shoe[j];

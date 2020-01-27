@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
   }
   
   // cleanup
-  LL_FOREACH_SAFE(blackjack.players, player, tmp) {
+  for((player)=(blackjack.players);(player) && (tmp = (player)->next, 1); (player) = tmp) {   
     blackjack.current_player->write(player, "bye");
     write_yaml_report(blackjack.players);
     destroy_player(player);
@@ -254,4 +254,3 @@ int main(int argc, char** argv) {
  
   return (EXIT_SUCCESS);
 }
-

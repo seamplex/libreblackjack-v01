@@ -494,7 +494,7 @@ int bjinit(char *cmdline_file_path) {
 
   
   // function pointers
-  LL_FOREACH(blackjack.players, player) {
+  for (player = blackjack.players; player != NULL; player = player->next) {
     
     switch (player->dealer2player.ipc_type) {
       case ipc_none:

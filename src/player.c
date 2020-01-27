@@ -31,7 +31,9 @@ player_t *new_player(const char *name) {
   player->name = strdup(name);
 //  player->dealer2player.fd = -1;
 //  player->player2dealer.fd = -1;
-  LL_APPEND(blackjack.players, player);
+  // TODO: multi-player
+  blackjack.players = player;
+//  list_append(blackjack.players, player);
   return player;
 }
 
@@ -113,7 +115,9 @@ void destroy_player(player_t *player) {
   free(player->player2dealer.name);
   free(player->name);
   destroy_hands(&player->hands);
-  LL_DELETE(blackjack.players, player);
+  // TODO
+  blackjack.players = NULL;
+//  LL_DELETE(blackjack.players, player);
   free(player);
   player = NULL;
   return;
@@ -123,7 +127,7 @@ void destroy_player(player_t *player) {
 player_t *get_player(const char *name) {
   player_t *player;
   
-  LL_FOREACH(blackjack.players, player) {
+  for (player = blackjack.players; player != NULL; player = player->next) {
     if (strcmp(player->name, name) == 0) {
       return player;
     }

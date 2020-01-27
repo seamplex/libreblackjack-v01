@@ -19,8 +19,8 @@ libreblackjack_LDADD = $(all_libraries)
 libreblackjack_SOURCES = \
  src/libreblackjack.h \
  src/version-vcs.h \
- src/utlist.h \
  src/main.c \
+ src/lists.c \
  src/cards.c \
  src/dealer.c \
  src/stdinout.c \
