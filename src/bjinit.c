@@ -38,15 +38,10 @@ char numbername[14][4] = {"X", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T",
 int cardvalue[14] = {0, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10};
 
 
-// saca los blancos de una cadena (inline)
 void bj_strip_blanks(char *string) {
   int i = 0;
   int j = 0;
-  // capaz se pueda hacer sin duplicar string, pero por
-  // si acaso vamos a lo seguro
-  char *buff;
-
-  buff = strdup(string);
+  char *buff = strdup(string);
 
   for (i = 0; i < strlen(string); i++) {
     if (!isspace((int)buff[i])) {
@@ -55,12 +50,31 @@ void bj_strip_blanks(char *string) {
   }
 
   string[j] = '\0';
-
   free(buff);
 
   return;
-
 }
+
+// saca los blancos de una cadena (inline)
+void bj_strip_blanks_leading_trailing(char *string) {
+  int i = 0;
+  int j = 0;
+  char *buff = strdup(string);
+
+  while (isspace(buff[i])) {
+    i++;
+  }
+  
+  for (j = strlen(buff)-1; j > i && isspace(buff[j]); j--) {
+    buff[j] = '\0';
+  }
+  
+  snprintf(string, j-i+2, "%s", &buff[i]);
+  free(buff);
+
+  return;
+}
+
 
 
 int fbj_ini_handler(const char* name, const char* value) {
@@ -333,8 +347,10 @@ int bjinit(char *cmdline_file_path) {
       }
 
       if (keyword != NULL && value != NULL) {
-        bj_strip_blanks(keyword);
-        bj_strip_blanks(value);
+//        bj_strip_blanks(keyword);
+//        bj_strip_blanks(value);
+        bj_strip_blanks_leading_trailing(keyword);
+        bj_strip_blanks_leading_trailing(value);
         if (fbj_ini_handler(keyword, value) != 0) {
           blackjack_push_error_message("%s:%d: ", ini_file_path, line);
           return -1;

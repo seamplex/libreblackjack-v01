@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
       case '?':
         argument_for_ini = strdup(argv[optind-1]);
         if ((equal_sign = strchr(argument_for_ini, '=')) == NULL) {
-          if (fbj_ini_handler(argument_for_ini+2, "") <= 0) {
+          if (fbj_ini_handler(argument_for_ini+2, "") != 0) {
             fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
             fprintf(stderr, _("Try '%s --help' for more information.\n)"), argv[0]);
             return 1;

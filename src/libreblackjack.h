@@ -40,7 +40,7 @@
 
 
 #define bjcall(function)   if ((function) != 0) return -1
-#define bjcallpop(function)   if ((function) <= 0) { blackjack_pop_errors(); return 1; }
+#define bjcallpop(function)   if ((function) != 0) { blackjack_pop_errors(); return 1; }
 
 #define INI_FILE_PATH "libreblackjack.ini"
 
