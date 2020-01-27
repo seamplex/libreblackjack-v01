@@ -302,6 +302,8 @@ extern int player_from_stdin(player_t *, char *buffer);
 extern void free_rl_stdin(void);
 
 // bjinit.c
+extern void bj_strip_blanks_leading_trailing(char *);
+extern void bj_strip_blanks(char *);
 extern player_t *new_player(const char *name);
 extern void destroy_player(player_t *player);
 extern player_t *get_player(const char *name);
