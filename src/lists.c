@@ -39,6 +39,20 @@ void append_card(card_t *head, card_t *card) {
   return;
 }
 
+void append_hand(hand_t *head, hand_t *hand) {
+
+  hand_t *last;
+  hand->next = NULL;
+  if (head != NULL) {
+    for (last = head; last-> next != NULL; last = last->next);
+    last->next = hand;
+  } else {
+    head = hand;
+  }
+  
+  return;
+}
+
 void delete_card(card_t *head, card_t *card) {
   card_t *tmp;
   if (head == card) {
@@ -47,6 +61,20 @@ void delete_card(card_t *head, card_t *card) {
     for (tmp = head; tmp->next && tmp->next != card; tmp = tmp->next);
     if (tmp->next) {                                                                          \
       tmp->next = card->next;                                                              \
+    }                                                                                          \
+  }
+
+  return;  
+}
+
+void delete_hand(hand_t *head, hand_t *hand) {
+  hand_t *tmp;
+  if (head == hand) {
+    head = head->next;
+  } else {
+    for (tmp = head; tmp->next && tmp->next != hand; tmp = tmp->next);
+    if (tmp->next) {                                                                          \
+      tmp->next = hand->next;                                                              \
     }                                                                                          \
   }
 

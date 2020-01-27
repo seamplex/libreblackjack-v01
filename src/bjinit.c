@@ -163,7 +163,7 @@ int fbj_ini_handler(const char* name, const char* value) {
       while (token != NULL) {
         arranged_card = calloc(1, sizeof(card_t));
         arranged_card->tag = atoi(token);
-        LL_APPEND(blackjack_ini.arranged_cards, arranged_card);
+        append_card(blackjack_ini.arranged_cards, arranged_card);
         token = strtok(NULL, INI_TOKEN_SEPARATORS);
       }
       free(tokens);

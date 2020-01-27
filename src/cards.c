@@ -186,7 +186,7 @@ void destroy_hands(hand_t **hands) {
       free(card);
       card = NULL;
     }
-    LL_DELETE(*hands, hand);
+    delete_hand(*hands, hand);
     free(hand);
     hand = NULL;
   }

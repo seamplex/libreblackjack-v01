@@ -529,16 +529,16 @@ int dealer_process_input(player_t *player, char *command) {
           hand->bet = player->current_hand->bet;
           player->total_money_waged += player->current_hand->bet;
           hand->id = player->current_hand->id + 1;
-          LL_APPEND(player->hands, hand);
+          append_hand(player->hands, hand);
           
           // llevamos la segunda carta a la segunda mano
           card = calloc(1, sizeof(card_t));
           memcpy(card, &blackjack.card[player->current_hand->cards->next->tag], sizeof(card_t));
           
           // borramos la carta de la primera
-          LL_DELETE(player->current_hand->cards, player->current_hand->cards->next);
+          delete_card(player->current_hand->cards, player->current_hand->cards->next);
           // y la ponemos en la segunda
-          LL_APPEND(hand->cards, card);
+          append_card(hand->cards, card);
           
           // le damos una carta en la primera
           card = deal_card_to_hand(player->current_hand);
