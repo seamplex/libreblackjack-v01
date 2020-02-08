@@ -53,9 +53,9 @@ int write_formatted(player_t *player, const char *fmt, ...) {
   
   bjcall(blackjack.current_player->write(player, command));
   
-  if (blackjack_ini.log != NULL) {
-    fprintf(blackjack_ini.log, "-> %s\n", command);
-    fflush(blackjack_ini.log);
+  if (blackjack_conf.log != NULL) {
+    fprintf(blackjack_conf.log, "-> %s\n", command);
+    fflush(blackjack_conf.log);
   }
   
   return 0;

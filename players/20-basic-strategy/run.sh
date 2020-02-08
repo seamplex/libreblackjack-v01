@@ -77,9 +77,9 @@ EOF
    
     for play in s d h; do
      
-     # start with options.ini as a template and add some custom stuff
-     cp options.ini libreblackjack.ini
-     cat << EOF >> libreblackjack.ini
+     # start with options.conf as a template and add some custom stuff
+     cp options.conf blackjack.conf
+     cat << EOF >> blackjack.conf
 hands = ${n}
 dealer2player = internal
 arranged_cards = ${card1} $((${upcard_n} + 13)) $((${card2} + 26))
@@ -269,9 +269,9 @@ EOF
    
    for play in y n; do
      
-    # start with options.ini as a template and add some custom stuff
-    cp options.ini libreblackjack.ini
-    cat << EOF >> libreblackjack.ini
+    # start with options.conf as a template and add some custom stuff
+    cp options.conf blackjack.conf
+    cat << EOF >> blackjack.conf
 hands = ${n}
 dealer2player = internal
 arranged_cards = ${pair} $((${upcard_n} + 13)) $((${pair} + 26))

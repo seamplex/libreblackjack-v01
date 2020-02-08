@@ -77,7 +77,7 @@ void bj_strip_blanks_leading_trailing(char *string) {
 
 
 
-int fbj_ini_handler(const char* name, const char* value) {
+int fbj_conf_handler(const char* name, const char* value) {
 
   player_t *player;
   char *tokens;
@@ -85,11 +85,11 @@ int fbj_ini_handler(const char* name, const char* value) {
   
 // global options (el primero que llega entre ini y commandline pone la opcion)
   if (MATCH("decks")) {
-    if (blackjack_ini.decks == 0) { blackjack_ini.decks = atoi(value); }
+    if (blackjack_conf.decks == 0) { blackjack_conf.decks = atoi(value); }
 
   } else if (MATCH("hands")) {
     // asi podemos poner cosas como 1e6
-    if (blackjack_ini.hands == 0) { blackjack_ini.hands = (long int)(atof(value)); }
+    if (blackjack_conf.hands == 0) { blackjack_conf.hands = (long int)(atof(value)); }
 
   } else if (MATCH("players")) {
     tokens = strdup(value);
@@ -101,90 +101,90 @@ int fbj_ini_handler(const char* name, const char* value) {
     free(token);
 
   } else if (MATCH("rng_seed")) {
-    if (blackjack_ini.rng_seed == 0) { blackjack_ini.rng_seed = atoi(value); }
+    if (blackjack_conf.rng_seed == 0) { blackjack_conf.rng_seed = atoi(value); }
 
   } else if (MATCH("rng_type")) {
-//        blackjack_ini.rng_type = gsl_rng_mt19937;
+//        blackjack_conf.rng_type = gsl_rng_mt19937;
     ;
 
   } else if (MATCH("number_of_burnt_cards") || MATCH("burnt_cards") || MATCH("burntcards")) {
-    if (blackjack_ini.number_of_burnt_cards == -1) {  blackjack_ini.number_of_burnt_cards = atoi(value); }
+    if (blackjack_conf.number_of_burnt_cards == -1) {  blackjack_conf.number_of_burnt_cards = atoi(value); }
 
   } else if (MATCH("penetration")) {
-    if (blackjack_ini.penetration == 0) { blackjack_ini.penetration = atof(value); }
-    if (blackjack_ini.penetration == 0) {
-      blackjack_ini.penetration = 1e-6;
+    if (blackjack_conf.penetration == 0) { blackjack_conf.penetration = atof(value); }
+    if (blackjack_conf.penetration == 0) {
+      blackjack_conf.penetration = 1e-6;
     }
 
   } else if (MATCH("penetration_sigma")) {
-    if (blackjack_ini.penetration_sigma == 0) { blackjack_ini.penetration_sigma = atof(value); }
+    if (blackjack_conf.penetration_sigma == 0) { blackjack_conf.penetration_sigma = atof(value); }
 
   } else if (MATCH("blackjack_pays") || MATCH("bjpays")) {
-    if (blackjack_ini.blackjack_pays == -1) {
+    if (blackjack_conf.blackjack_pays == -1) {
       if (strcmp(value, "3/2")) {
-        blackjack_ini.blackjack_pays = 3.0/2.0;
+        blackjack_conf.blackjack_pays = 3.0/2.0;
       } else if (strcmp(value, "6/5")) {
-        blackjack_ini.blackjack_pays = 6.0/5.0;
+        blackjack_conf.blackjack_pays = 6.0/5.0;
       } else {
-        blackjack_ini.blackjack_pays = atof(value);
+        blackjack_conf.blackjack_pays = atof(value);
       }
     }
 
-    if (blackjack_ini.blackjack_pays <= 0) {
+    if (blackjack_conf.blackjack_pays <= 0) {
       blackjack_push_error_message(_("blackjack_pays has to be positive, not '%s'"), value);
       return -1;
     }
 
   } else if (MATCH("no_negative_bankrolls") || MATCH("bouncer")) {
-    if (blackjack_ini.no_negative_bankroll == -1) { blackjack_ini.no_negative_bankroll = atoi(value); }
+    if (blackjack_conf.no_negative_bankroll == -1) { blackjack_conf.no_negative_bankroll = atoi(value); }
 
   } else if (MATCH("double_after_split") || MATCH("das")) {
-    if (blackjack_ini.double_after_split == -1) { blackjack_ini.double_after_split = atoi(value); }
+    if (blackjack_conf.double_after_split == -1) { blackjack_conf.double_after_split = atoi(value); }
 
   } else if (MATCH("hit_soft_17") || MATCH("h17")) {
-    if (blackjack_ini.hit_soft_17 == -1) { blackjack_ini.hit_soft_17 = atoi(value); }
+    if (blackjack_conf.hit_soft_17 == -1) { blackjack_conf.hit_soft_17 = atoi(value); }
 
   } else if (MATCH("max_bet") || MATCH("max_bet")) {
-    if (blackjack_ini.max_bet == 0) {  blackjack_ini.max_bet = atoi(value); }
+    if (blackjack_conf.max_bet == 0) {  blackjack_conf.max_bet = atoi(value); }
 
   } else if (MATCH("max_incorrect_commands")) {
-    if (blackjack_ini.max_invalid_commands == -1 ) { blackjack_ini.max_invalid_commands = atoi(value); }
+    if (blackjack_conf.max_invalid_commands == -1 ) { blackjack_conf.max_invalid_commands = atoi(value); }
 
   } else if (MATCH("error_standard_deviations")) {
-    if (blackjack_ini.error_standard_deviations == -1 ) { blackjack_ini.error_standard_deviations = atof(value); }
+    if (blackjack_conf.error_standard_deviations == -1 ) { blackjack_conf.error_standard_deviations = atof(value); }
     
   } else if (MATCH("log")) {
-    if (blackjack_ini.log == NULL ) {
-      if ((blackjack_ini.log = fopen(value, "w")) == NULL) {
+    if (blackjack_conf.log == NULL ) {
+      if ((blackjack_conf.log = fopen(value, "w")) == NULL) {
         blackjack_push_error_message(_("cannot open log file '%s': %s\n"), value, strerror(errno));
         return -1;
       }
     }
 
   } else if (MATCH("yaml_report")) {
-    if (blackjack_ini.yaml_report == NULL ) {
-      if ((blackjack_ini.yaml_report = fopen(value, "w")) == NULL) {
+    if (blackjack_conf.yaml_report == NULL ) {
+      if ((blackjack_conf.yaml_report = fopen(value, "w")) == NULL) {
         blackjack_push_error_message(_("cannot open YAML report file '%s': %s\n"), value, strerror(errno));
         return -1;
       }
     }
 
   } else if (MATCH("arranged_cards")) {
-    if (blackjack_ini.arranged_cards == NULL) {
+    if (blackjack_conf.arranged_cards == NULL) {
       card_t *arranged_card;
       tokens = strdup(value);
       token = strtok(tokens, INI_TOKEN_SEPARATORS);
       while (token != NULL) {
         arranged_card = calloc(1, sizeof(card_t));
         arranged_card->tag = atoi(token);
-        append_card(&blackjack_ini.arranged_cards, arranged_card);
+        append_card(&blackjack_conf.arranged_cards, arranged_card);
         token = strtok(NULL, INI_TOKEN_SEPARATORS);
       }
       free(tokens);
     }
 
   } else if (MATCH("shuffle_every_hand")) {
-    if (blackjack_ini.shuffle_every_hand == -1 ) { blackjack_ini.shuffle_every_hand = atoi(value); }
+    if (blackjack_conf.shuffle_every_hand == -1 ) { blackjack_conf.shuffle_every_hand = atoi(value); }
     
 // stdout      
   } else if (MATCH("no_color")) {
@@ -316,15 +316,15 @@ int bjinit(char *cmdline_file_path) {
   player_t *player;
 
   // las cosas que pueden ser cero arrancan en menos uno
-  blackjack_ini.no_negative_bankroll = -1;
-  blackjack_ini.max_bet = -1;
-  blackjack_ini.double_after_split = -1;
-  blackjack_ini.hit_soft_17 = -1;
-  blackjack_ini.max_invalid_commands = -1;
-  blackjack_ini.shuffle_every_hand = -1;
+  blackjack_conf.no_negative_bankroll = -1;
+  blackjack_conf.max_bet = -1;
+  blackjack_conf.double_after_split = -1;
+  blackjack_conf.hit_soft_17 = -1;
+  blackjack_conf.max_invalid_commands = -1;
+  blackjack_conf.shuffle_every_hand = -1;
   
   // leemos el ini
-  ini_file_path = strdup((cmdline_file_path == NULL) ? INI_FILE_PATH : cmdline_file_path);
+  ini_file_path = strdup((cmdline_file_path == NULL) ? CONF_FILE_PATH : cmdline_file_path);
   if ((ini_file = fopen(ini_file_path, "r")) != NULL) {
     while (fgets(buffer, BUF_SIZE-1, ini_file)) {
   
@@ -351,7 +351,7 @@ int bjinit(char *cmdline_file_path) {
 //        bj_strip_blanks(value);
         bj_strip_blanks_leading_trailing(keyword);
         bj_strip_blanks_leading_trailing(value);
-        if (fbj_ini_handler(keyword, value) != 0) {
+        if (fbj_conf_handler(keyword, value) != 0) {
           blackjack_push_error_message("%s:%d: ", ini_file_path, line);
           return -1;
         }
@@ -367,20 +367,20 @@ int bjinit(char *cmdline_file_path) {
   free(ini_file_path);
 
   // non-zero defaults
-  if (blackjack_ini.decks == 0) {  blackjack_ini.decks = 6; }
-  if (blackjack_ini.hands == 0) {  blackjack_ini.hands = 1e6; }
-  if (blackjack_ini.no_negative_bankroll == -1) { blackjack_ini.no_negative_bankroll = 0; }
-  if (blackjack_ini.max_bet == -1) { blackjack_ini.max_bet = 0; }
-  if (blackjack_ini.double_after_split == -1) { blackjack_ini.double_after_split = 1; }
-  if (blackjack_ini.hit_soft_17 == -1) { blackjack_ini.hit_soft_17 = 1; }
-  if (blackjack_ini.blackjack_pays == 0) { blackjack_ini.blackjack_pays = 3.0/2.0; }
-  if (blackjack_ini.error_standard_deviations == 0) { blackjack_ini.error_standard_deviations = 2.0; }
-  if (blackjack_ini.max_invalid_commands == -1) { blackjack_ini.max_invalid_commands = 100; }
-  if (blackjack_ini.shuffle_every_hand == -1) { blackjack_ini.shuffle_every_hand = 0; }
+  if (blackjack_conf.decks == 0) {  blackjack_conf.decks = 6; }
+  if (blackjack_conf.hands == 0) {  blackjack_conf.hands = 1e6; }
+  if (blackjack_conf.no_negative_bankroll == -1) { blackjack_conf.no_negative_bankroll = 0; }
+  if (blackjack_conf.max_bet == -1) { blackjack_conf.max_bet = 0; }
+  if (blackjack_conf.double_after_split == -1) { blackjack_conf.double_after_split = 1; }
+  if (blackjack_conf.hit_soft_17 == -1) { blackjack_conf.hit_soft_17 = 1; }
+  if (blackjack_conf.blackjack_pays == 0) { blackjack_conf.blackjack_pays = 3.0/2.0; }
+  if (blackjack_conf.error_standard_deviations == 0) { blackjack_conf.error_standard_deviations = 2.0; }
+  if (blackjack_conf.max_invalid_commands == -1) { blackjack_conf.max_invalid_commands = 100; }
+  if (blackjack_conf.shuffle_every_hand == -1) { blackjack_conf.shuffle_every_hand = 0; }
   
-//  blackjack_inirng_type = gsl_rng_mt19937;
-  if (blackjack_ini.penetration == 0) { blackjack_ini.penetration = 0.75; }
-  if (blackjack_ini.penetration_sigma ==  0) { blackjack_ini.penetration_sigma = 0.05; }
+//  blackjack_confrng_type = gsl_rng_mt19937;
+  if (blackjack_conf.penetration == 0) { blackjack_conf.penetration = 0.75; }
+  if (blackjack_conf.penetration_sigma ==  0) { blackjack_conf.penetration_sigma = 0.05; }
   
   // si no hay ningun player, creamos uno
   if ((blackjack.current_player = blackjack.players) == NULL) {
@@ -392,9 +392,9 @@ int bjinit(char *cmdline_file_path) {
     blackjack.current_player->delay = 0.4;
   }
   
-  if (blackjack_ini.rng_seed == 0) {
+  if (blackjack_conf.rng_seed == 0) {
     assert((devrandom = fopen("/dev/urandom", "r")));
-    assert(fread(&blackjack_ini.rng_seed, sizeof(blackjack_ini.rng_seed), 1, devrandom));
+    assert(fread(&blackjack_conf.rng_seed, sizeof(blackjack_conf.rng_seed), 1, devrandom));
     fclose(devrandom);
   }
 

@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   int hands_per_char = 0;
   unsigned long int last_hand_per_char = 0;
   int current_invalid_command = 0;
-  char *argument_for_ini;
+  char *argument_for_conf;
   char *equal_sign;
   
  
@@ -68,41 +68,41 @@ int main(int argc, char** argv) {
         show_version = 1;
         break;
       case 'd':
-        bjcallpop(fbj_ini_handler("decks", optarg));
+        bjcallpop(fbj_conf_handler("decks", optarg));
         break;
       case 'n':
-        bjcallpop(fbj_ini_handler("hands", optarg));
+        bjcallpop(fbj_conf_handler("hands", optarg));
         break;
       case 'i':
-        bjcallpop(fbj_ini_handler("player2dealer", "internal"));
-        bjcallpop(fbj_ini_handler("dealer2player", "internal"));
-        bjcallpop(fbj_ini_handler("flat_bet", "1"));
-        bjcallpop(fbj_ini_handler("no_insurance", "1"));
+        bjcallpop(fbj_conf_handler("player2dealer", "internal"));
+        bjcallpop(fbj_conf_handler("dealer2player", "internal"));
+        bjcallpop(fbj_conf_handler("flat_bet", "1"));
+        bjcallpop(fbj_conf_handler("no_insurance", "1"));
         break;
       case 'f':
         if (optarg != NULL) {
-          bjcallpop(fbj_ini_handler("flat_bet", optarg));
+          bjcallpop(fbj_conf_handler("flat_bet", optarg));
         } else {
-          bjcallpop(fbj_ini_handler("flat_bet", "1"));
+          bjcallpop(fbj_conf_handler("flat_bet", "1"));
         }
         break;
       case '?':
-        argument_for_ini = strdup(argv[optind-1]);
-        if ((equal_sign = strchr(argument_for_ini, '=')) == NULL) {
-          if (fbj_ini_handler(argument_for_ini+2, "") != 0) {
-            fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
+        argument_for_conf = strdup(argv[optind-1]);
+        if ((equal_sign = strchr(argument_for_conf, '=')) == NULL) {
+          if (fbj_conf_handler(argument_for_conf+2, "") != 0) {
+            fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_conf);
             fprintf(stderr, _("Try '%s --help' for more information.\n)"), argv[0]);
             return 1;
           }
         } else {
           *equal_sign = '\0';
-          if (fbj_ini_handler(argument_for_ini+2, equal_sign+1) <= 0) {
-            fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_ini);
+          if (fbj_conf_handler(argument_for_conf+2, equal_sign+1) <= 0) {
+            fprintf(stderr, _("Unkown option '%s'.\n"), argument_for_conf);
             fprintf(stderr, _("Try '%s --help' for more information.\n"), argv[0]);
             return 1;
           }
         }
-        free(argument_for_ini);
+        free(argument_for_conf);
         break;
       default:
         break;
@@ -153,9 +153,9 @@ int main(int argc, char** argv) {
   
   // TODO: elegir, poner opcion -q (y --verbose)
   if (blackjack.players->dealer2player.ipc_type != ipc_none) {
-    if (blackjack_ini.hands != 0) {
+    if (blackjack_conf.hands != 0) {
       show_bar = 1;
-      hands_per_char = blackjack_ini.hands/50;
+      hands_per_char = blackjack_conf.hands/50;
     }
   }
   
@@ -204,9 +204,9 @@ int main(int argc, char** argv) {
             return 1;
           }
           
-          if (blackjack_ini.log != NULL) {
-            fprintf(blackjack_ini.log, "-> %s\n", outputbuffer);
-            fflush(blackjack_ini.log);
+          if (blackjack_conf.log != NULL) {
+            fprintf(blackjack_conf.log, "-> %s\n", outputbuffer);
+            fflush(blackjack_conf.log);
           }
         }
         
@@ -214,14 +214,14 @@ int main(int argc, char** argv) {
           blackjack_pop_errors();
           return 1;
         }
-        if (blackjack_ini.log != NULL) {
-          fprintf(blackjack_ini.log, "<- %s\n", inputbuffer);
-          fflush(blackjack_ini.log);
+        if (blackjack_conf.log != NULL) {
+          fprintf(blackjack_conf.log, "<- %s\n", inputbuffer);
+          fflush(blackjack_conf.log);
         }
         
-        if (blackjack_ini.max_invalid_commands != 0 && current_invalid_command++ > blackjack_ini.max_invalid_commands) {
+        if (blackjack_conf.max_invalid_commands != 0 && current_invalid_command++ > blackjack_conf.max_invalid_commands) {
           blackjack.current_player->write(blackjack.current_player, "max_incorrect_commands");
-          blackjack_push_error_message(_("reached the maximum number of allowed incorrect commands (%d)"), blackjack_ini.max_invalid_commands);
+          blackjack_push_error_message(_("reached the maximum number of allowed incorrect commands (%d)"), blackjack_conf.max_invalid_commands);
           blackjack_pop_errors();
           blackjack.current_player->write(blackjack.current_player, "bye");
           exit(1);
@@ -243,8 +243,8 @@ int main(int argc, char** argv) {
   destroy_hands(&blackjack.dealer_hand);
   free_rl_stdin();
   free(blackjack.shoe);
-  if (blackjack_ini.log != NULL) {
-    fclose(blackjack_ini.log);
+  if (blackjack_conf.log != NULL) {
+    fclose(blackjack_conf.log);
   }
 #ifdef HAVE_LIBGSL
   gsl_rng_free(blackjack.rng);

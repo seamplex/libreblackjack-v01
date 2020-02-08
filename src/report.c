@@ -34,29 +34,29 @@ int write_yaml_report(player_t *player) {
   int precision;
   char format[32];
   
-  if ((file = blackjack_ini.yaml_report) == NULL) {
+  if ((file = blackjack_conf.yaml_report) == NULL) {
     file = stderr;
   }
   
   // TODO: elegir que se agreguen comentarios con explicaciones
   fprintf(file, "---\n");  
   fprintf(file, "rules:\n");
-  fprintf(file, "  decks:                  %d\n", blackjack_ini.decks);
+  fprintf(file, "  decks:                  %d\n", blackjack_conf.decks);
   fprintf(file, "  hands:                  %g\n", (double)blackjack.hand);
-  fprintf(file, "  hit_soft_17:            %d\n", blackjack_ini.hit_soft_17);
-  fprintf(file, "  double_after_split:     %d\n", blackjack_ini.double_after_split);
-  fprintf(file, "  blackjack_pays:         %g\n", blackjack_ini.blackjack_pays);
-  fprintf(file, "  rng_seed:               %d\n", blackjack_ini.rng_seed);
-  fprintf(file, "  number_of_burnt_cards:  %d\n", blackjack_ini.number_of_burnt_cards);
-  fprintf(file, "  no_negative_bankroll:   %d\n", blackjack_ini.no_negative_bankroll);
-  fprintf(file, "  max_bet:                %d\n", blackjack_ini.max_bet);
+  fprintf(file, "  hit_soft_17:            %d\n", blackjack_conf.hit_soft_17);
+  fprintf(file, "  double_after_split:     %d\n", blackjack_conf.double_after_split);
+  fprintf(file, "  blackjack_pays:         %g\n", blackjack_conf.blackjack_pays);
+  fprintf(file, "  rng_seed:               %d\n", blackjack_conf.rng_seed);
+  fprintf(file, "  number_of_burnt_cards:  %d\n", blackjack_conf.number_of_burnt_cards);
+  fprintf(file, "  no_negative_bankroll:   %d\n", blackjack_conf.no_negative_bankroll);
+  fprintf(file, "  max_bet:                %d\n", blackjack_conf.max_bet);
   
 //  card_t *arranged_cards;
 //  FILE *command_log;
   
-  if (blackjack_ini.decks > 0) {
-    fprintf(file, "  penetration:            %g\n", blackjack_ini.penetration);
-    fprintf(file, "  penetration_sigma:      %g\n", blackjack_ini.penetration_sigma);
+  if (blackjack_conf.decks > 0) {
+    fprintf(file, "  penetration:            %g\n", blackjack_conf.penetration);
+    fprintf(file, "  penetration_sigma:      %g\n", blackjack_conf.penetration_sigma);
   }
 
   // TODO
@@ -102,7 +102,7 @@ int write_yaml_report(player_t *player) {
   
   // return is a keyword!
   ev = (double)player->bankroll/(double)blackjack.hand;
-  error = blackjack_ini.error_standard_deviations * sqrt(player->variance / (double)(blackjack.hand));
+  error = blackjack_conf.error_standard_deviations * sqrt(player->variance / (double)(blackjack.hand));
   
   precision = (int)(ceil(-log10(error)))-2;
   if (precision >= 0) {

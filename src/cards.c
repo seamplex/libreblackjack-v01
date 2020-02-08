@@ -88,7 +88,7 @@ int compute_count(hand_t *hand) {
 int deal_card(void) {
   int dealt_tag = 0;
   
-  if (blackjack_ini.decks == -1) {
+  if (blackjack_conf.decks == -1) {
     
     // if using infinite decks we take a random suit and rank and that's it
     if (blackjack.rng == NULL) {
@@ -96,14 +96,14 @@ int deal_card(void) {
       int i;
       
       blackjack.n_arranged_cards = 0;
-      for (card = blackjack_ini.arranged_cards; card != NULL; card = card->next) {
+      for (card = blackjack_conf.arranged_cards; card != NULL; card = card->next) {
         blackjack.n_arranged_cards++;
       }
       if (blackjack.n_arranged_cards != 0) {
         blackjack.arranged_cards_array = calloc(blackjack.n_arranged_cards, sizeof(int));
       
         i = 0;
-        for (card = blackjack_ini.arranged_cards; card != NULL; card = card->next) {
+        for (card = blackjack_conf.arranged_cards; card != NULL; card = card->next) {
           blackjack.arranged_cards_array[i++] = card->tag;
         }
       }
@@ -113,9 +113,9 @@ int deal_card(void) {
       blackjack.rng = gsl_rng_alloc(gsl_rng_mt19937);
       // inicializamos el rng al principio, despues le seguimos pidiendo
       // randoms sin inicializar sino salen siempre los mismos shoes
-      gsl_rng_set(blackjack.rng, blackjack_ini.rng_seed);
+      gsl_rng_set(blackjack.rng, blackjack_conf.rng_seed);
 #else
-      srandom(blackjack_ini.rng_seed);
+      srandom(blackjack_conf.rng_seed);
 #endif
       
       
@@ -134,10 +134,10 @@ int deal_card(void) {
     
   } else {
     
-    if (blackjack.current_card_index >= 52*blackjack_ini.decks) {
+    if (blackjack.current_card_index >= 52*blackjack_conf.decks) {
       return 0;
     }
-    blackjack.last_pass = (blackjack.current_card_index >= blackjack.cut_card_index) || blackjack_ini.shuffle_every_hand;
+    blackjack.last_pass = (blackjack.current_card_index >= blackjack.cut_card_index) || blackjack_conf.shuffle_every_hand;
 
     dealt_tag = blackjack.shoe[blackjack.current_card_index++];
   }
@@ -201,15 +201,15 @@ void init_shoe(void)  {
   int tag;  // an integer between 1 and 52 inclusive
 
   if (blackjack.shoe == NULL) {
-    blackjack.shoe = malloc(blackjack_ini.decks * 52 * sizeof(int));
+    blackjack.shoe = malloc(blackjack_conf.decks * 52 * sizeof(int));
 #ifdef HAVE_LIBGSL
     // TODO: choose
     blackjack.rng = gsl_rng_alloc(gsl_rng_mt19937);
     // inicializamos el rng al principio, despues le seguimos pidiendo
     // randoms sin inicializar sino salen siempre los mismos shoes
-    gsl_rng_set(blackjack.rng, blackjack_ini.rng_seed);
+    gsl_rng_set(blackjack.rng, blackjack_conf.rng_seed);
 #else
-    srandom(blackjack_ini.rng_seed);
+    srandom(blackjack_conf.rng_seed);
 #endif
     
   }
@@ -219,7 +219,7 @@ void init_shoe(void)  {
   // each suit has 13 ranks 1--13
   // the "tag" is 13*suit+rank
   i = 0;
-  for (deck = 0; deck < blackjack_ini.decks; deck++) {
+  for (deck = 0; deck < blackjack_conf.decks; deck++) {
     for (tag = 1; tag <= 52; tag++) {
       blackjack.shoe[i++] = tag;
     }
@@ -238,14 +238,14 @@ void shuffle_shoe(void) {
 
   // si tenemos decks = 0 (infinitos) entonces no hace
   // falta mezclar, sorteamos una carta cada vez que nos piden
-  if (blackjack_ini.decks != -1) {
+  if (blackjack_conf.decks != -1) {
     // vemos si hay que inicializar el shoe
     if (blackjack.shoe == NULL) {
       init_shoe();
     }
   
     // mezclamos
-    for (i = 52*(blackjack_ini.decks)-1; i > 0; i--) {
+    for (i = 52*(blackjack_conf.decks)-1; i > 0; i--) {
 #ifdef HAVE_LIBGSL      
       j = gsl_rng_uniform_int(blackjack.rng, i);
 #else
@@ -260,9 +260,9 @@ void shuffle_shoe(void) {
 
     // ponemos la cut card segun la penetracion (hace desde el 2004 que quiero hacer esto)
 #ifdef HAVE_LIBGSL    
-    blackjack.cut_card_index = 52*(blackjack_ini.decks) * (blackjack_ini.penetration + gsl_ran_gaussian(blackjack.rng, blackjack_ini.penetration_sigma));
+    blackjack.cut_card_index = 52*(blackjack_conf.decks) * (blackjack_conf.penetration + gsl_ran_gaussian(blackjack.rng, blackjack_conf.penetration_sigma));
 #else
-    blackjack.cut_card_index = 52*(blackjack_ini.decks) * (blackjack_ini.penetration);
+    blackjack.cut_card_index = 52*(blackjack_conf.decks) * (blackjack_conf.penetration);
 #endif    
 
     // empezamos en la primera (el dealer es que el que tiene que quemar)  
@@ -270,8 +270,8 @@ void shuffle_shoe(void) {
 
     // ponemos primero las que estan arregladas
     j = 0;
-    for (card = blackjack_ini.arranged_cards; card != NULL; card = card->next) {
-      for (i = 52*(blackjack_ini.decks)-1; i > 0; i--) {
+    for (card = blackjack_conf.arranged_cards; card != NULL; card = card->next) {
+      for (i = 52*(blackjack_conf.decks)-1; i > 0; i--) {
         if (blackjack.shoe[i] == card->tag) {
           blackjack.shoe[i] = blackjack.shoe[j];
           blackjack.shoe[j] = card->tag;

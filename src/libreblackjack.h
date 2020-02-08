@@ -39,10 +39,10 @@
 #define _(string) gettext (string)
 
 
-#define bjcall(function)   if ((function) != 0) return -1
+#define bjcall(function)      if ((function) != 0) return -1
 #define bjcallpop(function)   if ((function) != 0) { blackjack_pop_errors(); return 1; }
 
-#define INI_FILE_PATH "libreblackjack.ini"
+#define CONF_FILE_PATH "blackjack.conf"
 
 // char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
@@ -101,7 +101,7 @@ struct ipc_t {
 struct {
   // rules
   int decks;                     // -1 for infinite
-  unsigned long int hands;       // max hands (read from ini or commandline)
+  unsigned long int hands;       // max hands (read from conf or commandline)
   int rng_seed;                  // zero = read from /dev/urandom
   int number_of_burnt_cards;     // number of burnt cards after shuffling
   int no_negative_bankroll;      // do not allow negative bankrolls
@@ -120,7 +120,7 @@ struct {
   double blackjack_pays;
   double error_standard_deviations;
   
-} blackjack_ini;
+} blackjack_conf;
 
 
 #define CARD_ART_LINES 6
@@ -310,7 +310,7 @@ extern player_t *get_player(const char *name);
 extern player_t *get_or_define_player(const char *name);
 extern player_t *player_from_section(const char *section);
 extern int bjinit(char *cmdline_file_path);
-int fbj_ini_handler(const char* name, const char* value);
+int fbj_conf_handler(const char* name, const char* value);
 
 // commands.c
 extern int write_formatted_card(player_t *player, int dealer, char *command, card_t *card);

@@ -33,7 +33,7 @@ int dealer_action(void) {
   // dealer_action
   switch (blackjack.next_dealer_action) {
     case START_NEW_HAND:
-      if (blackjack_ini.hands > 0 && blackjack.hand >= blackjack_ini.hands) {
+      if (blackjack_conf.hands > 0 && blackjack.hand >= blackjack_conf.hands) {
         blackjack.done = 1;
         return 0;
       }
@@ -75,7 +75,7 @@ int dealer_action(void) {
         shuffle_shoe();
         // TODO: reset card counting systems
         // 1b quemamos tantas cartas como me piden
-        for (i = 0; i < blackjack_ini.number_of_burnt_cards; i++) {
+        for (i = 0; i < blackjack_conf.number_of_burnt_cards; i++) {
           deal_card();
         }
         blackjack.last_pass = 0;
@@ -205,10 +205,10 @@ int dealer_action(void) {
 
       } else if (player->current_hand->blackjack) {
           bjcall(blackjack.current_player->write(player, "blackjack_player"));
-          player->current_result += blackjack_ini.blackjack_pays * player->current_hand->bet;
-          player->bankroll += blackjack_ini.blackjack_pays * player->current_hand->bet;
+          player->current_result += blackjack_conf.blackjack_pays * player->current_hand->bet;
+          player->bankroll += blackjack_conf.blackjack_pays * player->current_hand->bet;
           player->player_blackjacks++;
-          bjcall(write_formatted(player, "player_wins %g", blackjack_ini.blackjack_pays * player->current_hand->bet));
+          bjcall(write_formatted(player, "player_wins %g", blackjack_conf.blackjack_pays * player->current_hand->bet));
           player->wins++;
           player->blackjack_wins++;
           
@@ -283,7 +283,7 @@ int dealer_action(void) {
       if (stdout_opts.isatty) { printf(_("dealer's count is %s%d\n"), blackjack.dealer_hand->soft?"soft ":"", blackjack.dealer_hand->count); }
       
       // hit if count is less than 17 (or equalt to soft 17 if hit_soft_17 is true)
-      while (((blackjack.dealer_hand->count < 17 || (blackjack_ini.hit_soft_17 && blackjack.dealer_hand->count == 17 && blackjack.dealer_hand->soft))) && blackjack.dealer_hand->busted == 0) {
+      while (((blackjack.dealer_hand->count < 17 || (blackjack_conf.hit_soft_17 && blackjack.dealer_hand->count == 17 && blackjack.dealer_hand->soft))) && blackjack.dealer_hand->busted == 0) {
         card = deal_card_to_hand(blackjack.dealer_hand);
         bjcall(write_formatted_card(player, 1, "card_dealer", card));
         if (stdout_opts.isatty) { print_hand_art(blackjack.dealer_hand); }
@@ -451,7 +451,7 @@ int dealer_process_input(player_t *player, char *command) {
     case BET:
       player->current_hand->bet = atoi(command);
       // TODO: bet = 0 -> wonging
-      if (player->hands->bet <= 0 || (blackjack_ini.max_bet != 0 && player->hands->bet > blackjack_ini.max_bet)) {
+      if (player->hands->bet <= 0 || (blackjack_conf.max_bet != 0 && player->hands->bet > blackjack_conf.max_bet)) {
         bjcall(write_formatted(player, "invalid_bet %d", player->hands->bet));
         return -1;
       } else {

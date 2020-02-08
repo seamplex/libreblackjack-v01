@@ -10,7 +10,7 @@ lang: en-US
 
 [Link to the derivation of the basic strategy](https://www.seamplex.com/blackjack/players/20-basic-strategy/)
 
-[LibreBlackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals cards and understands commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or automated way through
+[LibreBlackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals (digital) cards and understands commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or in an automated way through
  
  * the standard input,
  * named pipes,
@@ -18,7 +18,13 @@ lang: en-US
  * TCP (web)sockets (using netcat or gwsocket), or
  * dynamically loaded from shared objects.
   
-These players can be actual human players playing in real-time through a front-end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive [ASCII blackjack](#play).
+These players can be actual human players playing in real-time through a front-end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive [ASCII blackjack](#play):
+
+```{=html}
+<asciinema-player src="doc/libreblackjack.cast" cols="89" rows="28" preload="true" poster="npt:0:20"></asciinema-player>
+```
+
+
 
 ## Why
 
@@ -81,20 +87,22 @@ $ make check
 
 The subdirectory `players` contains some automatic players that play against LibreBlackjack. These players are coded in different languages and communicate with LibreBlackjack in a variety of ways in order to illustrate the design basis:
 
- * [`00-internal`](players/00-internal) uses the internal player that defaults to playing one million hands of basic strategy
- * [`02-always-stand`](players/02-always-stand), using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to libreblackjack’s standard input) no matter what the cards are
- * [`05-no-bust`](players/05-no-bust) is a PERL-based player does not bust (i.e. hits if the hard total is less than twelve) that receives tha cards through the standard input but draws or stands using a FIFO to talk back to the dealer
- * [`08-mimic-the-dealer`](players/08-mimic-the-dealer) does tha same the dealer do (hits soft seventeens). It is implemented in AWK using two FIFOs.
- * [`20-basic-strategy`](players/20-basic-strategy) derives the basic strategy from scratch in less than one minute.
+ * [00-internal](players/00-internal) uses the internal player that defaults to playing one million hands of basic strategy
+ * [02-always-stand](players/02-always-stand), using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to libreblackjack’s standard input) no matter what the cards are
+ * [05-no-bust](players/05-no-bust) is a PERL-based player does not bust (i.e. hits if the hard total is less than twelve) that receives the cards through the standard input but draws or stands using a FIFO to talk back to the dealer
+ * [08-mimic-the-dealer](players/08-mimic-the-dealer) follows what the dealer does (i.e. hits soft seventeens). It is implemented in AWK using two FIFOs.
+ * [20-basic-strategy](players/20-basic-strategy) derives the basic strategy from scratch in less than one minute by creating all the possible combination of hitting/standing/doubling/pairing strategies in an ASCII text file that the internal player can read and use.
 
 
 # Play
 
 Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII (actually UTF-8) mode.
 
-![ASCII (UTF-8) playing!](doc/ascii.png){.img-fluid}
+```{=html}
+<asciinema-player src="doc/libreblackjack2.cast" cols="89" rows="28" preload="true" poster="npt:0:20"></asciinema-player>
+```
 
-Edit the file `libreblackjack.ini` to set up rules, arranged shoes and other options. Type `help` at the prompt to get it.
+Edit the file [`blackjack.conf`](https://github.com/seamplex/libreblackjack/blob/master/blackjack.conf) in the same directory where the executable is run to set up rules, arranged shoes and other options. Type `help` at the prompt to get it.
 
 ## Automatic playing
 
@@ -132,11 +140,11 @@ LibreBlackjack is free software; you can redistribute it and/or modify it under 
 Home page: <https://www.seamplex.com/blackjack>  
 Repository: <https://github.com/seamplex/blackjack>  
 Mailing list and bug reports: <wasora@seamplex.com>  (you need to subscribe first at <wasora+subscribe@seamplex.com>)  
-Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA) [LinkedIn](https://www.linkedin.com/company/seamplex/) [Bitbucket](https://bitbucket.org/seamplex/)
+Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA) [LinkedIn](https://www.linkedin.com/company/seamplex/) [GitHub](https://github.com/seamplex/)
 
 ----------------------------------------------------
 
-libreblackjack is copyright (C) 2016,2019 Jeremy Theler  
+libreblackjack is copyright (C) 2016,2020 Jeremy Theler  
 libreblackjack is licensed under [GNU GPL version 3](http://www.gnu.org/copyleft/gpl.html) or (at your option) any later version.  
 libreblackjack is free software: you are free to change and redistribute it.  
 There is NO WARRANTY, to the extent permitted by law.  
