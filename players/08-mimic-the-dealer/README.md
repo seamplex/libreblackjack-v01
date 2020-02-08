@@ -37,6 +37,12 @@ In another terminal run the player
 Both dealer and player may be run in the same terminal putting the first one on the background:
 
 ```
+if [ -z "`which gawk`" ]; then
+  echo "error: gawk is not installed"
+  exit 1
+fi      
+
+rm -f mimic_d2p mimic_p2d
 mkfifo mimic_d2p mimic_p2d
 libreblackjack &
 ./mimic-the-dealer.awk < mimic_d2p > mimic_p2d
