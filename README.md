@@ -1,12 +1,12 @@
 ---
-title: LibreBlackjack, a free blackjack back-end
+title: LibreBlackjack, a free blackjack back end
 lang: en-US
 ...
 
 
 # LibreBlackjack
 
-> A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back-end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
+> A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
 
 [Link to the derivation of the basic strategy](https://www.seamplex.com/blackjack/players/20-basic-strategy/)
 
