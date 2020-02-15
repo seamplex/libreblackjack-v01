@@ -28,54 +28,70 @@
 #include "libreblackjack.h"
 #endif
 
-void blackjack_push_error_message(const char *fmt, ...) {
-  
+void
+blackjack_push_error_message (const char *fmt, ...)
+{
+
   va_list ap;
-  
-  assert(blackjack.error_level<100);
-  
-  blackjack.error = realloc(blackjack.error, (++blackjack.error_level)*sizeof(char *));
-  blackjack.error[blackjack.error_level-1] = malloc(BUF_SIZE);
-  
-  va_start(ap, fmt);
-  vsnprintf(blackjack.error[blackjack.error_level-1], BUF_SIZE, fmt, ap);
-  va_end(ap);
+
+  assert (blackjack.error_level < 100);
+
+  blackjack.error =
+    realloc (blackjack.error, (++blackjack.error_level) * sizeof (char *));
+  blackjack.error[blackjack.error_level - 1] = malloc (BUF_SIZE);
+
+  va_start (ap, fmt);
+  vsnprintf (blackjack.error[blackjack.error_level - 1], BUF_SIZE, fmt, ap);
+  va_end (ap);
   // TODO: realloc if run out of space
-  
+
   return;
 }
 
-void blackjack_pop_error_message(void) {
-  
-  if (blackjack.error_level > 0) {
-    free(blackjack.error[blackjack.error_level-1]);
-    blackjack.error_level--;
-  }
-  
-  return;
-}
+void
+blackjack_pop_error_message (void)
+{
 
-
-void blackjack_pop_errors(void) {
-
-  fprintf(stderr, "error: ");
-  if (blackjack.error_level == 0) {
-    fprintf(stderr, _("unspecified error\n"));
-  } else {
-    while (blackjack.error_level > 0) {
-      fprintf(stderr, "%s%s", blackjack.error[blackjack.error_level-1], (blackjack.error_level != 1)?" ":"\n");
-      blackjack_pop_error_message();
+  if (blackjack.error_level > 0)
+    {
+      free (blackjack.error[blackjack.error_level - 1]);
+      blackjack.error_level--;
     }
-  }
 
   return;
 }
 
 
-void blackjack_signal_handler(int sig_num) {
+void
+blackjack_pop_errors (void)
+{
 
-  fprintf(stderr, _("\npid %d: signal #%d caught, finnishing... "), getpid(), sig_num);
-  fflush(stderr);
+  fprintf (stderr, "error: ");
+  if (blackjack.error_level == 0)
+    {
+      fprintf (stderr, _("unspecified error\n"));
+    }
+  else
+    {
+      while (blackjack.error_level > 0)
+	{
+	  fprintf (stderr, "%s%s", blackjack.error[blackjack.error_level - 1],
+		   (blackjack.error_level != 1) ? " " : "\n");
+	  blackjack_pop_error_message ();
+	}
+    }
+
+  return;
+}
+
+
+void
+blackjack_signal_handler (int sig_num)
+{
+
+  fprintf (stderr, _("\npid %d: signal #%d caught, finnishing... "),
+	   getpid (), sig_num);
+  fflush (stderr);
 
   blackjack.done = 1;
 
@@ -85,7 +101,7 @@ void blackjack_signal_handler(int sig_num) {
   }
 */
 
-  fprintf(stderr, "ok\n");
-  exit(1);
+  fprintf (stderr, "ok\n");
+  exit (1);
 
 }

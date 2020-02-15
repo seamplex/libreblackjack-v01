@@ -33,33 +33,44 @@
 #include "libreblackjack.h"
 #endif
 
-int write_formatted_card(player_t *player, int dealer, char *command, card_t *card) {
+int
+write_formatted_card (player_t * player, int dealer, char *command,
+		      card_t * card)
+{
   char full_command[BUF_SIZE];
-  
-  if (player->has_split == 0 || dealer != 0) {
-    snprintf(full_command, BUF_SIZE-1, "%s %s", command, card->token[player->token_type]);
-  } else {
-    snprintf(full_command, BUF_SIZE-1, "%s %s #%d", command, card->token[player->token_type], player->current_hand->id);
-  }
-  player->write(player, full_command);
-   
+
+  if (player->has_split == 0 || dealer != 0)
+    {
+      snprintf (full_command, BUF_SIZE - 1, "%s %s", command,
+		card->token[player->token_type]);
+    }
+  else
+    {
+      snprintf (full_command, BUF_SIZE - 1, "%s %s #%d", command,
+		card->token[player->token_type], player->current_hand->id);
+    }
+  player->write (player, full_command);
+
   return 0;
 }
 
-int write_formatted(player_t *player, const char *fmt, ...) {
+int
+write_formatted (player_t * player, const char *fmt, ...)
+{
   va_list ap;
   char command[BUF_SIZE];
-  
-  va_start(ap, fmt);
-  vsnprintf(command, BUF_SIZE, fmt, ap);
-  va_end(ap);
-  
-  bjcall(blackjack.current_player->write(player, command));
-  
-  if (blackjack_conf.log != NULL) {
-    fprintf(blackjack_conf.log, "-> %s\n", command);
-    fflush(blackjack_conf.log);
-  }
-  
+
+  va_start (ap, fmt);
+  vsnprintf (command, BUF_SIZE, fmt, ap);
+  va_end (ap);
+
+  bjcall (blackjack.current_player->write (player, command));
+
+  if (blackjack_conf.log != NULL)
+    {
+      fprintf (blackjack_conf.log, "-> %s\n", command);
+      fflush (blackjack_conf.log);
+    }
+
   return 0;
 }

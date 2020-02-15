@@ -23,10 +23,10 @@
 #define _LIBREBLACKJACK_H_
 
 #ifdef HAVE_LIBGSL
- #include <gsl/gsl_types.h>
- #include <gsl/gsl_rng.h>
- #include <gsl/gsl_randist.h>
-#endif 
+#include <gsl/gsl_types.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,10 +75,12 @@ typedef struct ipc_t ipc_t;
 char outputbuffer[BUF_SIZE];
 char inputbuffer[BUF_SIZE];
 
-struct ipc_t {
+struct ipc_t
+{
   char *name;
-  
-  enum {
+
+  enum
+  {
     ipc_none,
     ipc_fifo,
     ipc_shmem,
@@ -89,37 +91,38 @@ struct ipc_t {
   int buffered;
 
   int fd;
-  FILE *fp;  
-  
+  FILE *fp;
+
   char *shmem;
   sem_t *sem_written;
   sem_t *sem_read;
 
-  mqd_t mq;  
+  mqd_t mq;
 };
 
-struct {
+struct
+{
   // rules
-  int decks;                     // -1 for infinite
-  unsigned long int hands;       // max hands (read from conf or commandline)
-  int rng_seed;                  // zero = read from /dev/urandom
-  int number_of_burnt_cards;     // number of burnt cards after shuffling
-  int no_negative_bankroll;      // do not allow negative bankrolls
+  int decks;			// -1 for infinite
+  unsigned long int hands;	// max hands (read from conf or commandline)
+  int rng_seed;			// zero = read from /dev/urandom
+  int number_of_burnt_cards;	// number of burnt cards after shuffling
+  int no_negative_bankroll;	// do not allow negative bankrolls
   int max_bet;
   int double_after_split;
   int hit_soft_17;
   int max_invalid_commands;
   int shuffle_every_hand;
-  
+
   card_t *arranged_cards;
   FILE *log;
   FILE *yaml_report;
-  
+
   double penetration;
   double penetration_sigma;
   double blackjack_pays;
   double error_standard_deviations;
-  
+
 } blackjack_conf;
 
 
@@ -127,21 +130,23 @@ struct {
 #define CARD_TYPES     5
 #define CARD_SIZE      16
 
-struct card_t {
+struct card_t
+{
   int tag;
   int value;
 
-  char token[CARD_TYPES][CARD_SIZE];  
-  char text[32];  
+  char token[CARD_TYPES][CARD_SIZE];
+  char text[32];
   char art[CARD_ART_LINES][CARD_SIZE];
-  
+
   card_t *next;
 };
 
-struct {
-  
-  unsigned long int hand;                      // actual hand number (splits are counted as a single hand)
-  unsigned long int shuffles;                  // number of shuffles
+struct
+{
+
+  unsigned long int hand;	// actual hand number (splits are counted as a single hand)
+  unsigned long int shuffles;	// number of shuffles
   unsigned int infinite_decks_card_number_for_arranged_ones;
   unsigned int next_dealer_action;
   unsigned int players_input_needed;
@@ -150,95 +155,98 @@ struct {
   unsigned int holecard_shown;
   unsigned int last_pass;
   unsigned int done;
-  
+
   unsigned int n_arranged_cards;
   int *arranged_cards_array;
-  
+
   card_t card[53];
-  int *shoe;  
-  
+  int *shoe;
+
   player_t *players;
   player_t *current_player;
-  
+
   hand_t *dealer_hand;
   card_t *dealer_holecard;
-  
+
   struct timeval wall_time_initial;
   struct timeval wall_time_final;
-  
+
   char **error;
   unsigned int error_level;
-  
+
 #ifdef HAVE_LIBGSL
   gsl_rng_type *rng_type;
-  gsl_rng *rng;  
+  gsl_rng *rng;
 #else
   void *rng;
-#endif  
+#endif
 
 } blackjack;
 
-struct {
+struct
+{
   int isatty;
   int no_color;
   int no_utf8;
   int ascii_art;
-    
+
   char black[8];
   char red[8];
   char green[8];
   char yellow[8];
   char blue[8];
   char magenta[8];
-  char cyan[8];  
+  char cyan[8];
   char white[8];
   char reset[8];
 } stdout_opts;
 
-struct player_t {
+struct player_t
+{
   char *name;
-  
+
   hand_t *hands;
   hand_t *current_hand;
 
-  double current_result;  
+  double current_result;
   double mean;
   double M2;
   double variance;
-  
+
   int has_split;
   int doubled;
   int busted_all_hands;
-  
+
   int flat_bet;
   int no_insurance;
   int always_insure;
   double bankroll;
   double delay;
-  
-  enum {
-    card_utf8,        // one ascii char for the rank and one utf8 representation of the suit ♠,♥,♦,♣
-    card_utf8_single, // a single utf8 entity for the card 
-    card_ascii,       // two ascii chars, one for the rank A,2,...,T,J,Q,J and one for the suit S,H,D,C
-    card_value,       // the value for the game, A = 11, J,Q,K=10 or ran
-    card_tag,         // integer between 1--52: tag = 13*suit + rank
+
+  enum
+  {
+    card_utf8,			// one ascii char for the rank and one utf8 representation of the suit ♠,♥,♦,♣
+    card_utf8_single,		// a single utf8 entity for the card 
+    card_ascii,			// two ascii chars, one for the rank A,2,...,T,J,Q,J and one for the suit S,H,D,C
+    card_value,			// the value for the game, A = 11, J,Q,K=10 or ran
+    card_tag,			// integer between 1--52: tag = 13*suit + rank
   } token_type;
 
-  
+
   ipc_t dealer2player;
   ipc_t player2dealer;
 
-  int (*write)(player_t *, const char *);
-  int (*read)(player_t *, char *);
-  
+  int (*write) (player_t *, const char *);
+  int (*read) (player_t *, char *);
+
   // statistics
   unsigned long int number_of_hands;
   unsigned long int total_money_waged;
   double worst_bankroll;
-  
+
   unsigned long int dealer_blackjacks;
   unsigned long int player_blackjacks;
-  
+
   unsigned long int dealer_busts;
   unsigned long int player_busts;
 
@@ -247,28 +255,29 @@ struct player_t {
   unsigned long int plain_wins;
   unsigned long int pushes;
   unsigned long int losses;
-  
+
   unsigned long int doubled_hands;
   unsigned long int doubled_wins;
-  
+
   unsigned long int insured_hands;
   unsigned long int insured_wins;
-  
-  
+
+
   player_t *next;
 };
 
-struct hand_t {
+struct hand_t
+{
   int id;
   int bet;
-  
+
   int n_cards;
   int soft;
   int blackjack;
   int insured;
   int busted;
   int count;
-  
+
   card_t *cards;
 
   hand_t *next;
@@ -277,81 +286,81 @@ struct hand_t {
 
 
 // cards.c
-extern void print_card_art(card_t *);
-extern void print_hand_art(hand_t *);
-extern void print_card_unicode(card_t *);
-extern void print_card_text(card_t *);
-extern int compute_count(hand_t *);
-extern int deal_card(void);
-extern card_t *deal_card_to_hand(hand_t *);
-extern void destroy_hands(hand_t **);
-extern void init_card(int, int, int);
+extern void print_card_art (card_t *);
+extern void print_hand_art (hand_t *);
+extern void print_card_unicode (card_t *);
+extern void print_card_text (card_t *);
+extern int compute_count (hand_t *);
+extern int deal_card (void);
+extern card_t *deal_card_to_hand (hand_t *);
+extern void destroy_hands (hand_t **);
+extern void init_card (int, int, int);
 
-extern void init_shoe(void);
-extern void shuffle_shoe(void);
+extern void init_shoe (void);
+extern void shuffle_shoe (void);
 
 // dealer.c
-extern int dealer_action(void);
-extern int dealer_process_input(player_t *, char *);
+extern int dealer_action (void);
+extern int dealer_process_input (player_t *, char *);
 
 // stdinout.c
-extern int dealer_to_stdout(player_t *, const char *);
-extern int player_from_stdin(player_t *, char *);
-extern void free_rl_stdin(void);
+extern int dealer_to_stdout (player_t *, const char *);
+extern int player_from_stdin (player_t *, char *);
+extern void free_rl_stdin (void);
 
 // bjinit.c
-extern void bj_strip_blanks_leading_trailing(char *);
-extern void bj_strip_blanks(char *);
-extern player_t *new_player(const char *);
-extern void destroy_player(player_t *);
-extern player_t *get_player(const char *);
-extern player_t *get_or_define_player(const char *);
-extern player_t *player_from_section(const char *);
-extern int bjinit(char *);
-int fbj_conf_handler(const char *, const char *);
+extern void bj_strip_blanks_leading_trailing (char *);
+extern void bj_strip_blanks (char *);
+extern player_t *new_player (const char *);
+extern void destroy_player (player_t *);
+extern player_t *get_player (const char *);
+extern player_t *get_or_define_player (const char *);
+extern player_t *player_from_section (const char *);
+extern int bjinit (char *);
+int fbj_conf_handler (const char *, const char *);
 
 // commands.c
-extern int write_formatted_card(player_t *, int, char *, card_t *);
-extern int write_formatted(player_t *, const char *, ...);
+extern int write_formatted_card (player_t *, int, char *, card_t *);
+extern int write_formatted (player_t *, const char *, ...);
 
 // lists.c
-extern void append_card(card_t **, card_t *);
-extern void delete_card(card_t **, card_t *);
-extern void append_hand(hand_t **, hand_t *);
-extern void delete_hand(hand_t **, hand_t *);
+extern void append_card (card_t **, card_t *);
+extern void delete_card (card_t **, card_t *);
+extern void append_hand (hand_t **, hand_t *);
+extern void delete_hand (hand_t **, hand_t *);
 
 // fifo.c
-int create_fifo(const char *);
-int dealer_to_fifo(player_t *, const char *);
-int player_from_fifo(player_t *, char *);
+int create_fifo (const char *);
+int dealer_to_fifo (player_t *, const char *);
+int player_from_fifo (player_t *, char *);
 // version.c
-void libreblackjack_shortversion(void);
-void libreblackjack_help(char *);
-void libreblackjack_copyright(void);
+void libreblackjack_shortversion (void);
+void libreblackjack_help (char *);
+void libreblackjack_copyright (void);
 
 // report.c
-int write_yaml_report(player_t *);
+int write_yaml_report (player_t *);
 
 // error.c
-void blackjack_push_error_message(const char *fmt, ...);
-void blackjack_pop_error_message(void);
-void blackjack_pop_errors(void);
-void blackjack_signal_handler(int);
+void blackjack_push_error_message (const char *fmt, ...);
+void blackjack_pop_error_message (void);
+void blackjack_pop_errors (void);
+void blackjack_signal_handler (int);
 
 // shmem.c
 
-int create_shmem(const char *, char **, sem_t **, sem_t **);
-int dealer_to_shmem(player_t *, const char *);
-int player_from_shmem(player_t *, char *);
+int create_shmem (const char *, char **, sem_t **, sem_t **);
+int dealer_to_shmem (player_t *, const char *);
+int player_from_shmem (player_t *, char *);
 
 
 // mqueue.c
-int create_mqueue(const char *, mqd_t *);
-int dealer_to_mqueue(player_t *, const char *);
-int player_from_mqueue(player_t *, char *);
+int create_mqueue (const char *, mqd_t *);
+int dealer_to_mqueue (player_t *, const char *);
+int player_from_mqueue (player_t *, char *);
 
 // internal.c
-extern int dealer_to_internal(player_t *, const char *);
-extern int player_from_internal(player_t *, char *);
+extern int dealer_to_internal (player_t *, const char *);
+extern int player_from_internal (player_t *, char *);
 
 #endif

@@ -20,8 +20,8 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #ifdef HAVE_LIBREADLINE
- #include <readline/readline.h>
- #include <readline/history.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #endif
 
 #include <string.h>
@@ -32,85 +32,112 @@
 #include "libreblackjack.h"
 #endif
 
-int dealer_to_stdout(player_t *player, const char *command) {
+int
+dealer_to_stdout (player_t * player, const char *command)
+{
 
   // TODO: choose colors
-  if (stdout_opts.isatty) {
-    if (player->delay != 0) {
-      usleep((useconds_t)(1e6*player->delay));
+  if (stdout_opts.isatty)
+    {
+      if (player->delay != 0)
+	{
+	  usleep ((useconds_t) (1e6 * player->delay));
+	}
+
+      if (command[strlen (command) - 1] != '?')
+	{
+	  printf ("%s<-- %s%s%s\n", stdout_opts.yellow, stdout_opts.green,
+		  command, stdout_opts.reset);
+	}
+      else
+	{
+	  printf ("%s%s%s", stdout_opts.cyan, command, stdout_opts.reset);
+	}
     }
-    
-    if (command[strlen(command)-1] != '?') {
-      printf("%s<-- %s%s%s\n", stdout_opts.yellow, stdout_opts.green, command, stdout_opts.reset);
-    } else {
-      printf("%s%s%s", stdout_opts.cyan, command, stdout_opts.reset);
+  else
+    {
+      printf ("%s\n", command);
     }
-  } else {
-    printf("%s\n", command);
-  }
-  
+
   return 0;
 }
 
 
 #ifdef HAVE_LIBREADLINE
-char *line_read = (char *)NULL;
+char *line_read = (char *) NULL;
 char prompt[32];
 #endif
-  
-int player_from_stdin(player_t *player, char *buffer) {
-  if (stdout_opts.isatty) {
+
+int
+player_from_stdin (player_t * player, char *buffer)
+{
+  if (stdout_opts.isatty)
+    {
 #ifdef HAVE_LIBREADLINE
-    if (prompt[0] == '\0') {
-      sprintf(prompt,  " %s>%s ", stdout_opts.cyan, stdout_opts.reset);
-    }
+      if (prompt[0] == '\0')
+	{
+	  sprintf (prompt, " %s>%s ", stdout_opts.cyan, stdout_opts.reset);
+	}
 
-    if (line_read) {
-      free(line_read);
-      line_read = (char *)NULL;
-    }
-    line_read = readline(prompt);
-    if (line_read && *line_read) {
-      add_history(line_read);
-      strncpy(buffer, line_read, BUF_SIZE-1);
-    } else {
-      buffer[0] = '\0';
-    }
-  
+      if (line_read)
+	{
+	  free (line_read);
+	  line_read = (char *) NULL;
+	}
+      line_read = readline (prompt);
+      if (line_read && *line_read)
+	{
+	  add_history (line_read);
+	  strncpy (buffer, line_read, BUF_SIZE - 1);
+	}
+      else
+	{
+	  buffer[0] = '\0';
+	}
+
 #else
-    char *newline;
+      char *newline;
 
-    printf(" %s>%s ", stdout_opts.cyan, stdout_opts.reset);
-    if (fgets(buffer, BUF_SIZE-1, stdin) == NULL) {
-      return -1;
-    }
-    // strip \n
-    newline = strchr(buffer, '\n');
-    if (newline != NULL) {
-      *newline = '\0';
-    }
+      printf (" %s>%s ", stdout_opts.cyan, stdout_opts.reset);
+      if (fgets (buffer, BUF_SIZE - 1, stdin) == NULL)
+	{
+	  return -1;
+	}
+      // strip \n
+      newline = strchr (buffer, '\n');
+      if (newline != NULL)
+	{
+	  *newline = '\0';
+	}
 #endif
-  } else {
-    char *newline;
-    
-    if (fgets(buffer, BUF_SIZE-1, stdin) == NULL) {
-      return -1;
     }
-    // strip \n
-    newline = strchr(buffer, '\n');
-    if (newline != NULL) {
-      *newline = '\0';
+  else
+    {
+      char *newline;
+
+      if (fgets (buffer, BUF_SIZE - 1, stdin) == NULL)
+	{
+	  return -1;
+	}
+      // strip \n
+      newline = strchr (buffer, '\n');
+      if (newline != NULL)
+	{
+	  *newline = '\0';
+	}
     }
-  }
   return 0;
 }
 
-void free_rl_stdin(void) {
+void
+free_rl_stdin (void)
+{
 #ifdef HAVE_LIBREADLINE
-  if (line_read) {
-    free(line_read);
-    line_read = (char *)NULL;
-  }
+  if (line_read)
+    {
+      free (line_read);
+      line_read = (char *) NULL;
+    }
 #endif
   return;
 }

@@ -28,9 +28,11 @@
 #include "libreblackjack.h"
 #endif
 
-player_t *new_player(const char *name) {
-  player_t *player = calloc(1, sizeof(player_t));
-  player->name = strdup(name);
+player_t *
+new_player (const char *name)
+{
+  player_t *player = calloc (1, sizeof (player_t));
+  player->name = strdup (name);
 //  player->dealer2player.fd = -1;
 //  player->player2dealer.fd = -1;
   // TODO: multi-player
@@ -39,129 +41,160 @@ player_t *new_player(const char *name) {
   return player;
 }
 
-void destroy_player(player_t *player) {
-  
-  char buffer[BUF_SIZE];
-  
-  switch (player->dealer2player.ipc_type) {
-    case ipc_fifo:
-      if (player->dealer2player.buffered) {
-        fclose(player->dealer2player.fp);
-      } else {
-        close(player->dealer2player.fd);
-      }
-      unlink(player->dealer2player.name);
-    break;
-    case ipc_shmem:
-      if (player->dealer2player.shmem != NULL) {
-        shm_unlink(player->dealer2player.name);
-      }
-      
-      if (player->dealer2player.sem_read != NULL) {
-        sem_close(player->dealer2player.sem_read);
-        sprintf(buffer, "%s_read", player->dealer2player.name);
-        sem_unlink(buffer);
-      }
-      
-      if (player->dealer2player.sem_written != NULL) {
-        sem_close(player->dealer2player.sem_written);
-        sprintf(buffer, "%s_written", player->dealer2player.name);
-        sem_unlink(buffer);
-      }
-    break;
-    case ipc_mqueue:
-      mq_close(player->dealer2player.mq);
-      mq_unlink(player->dealer2player.name);
-    break;
-    default:
-      ;
-    break;
-  }
+void
+destroy_player (player_t * player)
+{
 
-  switch (player->player2dealer.ipc_type) {
+  char buffer[BUF_SIZE];
+
+  switch (player->dealer2player.ipc_type)
+    {
     case ipc_fifo:
-      if (player->player2dealer.buffered) {
-        fclose(player->player2dealer.fp);
-      } else {
-        close(player->player2dealer.fd);
-      }
-      unlink(player->player2dealer.name);
-    break;
+      if (player->dealer2player.buffered)
+	{
+	  fclose (player->dealer2player.fp);
+	}
+      else
+	{
+	  close (player->dealer2player.fd);
+	}
+      unlink (player->dealer2player.name);
+      break;
     case ipc_shmem:
-      if (player->player2dealer.shmem != NULL) {
-        shm_unlink(player->player2dealer.name);
-      }
-      
-      if (player->player2dealer.sem_read != NULL) {
-        sem_close(player->player2dealer.sem_read);
-        sprintf(buffer, "%s_read", player->player2dealer.name);
-        sem_unlink(buffer);
-      }
-      
-      if (player->player2dealer.sem_written != NULL) {
-        sem_close(player->player2dealer.sem_written);
-        sprintf(buffer, "%s_written", player->player2dealer.name);
-        sem_unlink(buffer);
-      }
-    break;
+      if (player->dealer2player.shmem != NULL)
+	{
+	  shm_unlink (player->dealer2player.name);
+	}
+
+      if (player->dealer2player.sem_read != NULL)
+	{
+	  sem_close (player->dealer2player.sem_read);
+	  sprintf (buffer, "%s_read", player->dealer2player.name);
+	  sem_unlink (buffer);
+	}
+
+      if (player->dealer2player.sem_written != NULL)
+	{
+	  sem_close (player->dealer2player.sem_written);
+	  sprintf (buffer, "%s_written", player->dealer2player.name);
+	  sem_unlink (buffer);
+	}
+      break;
     case ipc_mqueue:
-      mq_close(player->player2dealer.mq);
-      mq_unlink(player->player2dealer.name);
-    break;
+      mq_close (player->dealer2player.mq);
+      mq_unlink (player->dealer2player.name);
+      break;
     default:
       ;
-    break;
-  }
-  
-  free(player->dealer2player.name);
-  free(player->player2dealer.name);
-  free(player->name);
-  destroy_hands(&player->hands);
+      break;
+    }
+
+  switch (player->player2dealer.ipc_type)
+    {
+    case ipc_fifo:
+      if (player->player2dealer.buffered)
+	{
+	  fclose (player->player2dealer.fp);
+	}
+      else
+	{
+	  close (player->player2dealer.fd);
+	}
+      unlink (player->player2dealer.name);
+      break;
+    case ipc_shmem:
+      if (player->player2dealer.shmem != NULL)
+	{
+	  shm_unlink (player->player2dealer.name);
+	}
+
+      if (player->player2dealer.sem_read != NULL)
+	{
+	  sem_close (player->player2dealer.sem_read);
+	  sprintf (buffer, "%s_read", player->player2dealer.name);
+	  sem_unlink (buffer);
+	}
+
+      if (player->player2dealer.sem_written != NULL)
+	{
+	  sem_close (player->player2dealer.sem_written);
+	  sprintf (buffer, "%s_written", player->player2dealer.name);
+	  sem_unlink (buffer);
+	}
+      break;
+    case ipc_mqueue:
+      mq_close (player->player2dealer.mq);
+      mq_unlink (player->player2dealer.name);
+      break;
+    default:
+      ;
+      break;
+    }
+
+  free (player->dealer2player.name);
+  free (player->player2dealer.name);
+  free (player->name);
+  destroy_hands (&player->hands);
   // TODO
   blackjack.players = NULL;
 //  LL_DELETE(blackjack.players, player);
-  free(player);
+  free (player);
   player = NULL;
   return;
 }
 
 // it is not wortwhile to have a hash list just for this
-player_t *get_player(const char *name) {
+player_t *
+get_player (const char *name)
+{
   player_t *player;
-  
-  for (player = blackjack.players; player != NULL; player = player->next) {
-    if (strcmp(player->name, name) == 0) {
-      return player;
+
+  for (player = blackjack.players; player != NULL; player = player->next)
+    {
+      if (strcmp (player->name, name) == 0)
+	{
+	  return player;
+	}
     }
-  }
   return NULL;
 }
 
-player_t *get_or_define_player(const char *name) {
+player_t *
+get_or_define_player (const char *name)
+{
   player_t *player;
-  if ((player = get_player(name)) == NULL) {
-    player = new_player("player");
-  }
+  if ((player = get_player (name)) == NULL)
+    {
+      player = new_player ("player");
+    }
   return player;
 }
 
-player_t *player_from_section(const char *section) {
+player_t *
+player_from_section (const char *section)
+{
   player_t *player;
   char *name;
-  
-  if (section == NULL || section[0] == '\0') {
-    name = strdup("player");
-  } else {
-    name = strdup(section);
-  }
-  
-  if (blackjack.players == NULL) {
-    player = new_player(name);
-  } else {
-    player = get_or_define_player(name);
-  }
-  
-  free(name);
+
+  if (section == NULL || section[0] == '\0')
+    {
+      name = strdup ("player");
+    }
+  else
+    {
+      name = strdup (section);
+    }
+
+  if (blackjack.players == NULL)
+    {
+      player = new_player (name);
+    }
+  else
+    {
+      player = get_or_define_player (name);
+    }
+
+  free (name);
   return player;
 
 }
