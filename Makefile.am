@@ -9,7 +9,7 @@ dist_doc_DATA = README
 #doc/libreblackjack.texi
 
 TESTS = check-internal.sh check-stand.sh
-EXTRA_DIST = config.rpath m4/ChangeLog  libreblackjack.ini players $(TESTS)
+EXTRA_DIST = config.rpath m4/ChangeLog  blackjack.conf players $(TESTS)
 
 # ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 bin_PROGRAMS = libreblackjack

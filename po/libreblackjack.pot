@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: libreblackjack v0.1.55-g82976f6\n"
+"Project-Id-Version: libreblackjack v0.1.72-gc488b1f\n"
 "Report-Msgid-Bugs-To: jeremy@seamplex.com\n"
-"POT-Creation-Date: 2019-12-28 15:51-0300\n"
+"POT-Creation-Date: 2020-02-15 16:41-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,243 +17,299 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/bjinit.c:95
+#: src/bjinit.c:192
 #, c-format
 msgid "blackjack_pays has to be positive, not '%s'"
 msgstr ""
 
-#: src/bjinit.c:120
+#: src/bjinit.c:253
 #, c-format
 msgid "cannot open log file '%s': %s\n"
 msgstr ""
 
-#: src/bjinit.c:128
+#: src/bjinit.c:267
 #, c-format
 msgid "cannot open YAML report file '%s': %s\n"
 msgstr ""
 
-#: src/bjinit.c:237
+#: src/bjinit.c:452
 #, c-format
 msgid "unkown ipc type '%s'"
 msgstr ""
 
-#: src/bjinit.c:248
+#: src/bjinit.c:468
 msgid "expected object name after ipc type"
 msgstr ""
 
-#: src/bjinit.c:258
+#: src/bjinit.c:480
 #, c-format
 msgid "unknown keyword '%s'"
 msgstr ""
 
-#: src/bjinit.c:291
+#: src/bjinit.c:556
 #, c-format
 msgid "cannot open ini file '%s': %s\n"
 msgstr ""
 
-#: src/dealer.c:227 src/dealer.c:496
+#: src/dealer.c:300 src/dealer.c:730
 #, c-format
 msgid "player's count is %s%d\n"
 msgstr ""
 
-#: src/dealer.c:265
+#: src/dealer.c:361
 #, c-format
 msgid "player busted all hands\n"
 msgstr ""
 
-#: src/dealer.c:268
+#: src/dealer.c:369
 #, c-format
 msgid "dealer's hand was \n"
 msgstr ""
 
-#: src/dealer.c:283 src/dealer.c:290
+#: src/dealer.c:396 src/dealer.c:416
 #, c-format
 msgid "dealer's count is %s%d\n"
 msgstr ""
 
-#: src/dealer.c:409
+#: src/dealer.c:599
 #, c-format
 msgid "current table\n"
 msgstr ""
 
-#: src/dealer.c:412
+#: src/dealer.c:604
 #, c-format
 msgid "%s's hand #%d: "
 msgstr ""
 
-#: src/dealer.c:426
+#: src/dealer.c:624
 #, c-format
 msgid "dealer's upcard :  "
 msgstr ""
 
-#: src/dealer.c:430
+#: src/dealer.c:630
 #, c-format
 msgid "dealer's hand  :  "
 msgstr ""
 
-#: src/dealer.c:472
+#: src/dealer.c:694
 #, c-format
 msgid "answer either yes or no to insurance\n"
 msgstr ""
 
-#: src/dealer.c:484
+#: src/dealer.c:713
 #, c-format
 msgid "doubling down, dealing only one card\n"
 msgstr ""
 
-#: src/dealer.c:501 src/dealer.c:587
+#: src/dealer.c:742 src/dealer.c:879
 #, c-format
 msgid "player busted with %d\n"
 msgstr ""
 
-#: src/dealer.c:513
+#: src/dealer.c:760
 #, c-format
 msgid "cannot double down now\n"
 msgstr ""
 
-#: src/dealer.c:575
+#: src/dealer.c:856
 #, c-format
 msgid "cannot split now\n"
 msgstr ""
 
-#: src/fifo.c:37
+#: src/fifo.c:43
 #, c-format
 msgid "'%s' creating fifo '%s'"
 msgstr ""
 
-#: src/fifo.c:54
+#: src/fifo.c:66
 #, c-format
 msgid "waiting for dealer2player buffered fifo '%s'..."
 msgstr ""
 
-#: src/fifo.c:57
+#: src/fifo.c:73
 #, c-format
 msgid "opening buffered fifo '%s' for writing: %s"
 msgstr ""
 
-#: src/fifo.c:73
+#: src/fifo.c:94
 #, c-format
 msgid "waiting for dealer2player unbuffered fifo '%s'..."
 msgstr ""
 
-#: src/fifo.c:76
+#: src/fifo.c:101
 #, c-format
 msgid "opening unbuffered fifo '%s' for writing: %s"
 msgstr ""
 
-#: src/fifo.c:79 src/fifo.c:132 src/shmem.c:96 src/shmem.c:119
+#: src/fifo.c:106 src/fifo.c:182 src/shmem.c:126 src/shmem.c:158
 #, c-format
 msgid "ok!\n"
 msgstr ""
 
-#: src/fifo.c:107
+#: src/fifo.c:140
 #, c-format
 msgid "waiting for player2dealer buffered fifo '%s'... "
 msgstr ""
 
-#: src/fifo.c:110
+#: src/fifo.c:147
 #, c-format
 msgid "reading buffered fifo '%s': %s"
 msgstr ""
 
-#: src/fifo.c:126
+#: src/fifo.c:170
 #, c-format
 msgid "waiting for player2dealer unbuffered fifo '%s'..."
 msgstr ""
 
-#: src/fifo.c:129
+#: src/fifo.c:177
 #, c-format
 msgid "reading unbuffered fifo '%s': %s"
 msgstr ""
 
-#: src/fifo.c:141
+#: src/fifo.c:192
 #, c-format
 msgid "selecting unbuffered fifo '%s'"
 msgstr ""
 
-#: src/main.c:93 src/main.c:100
+#: src/main.c:107 src/main.c:121
 #, c-format
 msgid "Unkown option '%s'.\n"
 msgstr ""
 
-#: src/main.c:94
+#: src/main.c:110
 #, c-format
 msgid ""
 "Try '%s --help' for more information.\n"
 ")"
 msgstr ""
 
-#: src/main.c:101
+#: src/main.c:124
 #, c-format
 msgid "Try '%s --help' for more information.\n"
 msgstr ""
 
-#: src/main.c:224
+#: src/main.c:278
 #, c-format
 msgid "reached the maximum number of allowed incorrect commands (%d)"
 msgstr ""
 
-#: src/mqueue.c:45
+#: src/mqueue.c:49
 #, c-format
 msgid "'%s' opening message queue '%s'"
 msgstr ""
 
-#: src/mqueue.c:63
+#: src/mqueue.c:73
 #, c-format
 msgid "writing into player2dealer message queue '%s'... "
 msgstr ""
 
-#: src/mqueue.c:68
+#: src/mqueue.c:81
 #, c-format
 msgid "'%s' writing to message queue '%s'"
 msgstr ""
 
-#: src/mqueue.c:88
+#: src/mqueue.c:109
 #, c-format
 msgid "waiting for player2dealer message queue '%s'..."
 msgstr ""
 
-#: src/mqueue.c:93
+#: src/mqueue.c:116
 #, c-format
 msgid "'%s' reading from message queue '%s'"
 msgstr ""
 
-#: src/shmem.c:42
+#: src/shmem.c:49
 #, c-format
 msgid "'%s' opening shared memory object '%s'"
 msgstr ""
 
-#: src/shmem.c:47
+#: src/shmem.c:57
 #, c-format
 msgid "'%s' truncating shared memory object '%s'"
 msgstr ""
 
-#: src/shmem.c:51
+#: src/shmem.c:66
 #, c-format
 msgid "'%s' maping shared memory object '%s'"
 msgstr ""
 
-#: src/shmem.c:61 src/shmem.c:67
+#: src/shmem.c:78 src/shmem.c:86
 #, c-format
 msgid "'%s' opening semaphore '%s'"
 msgstr ""
 
-#: src/shmem.c:89
+#: src/shmem.c:117
 #, c-format
 msgid "waiting for dealer2player semaphore '%s_read'..."
 msgstr ""
 
-#: src/shmem.c:112
+#: src/shmem.c:149
 #, c-format
 msgid "waiting for player2dealer semaphore '%s_written'..."
 msgstr ""
 
-#: src/version.c:38
+#: src/version.c:49
 #, c-format
-msgid "a free & open blackjack engine\n"
+msgid "Usage: %s [options] [path_to_conf_file]\n"
 msgstr ""
 
-#: src/version.c:44
+#: src/version.c:52 src/version.c:59 src/version.c:67
+#, c-format
+msgid "\n"
+msgstr ""
+
+#: src/version.c:54
+#, c-format
+msgid "If not configuration file is given, a file named blackjack.conf\n"
+msgstr ""
+
+#: src/version.c:55
+#, c-format
+msgid "in the current directory is used, provided it exists.\n"
+msgstr ""
+
+#: src/version.c:57
+#, c-format
+msgid ""
+"See the full documentation for the available options and the default "
+"values.\n"
+msgstr ""
+
+#: src/version.c:61
+#, c-format
+msgid "  -h, --hands=N    set the number of hands to play before quiting\n"
+msgstr ""
+
+#: src/version.c:62
+#, c-format
+msgid "  -d, --decks=N    set the number of decks to use\n"
+msgstr ""
+
+#: src/version.c:64
+#, c-format
+msgid ""
+"  -f, --flatbet    do not ask for the bet before each hand, use a unit flat "
+"bet\n"
+msgstr ""
+
+#: src/version.c:66
+#, c-format
+msgid ""
+"  -i, --internal   use the internal player to play agains the dealer (not "
+"interactive)\n"
+msgstr ""
+
+#: src/version.c:68
+#, c-format
+msgid "  -h, --help       display this help and exit\n"
+msgstr ""
+
+#: src/version.c:69
+#, c-format
+msgid "  -v  --version    output version information and exit\n"
+msgstr ""
+
+#: src/version.c:78
 #, c-format
 msgid ""
 "copyright (c) %s jeremy theler.\n"
