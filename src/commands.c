@@ -19,7 +19,6 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -29,6 +28,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 int write_formatted_card(player_t *player, int dealer, char *command, card_t *card) {
   char full_command[BUF_SIZE];

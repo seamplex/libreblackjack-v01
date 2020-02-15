@@ -19,14 +19,16 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
-
 #include <unistd.h>
 #include <fcntl.h>           /* For O_* constants */
 #include <sys/stat.h>        /* For mode constants */
 
 #include <errno.h>
 #include <string.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 int create_mqueue(const char *name, mqd_t *mq) {
 
@@ -38,8 +40,6 @@ int create_mqueue(const char *name, mqd_t *mq) {
   attr.mq_maxmsg = 10;
   attr.mq_msgsize = 128;
   attr.mq_curmsgs = 0;
-  
-  // ojo con el destroy por el posix name; 
   
   if (((*mq) = mq_open(posix_name, O_RDWR | O_CREAT, 0666, &attr)) == -1) {
     blackjack_push_error_message(_("'%s' opening message queue '%s'"), strerror(errno), name);

@@ -19,8 +19,6 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -31,12 +29,16 @@
 #include <fcntl.h>           /* For O_* constants */
 #include <semaphore.h>
 
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
+
 int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **sem_read) {
 
   int fd;
   char *buff;
 
-  // TODO: hacer posix name (voy a tener que acordarme del posix name para hacer el free)
+  // TODO: create a posix name (need to remember the posix name to free it)
   
   if ((fd = shm_open(name, O_RDWR | O_CREAT, 0666)) == -1) {
     blackjack_push_error_message(_("'%s' opening shared memory object '%s'"), strerror(errno), name);
@@ -54,7 +56,7 @@ int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **
 
   close(fd);
 
-  // los semaforos
+  // sempahores
   buff = malloc(strlen(name) + 16);
   sprintf(buff, "%s_written", name);
   if ((*sem_written = sem_open(buff, O_CREAT, 0666, 0)) == SEM_FAILED) {

@@ -19,11 +19,13 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
-
 #include <math.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 
 int write_yaml_report(player_t *player) {
@@ -38,7 +40,7 @@ int write_yaml_report(player_t *player) {
     file = stderr;
   }
   
-  // TODO: elegir que se agreguen comentarios con explicaciones
+  // TODO: choose if comments with explanations are to be added
   fprintf(file, "---\n");  
   fprintf(file, "rules:\n");
   fprintf(file, "  decks:                  %d\n", blackjack_conf.decks);
@@ -51,9 +53,6 @@ int write_yaml_report(player_t *player) {
   fprintf(file, "  no_negative_bankroll:   %d\n", blackjack_conf.no_negative_bankroll);
   fprintf(file, "  max_bet:                %d\n", blackjack_conf.max_bet);
   
-//  card_t *arranged_cards;
-//  FILE *command_log;
-  
   if (blackjack_conf.decks > 0) {
     fprintf(file, "  penetration:            %g\n", blackjack_conf.penetration);
     fprintf(file, "  penetration_sigma:      %g\n", blackjack_conf.penetration_sigma);
@@ -65,12 +64,12 @@ int write_yaml_report(player_t *player) {
     fprintf(file, "  user:             %g\n", usage.ru_utime.tv_sec + 1e-6*usage.ru_utime.tv_usec);
     fprintf(file, "  system:           %g\n", usage.ru_stime.tv_sec + 1e-6*usage.ru_stime.tv_usec);
             
-    // medimos wall time final
+    // measue final wall time
     gettimeofday(&blackjack.wall_time_final, NULL);
     wall = (blackjack.wall_time_final.tv_sec - blackjack.wall_time_initial.tv_sec) + 1e-6 * (blackjack.wall_time_final.tv_usec - blackjack.wall_time_initial.tv_usec);
     fprintf(file, "  wall:             %g\n", wall);
     
-    // velocidad
+    // speed
     fprintf(file, "  second_per_hand:  %.1e\n", wall/blackjack.hand);
     fprintf(file, "  hands_per_second: %.1e\n", blackjack.hand/wall);
     

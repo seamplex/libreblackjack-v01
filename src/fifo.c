@@ -19,8 +19,6 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
-
 #include <string.h>
 #include <errno.h>
 
@@ -30,6 +28,10 @@
 #include <unistd.h>
 
 #include <fcntl.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 int create_fifo(const char *name) {
   if (mkfifo(name, 0666) != 0) {
@@ -46,7 +48,7 @@ int dealer_to_fifo(player_t *player, const char *command) {
   
   if (player->dealer2player.buffered) {
     if (player->dealer2player.fp == NULL) {
-      // TODO: elegir RO o WR
+      // TODO: choose RO or RW
       if (create_fifo(player->dealer2player.name) != 0) {
         return -1;
       }
@@ -66,7 +68,6 @@ int dealer_to_fifo(player_t *player, const char *command) {
     
   } else {
     if (player->dealer2player.fd == 0) {
-      // TODO: elegir RO o WR
       if (create_fifo(player->dealer2player.name) != 0) {
         return -1;
       }
@@ -100,7 +101,6 @@ int player_from_fifo(player_t *player, char *buffer) {
   
   if (player->player2dealer.buffered) {
     if (player->player2dealer.fp == NULL) {
-      // TODO: elegir RO o WR
       if (create_fifo(player->player2dealer.name) != 0) {
         return -1;
       }

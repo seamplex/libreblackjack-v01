@@ -19,8 +19,11 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
 #include <string.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 int dealer_action(void) {
   player_t *player;
@@ -38,7 +41,7 @@ int dealer_action(void) {
         return 0;
       }
 
-      // actualizamos la incerteza (knuth citando a welford)
+      // update the uncertainty (knuth citing welford)
       // The Art of Computer Programming, volume 2: Seminumerical Algorithms, 3rd edn., p. 232
       delta = player->current_result - player->mean;
       if (blackjack.hand != 0) {
@@ -50,41 +53,39 @@ int dealer_action(void) {
       blackjack.infinite_decks_card_number_for_arranged_ones = 0;
       blackjack.hand++;
       
-      // borramos la mano del dealer y creamos una nueva
+      // delete dealer's hand and create a new one
       destroy_hands(&blackjack.dealer_hand);
       hand = calloc(1, sizeof(hand_t));
       append_hand(&blackjack.dealer_hand, hand);
       
-      // marcamos que la holecard aun no se vio
+      // mark that the hole card was not seen
       blackjack.holecard_shown = 0;
         
-      // borramos todas las manos del jugador
+      // erase all the player's hand
       destroy_hands(&player->hands);
       
       
-      // marcamos que aun no gano nada ni hizo split ni double down
+      // set that nobody won anythin nor splitted nor doubled down
       player->current_result = 0;
       player->has_split = 0;
       player->doubled = 0;
       
       if (blackjack.last_pass) {
         
-///        
         bjcall(blackjack.current_player->write(player, "shuffling"));
-        // mezclamos las cartas
-        shuffle_shoe();
+        shuffle_shoe();  // shuffle the cards
         // TODO: reset card counting systems
-        // 1b quemamos tantas cartas como me piden
+        // burn as many cards as asked
         for (i = 0; i < blackjack_conf.number_of_burnt_cards; i++) {
           deal_card();
         }
         blackjack.last_pass = 0;
       }
 
-      // creamos la mano principal
+      // create the main hand
       hand = calloc(1, sizeof(hand_t));
       append_hand(&player->hands, hand);
-      player->current_hand = player->hands;   // la mano actual es la primera
+      player->current_hand = player->hands;   // current hand is the first one
       
       if (player->flat_bet != 0) {
         player->current_hand->bet = player->flat_bet;
@@ -93,48 +94,45 @@ int dealer_action(void) {
         blackjack.next_dealer_action = ASK_FOR_BETS;
       }
 
-///      
       bjcall(blackjack.current_player->write(player, "new_hand"));
     break;
 
     case ASK_FOR_BETS:
-      // paso 1. preguntar por las apuestas
-      snprintf(outputbuffer, BUF_SIZE-1, "bet?");   // es para poder re-preguntar
+      // step 1. ask for bets
+      snprintf(outputbuffer, BUF_SIZE-1, "bet?");   // this is so we can re-ask in case no number comes back
       blackjack.players_input_needed = BET;
       
     break;
 
     case DEAL_PLAYERS_FIRST_CARD:
-      // paso 3. da la primera carta a cada jugador
+      // step 3. deal the first card to each player
       player = blackjack.players;
-      player->number_of_hands++;   // los splits se cuentan como una sola mano
+      player->number_of_hands++;   // splits are counted as a single hand
       player->total_money_waged += player->current_hand->bet;
       
-      // aca cada jugador tiene una sola mano
+      // each player has a single hand here
       card = deal_card_to_hand(player->current_hand);
       bjcall(write_formatted_card(player, 0,  "card_player_first", card));
       
-      // paso 4. se da la upcard
+      // step 4. show dealer's upcard
       card = deal_card_to_hand(blackjack.dealer_hand);
       bjcall(write_formatted_card(player, 0,  "card_dealer_up", card));
       if (stdout_opts.isatty) { print_card_art(card); }
       
-      // paso 5. da la segunda carta a cada jugador
-      // aca cada jugador tiene una sola mano
+      // step 5. deal the second card to each player
       card = deal_card_to_hand(player->current_hand);
       bjcall(write_formatted_card(player, 0,  "card_player_second", card));
       if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
 
-      // si no es ENHC miramos ahora
-      // lo dejamos separa para cuando lo implementemos
+      // TODO: ENHC
       blackjack.next_dealer_action = DEAL_DEALERS_HOLE_CARD;
     break;
 
     case DEAL_DEALERS_HOLE_CARD:
-      // paso 6. se da la hole card muzarella
+      // step 6. deal the dealer's hole card 
       deal_card_to_hand(blackjack.dealer_hand);
 
-      // apuntador a la holecard
+      // pointer to the hole card
       blackjack.dealer_holecard = blackjack.dealer_hand->cards->next;
 
       if (blackjack.dealer_hand->cards->value == 11) {
@@ -163,7 +161,7 @@ int dealer_action(void) {
     break;
 
     case CHECK_FOR_BLACKJACKS:
-      // paso 7. mira si hay blackjacks
+      // step 7. check if there are any blackjack
       if (blackjack.dealer_hand->blackjack) {
         bjcall(write_formatted_card(player, 0,  "card_dealer_hole", blackjack.dealer_holecard));
         bjcall(blackjack.current_player->write(player, "blackjack_dealer"));
@@ -215,7 +213,7 @@ int dealer_action(void) {
           blackjack.next_dealer_action = START_NEW_HAND;
           
       } else {
-        // solo si habia posiblidad de blackjack en la banca decimos "no_blackjacks"
+        // only if the dealer had the chance to have a blackjack we say "no_blackjacks"
         if (blackjack.dealer_hand->cards->value == 10 || blackjack.dealer_hand->cards->value == 11) {
           bjcall(blackjack.current_player->write(player, "no_blackjacks"));
         }
@@ -228,11 +226,11 @@ int dealer_action(void) {
       
       snprintf(outputbuffer, BUF_SIZE-1, "play? %d %d", player->current_hand->soft?-player->current_hand->count:player->current_hand->count, blackjack.dealer_hand->cards->value);
       blackjack.players_input_needed = PLAY;
-      // en process_input tenemos que setear next_dealer_action
+      // in process_input we have to set next_dealer_action
       
     break;
     case MOVE_ON_TO_NEXT_HAND:
-      // vemos si terminamos todas las manos del jugador
+      // see if we finished all the player's hands
       if (player->current_hand->next != NULL) {
         player->current_hand = player->current_hand->next;
         card = deal_card_to_hand(player->current_hand);
@@ -251,11 +249,10 @@ int dealer_action(void) {
           
         
       } else {
-        // TODO: ver si ya terminamos con todos los jugadores
-        // suponemos que se paso en todas
+        // assume the player busted in all the hands
         player->busted_all_hands = 1;
         for(hand = player->hands; hand != NULL; hand = hand->next) {
-          // si no se paso en alguna ponemos cero
+          // if she did not bust, set zero
           if (hand->busted == 0) {
             player->busted_all_hands = 0;
           }
@@ -362,15 +359,15 @@ int dealer_action(void) {
   return 0;
 }
 
-// devuelve cero si es un comando comun y hay que volver a preguntar
-// devuelve positivo si se contesto lo que se preguntaba
-// devuelve negativo si no se contesto lo que se preguntaba o el comando no aplica
+// returns zero if it is a common command and we need to ask again
+// returns positive if what was asked was answered
+// returns negative if what was aked was not asnwered or the command does not apply
 int dealer_process_input(player_t *player, char *command) {
   
   hand_t *hand;
   card_t *card;
   
-  // primero vemos comandos comunes
+  // we firs check common commands
 /// quit  
   if (strcmp(command, "quit") == 0 || strcmp(command, "q") == 0) {
     blackjack.done = 1;
@@ -445,8 +442,8 @@ int dealer_process_input(player_t *player, char *command) {
     return 0;
   }
   
-  // comandos particulares
-  // estos tienen que devolver un numero positivo
+  // particular commands
+  // these have to return a positive number
   switch(blackjack.players_input_needed) {
     case BET:
       player->current_hand->bet = atoi(command);
@@ -490,13 +487,11 @@ int dealer_process_input(player_t *player, char *command) {
           player->total_money_waged += player->current_hand->bet;
           
           card = deal_card_to_hand(player->current_hand);
-///          
           bjcall(write_formatted_card(player, 0,  "card_player", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
           if (stdout_opts.isatty) { printf(_("player's count is %s%d\n"), player->current_hand->soft?"soft ":"", player->current_hand->count); }
 
           if (player->current_hand->busted) {
-///            
             bjcall(write_formatted(player, "busted_player %d", player->current_hand->count));
             if (stdout_opts.isatty) { printf(_("player busted with %d\n"), player->current_hand->count); }
             player->current_result -= player->current_hand->bet;
@@ -516,10 +511,10 @@ int dealer_process_input(player_t *player, char *command) {
       } else if (strcmp(command, "split") == 0 || strcmp(command, "p") == 0) {
         if (player->has_split < 3 &&  // up to three splits (i.e. four hands) TODO: option
             player->current_hand->n_cards == 2 && player->current_hand->cards->value == player->current_hand->cards->next->value) {
-          // marcamos que hicimos un split para poners ids en las manos
+          // mark that we split to put ids in the hands
           player->has_split++;
           
-          // a la primera mano le ponemos id 1, y despues empezamos a sumar de a uno
+          // the first hand is id 1, then we add one
           if (player->current_hand == player->hands) {
             player->current_hand->id = 1;
           }
@@ -531,30 +526,30 @@ int dealer_process_input(player_t *player, char *command) {
           hand->id = player->current_hand->id + 1;
           append_hand(&player->hands, hand);
           
-          // llevamos la segunda carta a la segunda mano
+          // take the second card to the second hand
           card = calloc(1, sizeof(card_t));
           memcpy(card, &blackjack.card[player->current_hand->cards->next->tag], sizeof(card_t));
           
-          // borramos la carta de la primera
+          // remove the card from the first hand
           delete_card(&player->current_hand->cards, player->current_hand->cards->next);
-          // y la ponemos en la segunda
+          // and put it in the second hand
           append_card(&hand->cards, card);
           
-          // le damos una carta en la primera
+          // deal a card to the first hand
           card = deal_card_to_hand(player->current_hand);
-///          
+
           bjcall(write_formatted_card(player, 0,  "card_player_second", card));
           if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
           
-          // los aces piden una sola carta (y si saco 21 tambien)
+          // aces get dealt only on card (and also if she already got 21)
           if (player->current_hand->cards->value == 11 || player->current_hand->count == 21) {
             if ((player->current_hand = player->current_hand->next) != NULL) {
               card = deal_card_to_hand(player->current_hand);
-///              
+
               bjcall(write_formatted_card(player, 0,  "card_player_second", card));
               if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
               
-              // si tenia as o saco 21 ya esta bien
+              // if she had an ace or got 21 we are done
               if (player->current_hand->cards->value == 11 || player->current_hand->count == 21) {
                 blackjack.next_dealer_action = MOVE_ON_TO_NEXT_HAND;
               } else {
@@ -578,7 +573,7 @@ int dealer_process_input(player_t *player, char *command) {
         
       } else if (strcmp(command, "hit") == 0 || strcmp(command, "h") == 0) {
         card = deal_card_to_hand(player->current_hand);
-///        
+
         bjcall(write_formatted_card(player, 0,  "card_player", card));
         if (stdout_opts.isatty) { print_hand_art(player->current_hand); }
 

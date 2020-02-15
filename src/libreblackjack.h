@@ -154,7 +154,6 @@ struct {
   unsigned int n_arranged_cards;
   int *arranged_cards_array;
   
-//  card_t *card;
   card_t card[53];
   int *shoe;  
   

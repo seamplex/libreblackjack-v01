@@ -19,7 +19,6 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
 #ifdef HAVE_LIBREADLINE
  #include <readline/readline.h>
  #include <readline/history.h>
@@ -28,6 +27,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 int dealer_to_stdout(player_t *player, const char *command) {
 

@@ -19,7 +19,10 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#ifndef _LIBREBLACKJACK_H_
 #include "libreblackjack.h"
+#endif
+
 
 
 #define LL_FOREACH(h,e) for(e=h;e!=NULL;e=e->next)
@@ -79,20 +82,4 @@ void delete_hand(hand_t **head, hand_t *hand) {
   }
 
   return;  
-}
-
-#define LL_DELETE(head,del)                                                              \
-{                                                                                           \
-  __typeof(head) _tmp;                                                                        \
-  if ((head) == (del)) {                                                                       \
-    (head)=(head)->next;                                                                       \
-  } else {                                                                                     \
-    _tmp = head;                                                                               \
-    while (_tmp->next && (_tmp->next != (del))) {                                              \
-      _tmp = _tmp->next;                                                                       \
-    }                                                                                          \
-    if (_tmp->next) {                                                                          \
-      _tmp->next = ((del)->next);                                                              \
-    }                                                                                          \
-  }                                                                                            \
 }

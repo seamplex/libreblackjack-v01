@@ -23,7 +23,10 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+
+#ifndef _LIBREBLACKJACK_H_
 #include "libreblackjack.h"
+#endif
 
 void print_card_art(card_t *card) {
   int i;
@@ -109,16 +112,11 @@ int deal_card(void) {
       }
       
 #ifdef HAVE_LIBGSL
-      // TODO: choose
       blackjack.rng = gsl_rng_alloc(gsl_rng_mt19937);
-      // inicializamos el rng al principio, despues le seguimos pidiendo
-      // randoms sin inicializar sino salen siempre los mismos shoes
       gsl_rng_set(blackjack.rng, blackjack_conf.rng_seed);
 #else
       srandom(blackjack_conf.rng_seed);
 #endif
-      
-      
     }
     
     if (blackjack.infinite_decks_card_number_for_arranged_ones < blackjack.n_arranged_cards) {
@@ -165,17 +163,6 @@ card_t *deal_card_to_hand(hand_t *hand) {
 }
 
 
-
-/*
-hand_t *new_hand(hand_t **hands, int id, int bet) {
-  hand_t *hand = calloc(1, sizeof(hand_t));
-  hand->id = id;
-  hand->bet = bet;
-  LL_APPEND(*hands, hand);
-  return hand;  
-}
-*/
-
 void destroy_hands(hand_t **hands) {
   hand_t *hand, *tmp;
   card_t *card, *tmp2;
@@ -205,8 +192,8 @@ void init_shoe(void)  {
 #ifdef HAVE_LIBGSL
     // TODO: choose
     blackjack.rng = gsl_rng_alloc(gsl_rng_mt19937);
-    // inicializamos el rng al principio, despues le seguimos pidiendo
-    // randoms sin inicializar sino salen siempre los mismos shoes
+    // initialize the RNG only at the beginning then we start
+    // start asking for numbers, otherwise we get always the same shoes
     gsl_rng_set(blackjack.rng, blackjack_conf.rng_seed);
 #else
     srandom(blackjack_conf.rng_seed);
@@ -236,15 +223,15 @@ void shuffle_shoe(void) {
   int i, j, k;
   card_t *card;
 
-  // si tenemos decks = 0 (infinitos) entonces no hace
-  // falta mezclar, sorteamos una carta cada vez que nos piden
+  // if we have decks = 0 (infinite) then it is not needed to shuffle
+  // just picka random card each time
   if (blackjack_conf.decks != -1) {
-    // vemos si hay que inicializar el shoe
+    // do we have to initalize the shoe?
     if (blackjack.shoe == NULL) {
       init_shoe();
     }
   
-    // mezclamos
+    // shuffle
     for (i = 52*(blackjack_conf.decks)-1; i > 0; i--) {
 #ifdef HAVE_LIBGSL      
       j = gsl_rng_uniform_int(blackjack.rng, i);
@@ -252,23 +239,24 @@ void shuffle_shoe(void) {
       j = i*random()/RAND_MAX;
 #endif
 
-      // manual de la CZ1000
+      // this reminds me of the Sinclair CZ1000 manual I read in 1991 when I was 8
       k = blackjack.shoe[i];
       blackjack.shoe[i] = blackjack.shoe[j];
       blackjack.shoe[j] = k;
     }
 
-    // ponemos la cut card segun la penetracion (hace desde el 2004 que quiero hacer esto)
+    // put the cut card according to the penetration with a gaussian distribution
+    // (I wanted to do this since 2004 when I was in college)
 #ifdef HAVE_LIBGSL    
     blackjack.cut_card_index = 52*(blackjack_conf.decks) * (blackjack_conf.penetration + gsl_ran_gaussian(blackjack.rng, blackjack_conf.penetration_sigma));
 #else
     blackjack.cut_card_index = 52*(blackjack_conf.decks) * (blackjack_conf.penetration);
 #endif    
 
-    // empezamos en la primera (el dealer es que el que tiene que quemar)  
+    // start in the first card (the dealer burns the card)
     blackjack.current_card_index = 0;
 
-    // ponemos primero las que estan arregladas
+    // first the ones that are fixed/set-up
     j = 0;
     for (card = blackjack_conf.arranged_cards; card != NULL; card = card->next) {
       for (i = 52*(blackjack_conf.decks)-1; i > 0; i--) {
@@ -281,7 +269,7 @@ void shuffle_shoe(void) {
       j++;
     }
 
-    // contamos cuantos shuffles hubo (de curiosos)  
+    // count how many shuffles there are (out of curiosity)
     blackjack.shuffles++;
   }
     

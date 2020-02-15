@@ -25,15 +25,16 @@
 #include <ctype.h>
 #include <errno.h>
 
+#ifndef _LIBREBLACKJACK_H_
 #include "libreblackjack.h"
+#endif
 
-#define INI_TOKEN_SEPARATORS " \t"
+#define CONF_TOKEN_SEPARATORS " \t"
 #define MATCH(n) (strcmp(name, n) == 0)
 
 char suitname[4][12]  = {"spades", "hearts", "diamonds", "clubs"};
 char suitletter[4][8] = {"S",      "H",      "D",        "C"};
 char suitcode[4][8]   = {"♠", "♥", "♦", "♣"};
-//char suitcode[4][8]   = {"\u2660", "\u2665", "\u2666", "\u2663"};
 char numbername[14][4] = {"X", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"};
 int cardvalue[14] = {0, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10};
 
@@ -55,7 +56,7 @@ void bj_strip_blanks(char *string) {
   return;
 }
 
-// saca los blancos de una cadena (inline)
+// strip out the blanks of a string (inline)
 void bj_strip_blanks_leading_trailing(char *string) {
   int i = 0;
   int j = 0;
@@ -83,20 +84,19 @@ int fbj_conf_handler(const char* name, const char* value) {
   char *tokens;
   char *token;
   
-// global options (el primero que llega entre ini y commandline pone la opcion)
   if (MATCH("decks")) {
     if (blackjack_conf.decks == 0) { blackjack_conf.decks = atoi(value); }
 
   } else if (MATCH("hands")) {
-    // asi podemos poner cosas como 1e6
+    // with atof we can use things like "1e6" instead of 1000000
     if (blackjack_conf.hands == 0) { blackjack_conf.hands = (long int)(atof(value)); }
 
   } else if (MATCH("players")) {
     tokens = strdup(value);
-    token = strtok(tokens, INI_TOKEN_SEPARATORS);
+    token = strtok(tokens, CONF_TOKEN_SEPARATORS);
     while (token != NULL) {
       new_player(token);
-      token = strtok(NULL, INI_TOKEN_SEPARATORS);
+      token = strtok(NULL, CONF_TOKEN_SEPARATORS);
     }
     free(token);
 
@@ -104,6 +104,7 @@ int fbj_conf_handler(const char* name, const char* value) {
     if (blackjack_conf.rng_seed == 0) { blackjack_conf.rng_seed = atoi(value); }
 
   } else if (MATCH("rng_type")) {
+    // TODO
 //        blackjack_conf.rng_type = gsl_rng_mt19937;
     ;
 
@@ -173,12 +174,12 @@ int fbj_conf_handler(const char* name, const char* value) {
     if (blackjack_conf.arranged_cards == NULL) {
       card_t *arranged_card;
       tokens = strdup(value);
-      token = strtok(tokens, INI_TOKEN_SEPARATORS);
+      token = strtok(tokens, CONF_TOKEN_SEPARATORS);
       while (token != NULL) {
         arranged_card = calloc(1, sizeof(card_t));
         arranged_card->tag = atoi(token);
         append_card(&blackjack_conf.arranged_cards, arranged_card);
-        token = strtok(NULL, INI_TOKEN_SEPARATORS);
+        token = strtok(NULL, CONF_TOKEN_SEPARATORS);
       }
       free(tokens);
     }
@@ -186,7 +187,7 @@ int fbj_conf_handler(const char* name, const char* value) {
   } else if (MATCH("shuffle_every_hand")) {
     if (blackjack_conf.shuffle_every_hand == -1 ) { blackjack_conf.shuffle_every_hand = atoi(value); }
     
-// stdout      
+  // stdout      
   } else if (MATCH("no_color")) {
     if (stdout_opts.no_color == 0) { stdout_opts.no_color = atoi(value); }
 
@@ -196,7 +197,7 @@ int fbj_conf_handler(const char* name, const char* value) {
   } else if (MATCH("ascii_art")) {
     if (stdout_opts.ascii_art == 0) { stdout_opts.ascii_art = atoi(value); }
       
-// player-based options
+  // player-based options
   } else if (strcmp(name, "flat_bet") == 0 || strcmp(name, "flatbet") == 0) {
     player = player_from_section(NULL);
     if (strcmp(value, "") == 0) {
@@ -260,7 +261,7 @@ int fbj_conf_handler(const char* name, const char* value) {
     }
     
     tokens = strdup(value);
-    token = strtok(tokens, INI_TOKEN_SEPARATORS);
+    token = strtok(tokens, CONF_TOKEN_SEPARATORS);
     
     if (strcmp(token, "fifo") == 0) {
       ipc->ipc_type = ipc_fifo;
@@ -283,7 +284,7 @@ int fbj_conf_handler(const char* name, const char* value) {
       player->dealer2player.ipc_type = ipc_internal;
     } else {
       // otherwise we need an object name
-      if ((token = strtok(NULL, INI_TOKEN_SEPARATORS)) == NULL) {
+      if ((token = strtok(NULL, CONF_TOKEN_SEPARATORS)) == NULL) {
         blackjack_push_error_message(_("expected object name after ipc type"));
         return -1;
       }
@@ -308,14 +309,14 @@ int bjinit(char *cmdline_file_path) {
   char *value;
   char *comment_colon;
   char *comment_hash;
-  char *ini_file_path;
-  FILE *ini_file;
+  char *conf_file_path;
+  FILE *conf_file;
   FILE *devrandom;
   int suit, rank, tag;
   int line = 0;
   player_t *player;
 
-  // las cosas que pueden ser cero arrancan en menos uno
+  // stuff that can be zero start in minus one
   blackjack_conf.no_negative_bankroll = -1;
   blackjack_conf.max_bet = -1;
   blackjack_conf.double_after_split = -1;
@@ -323,10 +324,10 @@ int bjinit(char *cmdline_file_path) {
   blackjack_conf.max_invalid_commands = -1;
   blackjack_conf.shuffle_every_hand = -1;
   
-  // leemos el ini
-  ini_file_path = strdup((cmdline_file_path == NULL) ? CONF_FILE_PATH : cmdline_file_path);
-  if ((ini_file = fopen(ini_file_path, "r")) != NULL) {
-    while (fgets(buffer, BUF_SIZE-1, ini_file)) {
+  // read the conf
+  conf_file_path = strdup((cmdline_file_path == NULL) ? CONF_FILE_PATH : cmdline_file_path);
+  if ((conf_file = fopen(conf_file_path, "r")) != NULL) {
+    while (fgets(buffer, BUF_SIZE-1, conf_file)) {
   
       line++;  
       keyword = NULL;
@@ -347,24 +348,20 @@ int bjinit(char *cmdline_file_path) {
       }
 
       if (keyword != NULL && value != NULL) {
-//        bj_strip_blanks(keyword);
-//        bj_strip_blanks(value);
         bj_strip_blanks_leading_trailing(keyword);
         bj_strip_blanks_leading_trailing(value);
         if (fbj_conf_handler(keyword, value) != 0) {
-          blackjack_push_error_message("%s:%d: ", ini_file_path, line);
+          blackjack_push_error_message("%s:%d: ", conf_file_path, line);
           return -1;
         }
       }  
-      
-      
     }
     
   } else if (cmdline_file_path != NULL) {
     blackjack_push_error_message(_("cannot open ini file '%s': %s\n"), cmdline_file_path, strerror(errno));
     return -1;
   }
-  free(ini_file_path);
+  free(conf_file_path);
 
   // non-zero defaults
   if (blackjack_conf.decks == 0) {  blackjack_conf.decks = 6; }
@@ -382,12 +379,12 @@ int bjinit(char *cmdline_file_path) {
   if (blackjack_conf.penetration == 0) { blackjack_conf.penetration = 0.75; }
   if (blackjack_conf.penetration_sigma ==  0) { blackjack_conf.penetration_sigma = 0.05; }
   
-  // si no hay ningun player, creamos uno
+  // create a player
   if ((blackjack.current_player = blackjack.players) == NULL) {
     blackjack.current_player = new_player("player");
   }
   
-  // el delay es solo para stdout por tty
+  // the delay is only for tty-stdout
   if (blackjack.current_player->delay == 0) {
     blackjack.current_player->delay = 0.4;
   }
@@ -398,8 +395,6 @@ int bjinit(char *cmdline_file_path) {
     fclose(devrandom);
   }
 
-  // TODO!
-  // solo el primer jugador puede salir por tty
   if (blackjack.players->dealer2player.ipc_type == ipc_none) {
     stdout_opts.isatty = isatty(1);
   }

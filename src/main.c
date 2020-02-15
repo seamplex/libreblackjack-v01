@@ -19,12 +19,15 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
-
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <sys/time.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
+
 
 int main(int argc, char** argv) {
   
@@ -121,10 +124,10 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  // medimos wall time inicial
+  // measure wall time, ask fot the initial time
   gettimeofday(&blackjack.wall_time_initial, NULL);
   
-  // si nos quedaron argumentos sin procesar, es el ini
+  // if we still have arguments, it is the path to the conf file
   if (optind == argc) {
     if (bjinit(NULL) != 0) {
       blackjack_pop_errors();
@@ -137,7 +140,6 @@ int main(int argc, char** argv) {
     }
   }
 
-  // TODO: ver  
   if (stdout_opts.isatty) {
     libreblackjack_shortversion();
     libreblackjack_copyright();
@@ -146,11 +148,11 @@ int main(int argc, char** argv) {
   blackjack.next_dealer_action = START_NEW_HAND;
   blackjack.last_pass = 1;
   
-  // TODO: revisar/elegir por ini
+  // TODO: check and/or choose in the conf
 //  setvbuf(stdout, NULL, _IONBF, 0);
   setlinebuf(stdout);
   
-  // TODO: elegir, poner opcion -q (y --verbose)
+  // TODO: check, add options --quiet and --verbose
   if (blackjack.players->dealer2player.ipc_type != ipc_none) {
     if (blackjack_conf.hands != 0) {
       show_bar = 1;
@@ -160,13 +162,13 @@ int main(int argc, char** argv) {
   
   while (!blackjack.done) {
 
-    // por default hacemos que no se necesite feedback
-    // si no se necesita feedback, en dealer_action seteamos next_action
-    // si se necesita feedback, en process_player_input se setea el next_action
-    // asi podemos chequear que el feedback que pedimos es valido
+    // assume no feedback from the player is needed
+    // if none is needed, in dealer_action we set next_action
+    // if feedback is needed, in process_player_input we set next_action
+    // this way we can check that the feedback we get is valid
     blackjack.players_input_needed = NONE;
     
-    // limpiamos el output buffer (se usa para re-preguntar cuando es invalida la entrada)
+    // clean the output buffer (this is used to re-ask when the input is invalid)
     outputbuffer[0] = '\0';
     current_invalid_command = 0;
 

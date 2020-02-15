@@ -19,12 +19,14 @@
  *  along with libreblackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "libreblackjack.h"
-
 #include <assert.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <sys/types.h>
+
+#ifndef _LIBREBLACKJACK_H_
+#include "libreblackjack.h"
+#endif
 
 void blackjack_push_error_message(const char *fmt, ...) {
   
@@ -38,7 +40,7 @@ void blackjack_push_error_message(const char *fmt, ...) {
   va_start(ap, fmt);
   vsnprintf(blackjack.error[blackjack.error_level-1], BUF_SIZE, fmt, ap);
   va_end(ap);
-  // TODO: si nos quedamos sin lugar hacer realloc
+  // TODO: realloc if run out of space
   
   return;
 }
@@ -84,7 +86,6 @@ void blackjack_signal_handler(int sig_num) {
 */
 
   fprintf(stderr, "ok\n");
-//  blackjack_polite_exit(EXIT_SUCCESS);
   exit(1);
 
 }
