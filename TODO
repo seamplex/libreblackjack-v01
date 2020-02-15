@@ -1,4 +1,3 @@
-remove uthash
 change name and move to savannah
 manual -> texinfo
 --help
@@ -35,7 +34,6 @@ https://www.blackjackincolor.com/
 https://www.blackjackinfo.com/
 https://www.gnu.org/help/evaluation.html 
 re-calcular resultados del wizard
-generar la basic strategy desde cero, mandar al wizzard
 https://github.com/imneme/pcg-c
 martingale and positive progression
 https://wizardofodds.com/gambling/betting-systems/cancellation/appendix/

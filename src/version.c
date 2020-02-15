@@ -24,8 +24,9 @@
 
 #include <string.h>
 
+#define ENGINE  "a free & open blackjack engine\n" 
+
 void libreblackjack_shortversion(void) {
-  // TODO: gettext & version from hg
 
 #ifdef LIBREBLACKJACK_VCS_BRANCH
   printf("libreblackjack %s%s %s\n", LIBREBLACKJACK_VCS_VERSION,
@@ -35,7 +36,28 @@ void libreblackjack_shortversion(void) {
   printf("libreblackjack %s\n", PACKAGE_VERSION);
 #endif
 
-  printf(_("a free & open blackjack engine\n"));
+  printf(_(ENGINE));
+  return;
+}
+
+void libreblackjack_help(char *program_name) {
+  printf(_("Usage: %s [options] [path_to_conf_file]\n"), program_name);
+  printf(_(ENGINE));
+
+  printf(_("\n"));
+  printf(_("If not configuration file is given, a file named blackjack.conf\n"));
+  printf(_("in the current directory is used, provided it exists.\n"));
+  printf(_("See the full documentation for the available options and the default values.\n"));
+   
+  printf(_("\n"));
+  printf(_("  -h, --hands=N    set the number of hands to play before quiting\n"));
+  printf(_("  -d, --decks=N    set the number of decks to use\n"));
+  printf(_("  -f, --flatbet    do not ask for the bet before each hand, use a unit flat bet\n"));
+  printf(_("  -i, --internal   use the internal player to play agains the dealer (not interactive)\n"));
+  printf(_("\n"));
+  printf(_("  -h, --help       display this help and exit\n"));
+  printf(_("  -v  --version    output version information and exit\n"));
+  
   return;
 }
 

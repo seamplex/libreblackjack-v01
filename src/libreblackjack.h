@@ -278,81 +278,81 @@ struct hand_t {
 
 
 // cards.c
-extern void print_card_art(card_t *card);
-extern void print_hand_art(hand_t *hand);
-extern void print_card_unicode(card_t *card);
-extern void print_card_text(card_t *card);
-extern int compute_count(hand_t *hand);
+extern void print_card_art(card_t *);
+extern void print_hand_art(hand_t *);
+extern void print_card_unicode(card_t *);
+extern void print_card_text(card_t *);
+extern int compute_count(hand_t *);
 extern int deal_card(void);
-extern card_t *deal_card_to_hand(hand_t *hand);
-//extern hand_t *new_hand(hand_t **hands, int id, int bet);
-extern void destroy_hands(hand_t **hands);
-extern void init_card(int tag, int number, int suit);
+extern card_t *deal_card_to_hand(hand_t *);
+extern void destroy_hands(hand_t **);
+extern void init_card(int, int, int);
 
 extern void init_shoe(void);
 extern void shuffle_shoe(void);
 
 // dealer.c
 extern int dealer_action(void);
-extern int dealer_process_input(player_t *player, char *command);
+extern int dealer_process_input(player_t *, char *);
 
 // stdinout.c
-extern int dealer_to_stdout(player_t *, const char *command);
-extern int player_from_stdin(player_t *, char *buffer);
+extern int dealer_to_stdout(player_t *, const char *);
+extern int player_from_stdin(player_t *, char *);
 extern void free_rl_stdin(void);
 
 // bjinit.c
 extern void bj_strip_blanks_leading_trailing(char *);
 extern void bj_strip_blanks(char *);
-extern player_t *new_player(const char *name);
-extern void destroy_player(player_t *player);
-extern player_t *get_player(const char *name);
-extern player_t *get_or_define_player(const char *name);
-extern player_t *player_from_section(const char *section);
-extern int bjinit(char *cmdline_file_path);
-int fbj_conf_handler(const char* name, const char* value);
+extern player_t *new_player(const char *);
+extern void destroy_player(player_t *);
+extern player_t *get_player(const char *);
+extern player_t *get_or_define_player(const char *);
+extern player_t *player_from_section(const char *);
+extern int bjinit(char *);
+int fbj_conf_handler(const char *, const char *);
 
 // commands.c
-extern int write_formatted_card(player_t *player, int dealer, char *command, card_t *card);
-extern int write_formatted(player_t *player, const char *fmt, ...);
+extern int write_formatted_card(player_t *, int, char *, card_t *);
+extern int write_formatted(player_t *, const char *, ...);
 
 // lists.c
-extern void append_card(card_t **head, card_t *card);
-extern void delete_card(card_t **head, card_t *card);
-extern void append_hand(hand_t **head, hand_t *hand);
-extern void delete_hand(hand_t **head, hand_t *hand);
+extern void append_card(card_t **, card_t *);
+extern void delete_card(card_t **, card_t *);
+extern void append_hand(hand_t **, hand_t *);
+extern void delete_hand(hand_t **, hand_t *);
 
 // fifo.c
-int create_fifo(const char *name);
-int dealer_to_fifo(player_t *player, const char *command);
-int player_from_fifo(player_t *player, char *buffer);
+int create_fifo(const char *);
+int dealer_to_fifo(player_t *, const char *);
+int player_from_fifo(player_t *, char *);
 // version.c
 void libreblackjack_shortversion(void);
+void libreblackjack_help(char *);
 void libreblackjack_copyright(void);
 
 // report.c
-int write_yaml_report(player_t *player);
+int write_yaml_report(player_t *);
 
 // error.c
 void blackjack_push_error_message(const char *fmt, ...);
 void blackjack_pop_error_message(void);
 void blackjack_pop_errors(void);
-void blackjack_signal_handler(int sig_num);
+void blackjack_signal_handler(int);
 
 // shmem.c
 
-int create_shmem(const char *name, char **pointer, sem_t **sem_written, sem_t **sem_read);
-int dealer_to_shmem(player_t *player, const char *command);
-int player_from_shmem(player_t *player, char *buffer);
+int create_shmem(const char *, char **, sem_t **, sem_t **);
+int dealer_to_shmem(player_t *, const char *);
+int player_from_shmem(player_t *, char *);
 
 
 // mqueue.c
-int create_mqueue(const char *name, mqd_t *mq);
-int dealer_to_mqueue(player_t *player, const char *command);
-int player_from_mqueue(player_t *player, char *buffer);
+int create_mqueue(const char *, mqd_t *);
+int dealer_to_mqueue(player_t *, const char *);
+int player_from_mqueue(player_t *, char *);
 
 // internal.c
-extern int dealer_to_internal(player_t *player, const char *command);
-extern int player_from_internal(player_t *player, char *buffer);
+extern int dealer_to_internal(player_t *, const char *);
+extern int player_from_internal(player_t *, char *);
 
 #endif

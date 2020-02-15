@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   
  
   player_t *player;
-  player_t *tmp;  // for FOR_EACH_SAFE
+  player_t *tmp;  // for the cleanup
 
   const struct option longopts[] = {
     { "help",        no_argument,       NULL, 'h'},
@@ -114,8 +114,7 @@ int main(int argc, char** argv) {
     libreblackjack_copyright();
   }
   if (show_help) {
-    // TODO
-    printf("help\n");
+    libreblackjack_help(argv[0]);
   }
   
   if (show_version || show_help) {

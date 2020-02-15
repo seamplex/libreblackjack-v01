@@ -41,7 +41,7 @@ With LibreBlackjack you do not have to trust other people anymore. You have a fr
  2. share it with your friends and colleagues, and
  3. distribute copies of your modified versions.
 
-If you do not know how to program, you have the _freedom_ to hire a programmer to do it for you. That is why [LibreBlackjack](https:/www.seamplex.com/blackjack) is [free software](https://www.gnu.org/philosophy/free-sw.html).
+If you do not know how to program, you have the _freedom_ to hire a programmer to do it for you. That is why [LibreBlackjack](https://www.seamplex.com/blackjack) is [free software](https://www.gnu.org/philosophy/free-sw.html).
 
 
 ## How 
