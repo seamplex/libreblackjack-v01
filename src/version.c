@@ -51,7 +51,7 @@ libreblackjack_help (char *program_name)
 
   printf (_("\n"));
   printf (_
-	  ("If not configuration file is given, a file named blackjack.conf\n"));
+	  ("If no configuration file is given, a file named blackjack.conf\n"));
   printf (_("in the current directory is used, provided it exists.\n"));
   printf (_
 	  ("See the full documentation for the available options and the default values.\n"));

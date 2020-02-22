@@ -1,23 +1,19 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
-@setfilename libreblackjack.info
-@include version.texi
-@settitle LibreBlackjack @value{VERSION}
+@documentencoding UTF-8
+$for(header-includes)$
+$header-includes$
+$endfor$
 
-@c Define a new index for options.
-@defcodeindex op
-@c Combine everything into one index (arbitrarily chosen to be the
-@c concept index).
-@syncodeindex op cp
-@c %**end of header
+@comment  @setfilename hello.info
+@set UPDATED $date$
+@set VERSION v$version$
 
 @copying
 This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
-a completely free-as-in-freedom blackjack engine designed to study and analyze
-the game statistics using different playing strategies ranging from simple
-card counting up to other complex alogirthms based on artificial inteligence.
+which is $desc$.
 
-Copyright @copyright{} 2016 Jeremy Theler.
+Copyright @copyright{} 2016-2020 Jeremy Theler.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -28,46 +24,41 @@ Texts.  A copy of the license is included in the section entitled
 ``GNU Free Documentation License''.
 @end quotation
 @end copying
-@c If your manual is published on paper by the FSF, it should include
-@c the standard FSF Front-Cover and Back-Cover Texts, as given in
-@c maintain.texi.
 
-@dircategory Basics
-@direntry
-* Hello: (hello).               Hello, GNU world.
-@end direntry
-
+$if(strikeout)$
+@macro textstrikeout{text}
+~~\text\~~
+@end macro
+$endif$
+@ifnottex
+@paragraphindent 0
+@end ifnottex
+$if(titlepage)$
 @titlepage
-@title LibreBlackjack
-@subtitle for version @value{VERSION}, @value{UPDATED}
-@author Jeremy Theler (@email{gtheler@@cites-gss.com})
+@title $title$
+@subtitle $subtitle$, version $version$
+$for(author)$
+@author $author$
+$endfor$
+$if(date)$
+$date$
 @page
 @vskip 0pt plus 1filll
 @insertcopying
+$endif$
 @end titlepage
 
+$endif$
+$for(include-before)$
+$include-before$
+$endfor$
+$if(toc)$
 @contents
 
-
-@ifnottex
-@comment  @node Top
-@comment  @top GNU Hello
-
-This manual is for GNU Hello (version @value{VERSION}, @value{UPDATED}),
-which prints a friendly greeting (and serves as an example GNU package).
-@end ifnottex
-
+$endif$
 $body$
-
-@comment  @node GNU Free Documentation License
-@appendix GNU Free Documentation License
-
-@include fdl.texi
-
-
-@comment  @node Concept index
-@comment  @unnumbered Concept index
-
-@comment  @printindex cp
+$for(include-after)$
+$include-after$
+$endfor$
 
 @bye

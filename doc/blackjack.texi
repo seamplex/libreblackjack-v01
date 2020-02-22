@@ -1,0 +1,139 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@documentencoding UTF-8
+
+@comment  @setfilename hello.info
+@set UPDATED February 20, 2020
+@set VERSION vv0.1.73-g340abaf+Δ
+
+@copying
+This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
+which is a completely free-as-in-freedom blackjack engine designed to
+study and analyze the game statistics using different playing strategies
+ranging from simple card counting up to other complex algorithms based
+on artificial intelligence..
+
+Copyright @copyright{} 2016-2020 Jeremy Theler.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+@end quotation
+@end copying
+
+@ifnottex
+@paragraphindent 0
+@end ifnottex
+@titlepage
+@title LibreBlackjack
+@subtitle A free blackjack back end, version v0.1.73-g340abaf+Δ
+@author Jeremy Theler
+February 20, 2020
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top LibreBlackjack
+
+@menu
+* Overview::
+* Running libreblackjack::
+* Commands::
+* Configuration file::
+* Example automated players::
+@end menu
+
+@node Overview
+@chapter Overview
+@anchor{#overview}
+LibreBlackjack is a blackjack engine that emulates a dealer, deals
+(digital) cards and understands plain-text commands such as @code{hit}
+or @code{stand}. The basic idea is that one or more players can talk to
+LibreBlackjack either in an interactive or in an automated way through
+
+@itemize
+@item
+the standard input and/or output,
+@item
+named pipes,
+@item
+POSIX message queues,
+@item
+TCP (web)sockets (using @code{netcat} or @code{gwsocket}), or
+@item
+dynamically loaded arbitrary routines from shared objects.
+@end itemize
+
+These players can be actual human players playing in real-time through a
+front end (a GUI application, a web-based interface, a mobile app, etc.)
+or robots that implement a certain betting and playing strategy playing
+(i.e.@ card counting) as fast as possible to study and analyze game
+statistics. There is an internal player that reads the strategy from a
+text file and plays accordingly. It can also be used to play interactive
+ASCII blackjack.
+
+@float
+@image{ascii,,,Interactive ASCII (actually UTF-8) blackjack,png}
+@caption{Interactive ASCII (actually UTF-8) blackjack}
+@end float
+
+@node Running libreblackjack
+@chapter Running @code{libreblackjack}
+@anchor{#running-libreblackjack}
+
+@menu
+* Invocation::
+* Interactive game::
+* Automated playing::
+@end menu
+
+@node Invocation
+@section Invocation
+@anchor{#invocation}
+
+@verbatim
+Usage: ./libreblackjack [options] [path_to_conf_file]
+a free & open blackjack engine
+
+If no configuration file is given, a file named blackjack.conf
+in the current directory is used, provided it exists.
+See the full documentation for the available options and the default values.
+
+  -h, --hands=N    set the number of hands to play before quiting
+  -d, --decks=N    set the number of decks to use
+  -f, --flatbet    do not ask for the bet before each hand, use a unit flat bet
+  -i, --internal   use the internal player to play agains the dealer (not interactive)
+
+  -h, --help       display this help and exit
+  -v  --version    output version information and exit
+@end verbatim
+
+@node Interactive game
+@section Interactive game
+@anchor{#interactive-game}
+
+@node Automated playing
+@section Automated playing
+@anchor{#automated-playing}
+
+@node Commands
+@chapter Commands
+@anchor{#commands}
+
+@node Configuration file
+@chapter Configuration file
+@anchor{#configuration-file}
+
+@node Example automated players
+@chapter Example automated players
+@anchor{#example-automated-players}
+
+@bye

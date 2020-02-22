@@ -35,6 +35,7 @@ po/Makefile.in
 po/messages
 po/POTFILES
 po/stamp-po
+po/libreblackjack.pot
 README-release
 src/.deps
 src/.libs
