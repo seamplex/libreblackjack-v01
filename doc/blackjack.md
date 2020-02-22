@@ -5,6 +5,7 @@ desc: a completely free-as-in-freedom blackjack engine designed to study and ana
 author: Jeremy Theler
 date: February 20, 2020
 version: v0.1.73-g340abaf+Δ
+infoname: blackjack
 ---
 
 # Overview

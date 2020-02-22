@@ -5,7 +5,7 @@ $for(header-includes)$
 $header-includes$
 $endfor$
 
-@setfilename blackjack.info
+@setfilename $infoname$.info
 @set UPDATED $date$
 @set VERSION v$version$
 
