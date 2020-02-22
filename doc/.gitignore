@@ -1,0 +1,10 @@
+*.aux
+*.dvi
+*.info*
+*.log
+*.toc
+stamp-vti
+wwwtemp
+blackjack.t2p/
+blackjack.pdf
+blackjack.html

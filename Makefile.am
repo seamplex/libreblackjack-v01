@@ -3,10 +3,9 @@
 # This file is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# SUBDIRS = doc
+SUBDIRS = doc po
 AUTOMAKE_OPTIONS = subdir-objects
-dist_doc_DATA = README
-#doc/libreblackjack.texi
+dist_doc_DATA = README doc/blackjack.texi
 
 TESTS = check-internal.sh check-stand.sh
 EXTRA_DIST = config.rpath m4/ChangeLog  blackjack.conf players $(TESTS)
@@ -34,7 +33,5 @@ libreblackjack_SOURCES = \
  src/internal.c \
  src/shmem.c \
  src/mqueue.c
-
-SUBDIRS = po
 
 ACLOCAL_AMFLAGS = -I m4

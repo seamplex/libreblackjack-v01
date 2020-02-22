@@ -11,16 +11,6 @@ config.in
 config.log
 config.status
 configure
-doc/*.aux
-doc/*.dvi
-doc/*.info*
-doc/*.log
-doc/*.pdf
-doc/*.toc
-doc/hello.??
-doc/hello.??s
-doc/stamp-vti
-doc/wwwtemp
 GNUmakefile
 INSTALL
 libmaint.mk

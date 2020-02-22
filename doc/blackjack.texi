@@ -2,7 +2,7 @@
 @c %**start of header
 @documentencoding UTF-8
 
-@comment  @setfilename hello.info
+@setfilename blackjack.info
 @set UPDATED February 20, 2020
 @set VERSION vv0.1.73-g340abaf+Δ
 
