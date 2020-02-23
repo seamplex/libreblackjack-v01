@@ -4,14 +4,14 @@
 
 @setfilename blackjack.info
 @set UPDATED February 20, 2020
-@set VERSION vv0.1.73-g340abaf+Δ
+@set VERSION v0.1.73-g340abaf+Δ
 
 @copying
 This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
-which is a completely free-as-in-freedom blackjack engine designed to
-study and analyze the game statistics using different playing strategies
-ranging from simple card counting up to other complex algorithms based
-on artificial intelligence..
+which is a completely free-as-in-freedom blackjack engine designed to study and
+analyze the game statistics using different playing strategies ranging
+from simple card counting up to other complex algorithms based on
+artificial intelligence..
 
 Copyright @copyright{} 2016-2020 Jeremy Theler.
 
@@ -30,7 +30,7 @@ Texts.  A copy of the license is included in the section entitled
 @end ifnottex
 @titlepage
 @title LibreBlackjack
-@subtitle A free blackjack back end, version v0.1.73-g340abaf+Δ
+@subtitle A free blackjack back end, v0.1.73-g340abaf+Δ
 @author Jeremy Theler
 February 20, 2020
 @page
@@ -88,7 +88,6 @@ ASCII blackjack.
 @node Running libreblackjack
 @chapter Running @code{libreblackjack}
 @anchor{#running-libreblackjack}
-
 @menu
 * Invocation::
 * Interactive game::

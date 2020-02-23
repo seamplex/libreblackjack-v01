@@ -7,7 +7,7 @@ $endfor$
 
 @setfilename $infoname$.info
 @set UPDATED $date$
-@set VERSION v$version$
+@set VERSION $version$
 
 @copying
 This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
@@ -36,7 +36,7 @@ $endif$
 $if(titlepage)$
 @titlepage
 @title $title$
-@subtitle $subtitle$, version $version$
+@subtitle $subtitle$, $version$
 $for(author)$
 @author $author$
 $endfor$
