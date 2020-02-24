@@ -63,7 +63,7 @@ libreblackjack_help (char *program_name)
   printf (_
 	  ("  -f, --flatbet    do not ask for the bet before each hand, use a unit flat bet\n"));
   printf (_
-	  ("  -i, --internal   use the internal player to play agains the dealer (not interactive)\n"));
+	  ("  -i, --internal   use the internal player to play against the dealer (not interactive)\n"));
   printf (_("\n"));
   printf (_("  -h, --help       display this help and exit\n"));
   printf (_("  -v  --version    output version information and exit\n"));

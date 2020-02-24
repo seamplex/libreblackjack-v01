@@ -1,26 +1,7 @@
----
-title: LibreBlackjack
-subtitle:  A free blackjack back end
-desc: a completely free-as-in-freedom blackjack engine designed to study and analyze the game statistics using different playing strategies ranging from simple card counting up to other complex algorithms based on artificial intelligence.
-author: Jeremy Theler
-date: February 20, 2020
-version: v0.1.73-g340abaf+Δ
-infoname: blackjack
----
-
-# Overview
-
-include(overview.md)
-
-# Running `libreblackjack`
-
-## Invocation
-
-```{=texinfo}
 The format for running the @command{libreblackjack} program is:
 
 @example
-libreblackjack @var{options} @var{path_to_conf_file}
+libreblackjack @var{options} @var{path\_to\_conf\_file}
 @end example
 
 If no configuration file is given, a file named @file{blackjack.conf} in the current directory is used, provided it exists.
@@ -61,25 +42,3 @@ successfully.
 @cindex version
 Print the version number and licensing information of Hello on
 standard output and then exit successfully.
-```
-
-## Interactive game
-
-## Automated playing
-
-
-# Configuration file
-
-
-# Commands
-
-
-
-
-
-# Example automated players
-
-include(players.md)
-
-
-
