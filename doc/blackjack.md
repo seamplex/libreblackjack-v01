@@ -48,19 +48,15 @@ Use the internal player to play against itself.
 
 @item --help
 @itemx -h
-@opindex --help
-@opindex -h
-@cindex help
 Print an informative help message on standard output and exit
 successfully.
 
 @item --version
 @itemx -v
-@opindex --version
-@opindex -v
-@cindex version
 Print the version number and licensing information of Hello on
 standard output and then exit successfully.
+
+@end table
 ```
 
 ## Interactive game
@@ -70,6 +66,7 @@ standard output and then exit successfully.
 
 # Configuration file
 
+include(conf.md)
 
 # Commands
 

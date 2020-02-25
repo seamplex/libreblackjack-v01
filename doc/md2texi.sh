@@ -12,4 +12,6 @@ for i in `cat players`; do
   sed s/\#/\#\#/ ../players/${i}/README.md | grep -v ':::' | grep -v 'Index' | grep -vw '\-\-\-\-\-\-\-' >> players.md
 done
 
+./reference.sh bjinit va > conf.md
+
 m4 header.m4 blackjack.md | pandoc --toc --template template.texi -o blackjack.texi

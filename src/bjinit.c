@@ -95,6 +95,11 @@ fbj_conf_handler (const char *name, const char *value)
   char *tokens;
   char *token;
 
+///va+decks+name decks
+///va+decks+desc Number of decks in the shoe.
+///va+decks+detail A value of -1 corresponds "infinite" which means
+///va+decks+detail sample a random card instead of actually shuffling a
+///va+decks+detail real shoe and drawing a card from it  
   if (MATCH ("decks"))
     {
       if (blackjack_conf.decks == 0)
@@ -103,6 +108,13 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+///va+hands+name hands
+///va+hands+desc Number of hands to play.
+///va+hands+detail After the prescribed number of hands have been played,
+///va+hands+detail the execution ends. A scientific notation number can
+///va+hands+detail be given to avoid issues with too many zeros.
+///va+hands+detail So one million hands can be written either
+///va+hands+detail as `1000000` or as `1e6`.
   else if (MATCH ("hands"))
     {
       // with atof we can use things like "1e6" instead of 1000000
@@ -112,6 +124,7 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+/*    
   else if (MATCH ("players"))
     {
       tokens = strdup (value);
@@ -124,6 +137,12 @@ fbj_conf_handler (const char *name, const char *value)
       free (token);
 
     }
+*/
+///va+rng_seed+desc Random number generator seed.
+///va+rng_seed+detail The seed used by the RNG in charge of shuffling the shoe
+///va+rng_seed+detail (or sampling from an infinite deck if `decks`=-1).
+///va+rng_seed+detail This can be used to have repeteability in the order
+///va+rng_seed+detail of the dealt cards.
   else if (MATCH ("rng_seed"))
     {
       if (blackjack_conf.rng_seed == 0)
@@ -132,14 +151,21 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+/*    
   else if (MATCH ("rng_type"))
     {
       // TODO
 //        blackjack_conf.rng_type = gsl_rng_mt19937;
       ;
-
     }
-  else if (MATCH ("number_of_burnt_cards") || MATCH ("burnt_cards")
+*/
+///va+burnt_cards+desc Number of burnt cards when starting a new shoe.
+///va+burnt_cards+detail When a new shoe is started, this number of cards
+///va+burnt_cards+detail are burned by the dealer.
+///va+burnt_cards+detail Statistically this number does not have any effect,
+///va+burnt_cards+detail it is provided for the sake of completeness.
+///va+burnt_cards+default No cards are burned.
+  else if (MATCH ("burnt_cards") || MATCH ("number_of_burnt_cards")
 	   || MATCH ("burntcards"))
     {
       if (blackjack_conf.number_of_burnt_cards == -1)
@@ -148,6 +174,18 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+///va+penetration+desc Fraction of the shoe where the cut card is
+///va+penetration+desc (randomnly) placed
+///va+penetration+detail This variable controls the percentage of 
+///va+penetration+detail the shoe which is used for playing before
+///va+penetration+detail re-shuffling. The cut card is placed by the
+///va+penetration+detail dealer with a gaussian random distribution 
+///va+penetration+detail centered at this fraction $\in [0:1]$ and
+///va+penetration+detail standard deviation contrlled by `penetration_sigma`.
+///va+penetration+detail The hand in which the cut card appears is
+///va+penetration+detail finished and a new show is started.
+///va+penetration+detail If the value is zero, the sho is reshuffled after
+///va+penetration+detail each hand.
   else if (MATCH ("penetration"))
     {
       if (blackjack_conf.penetration == 0)
@@ -158,8 +196,31 @@ fbj_conf_handler (const char *name, const char *value)
 	{
 	  blackjack_conf.penetration = 1e-6;
 	}
+      if (blackjack_conf.penetration < 0)
+	{
+	  blackjack_push_error_message (_
+					("penetration has to be positive, not '%s'"),
+					value);
+	  return -1;
+	}
+      if (blackjack_conf.penetration > 1)
+	{
+	  blackjack_push_error_message (_
+					("penetration has to be less than one, not '%s'"),
+					value);
+	  return -1;
+	}
 
     }
+///va+penetration_sigma+desc Standard deviation of the distribution of the
+///va+penetration_sigma+desc fraction that controls the location of the cut card.
+///va+penetration_sigma+detail This variable gives the standard deviation of the
+///va+penetration_sigma+detail random distribution used to place the cut card in
+///va+penetration_sigma+detail the shoe before re-shuffling. The cut card is placed
+///va+penetration_sigma+detail by the dealer with a gaussian random distribution 
+///va+penetration_sigma+detail centered at the fraction $\in [0:1]$ given by
+///va+penetration_sigma+detail `penetration` and standard deviation given by this
+///va+penetration_sigma+detail value.
   else if (MATCH ("penetration_sigma"))
     {
       if (blackjack_conf.penetration_sigma == 0)
@@ -168,6 +229,10 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+///va+blackjack_pays+desc Blackjack payout ratio
+///va+blackjack_pays+detail Set how much a blackjack received by the player pays.
+///va+blackjack_pays+detail It can be either a textual `3/2` or `6/5` or any
+///va+blackjack_pays+detail floating-point number.
   else if (MATCH ("blackjack_pays") || MATCH ("bjpays"))
     {
       if (blackjack_conf.blackjack_pays == -1)
@@ -195,6 +260,7 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+/*    
   else if (MATCH ("no_negative_bankrolls") || MATCH ("bouncer"))
     {
       if (blackjack_conf.no_negative_bankroll == -1)
@@ -203,6 +269,12 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+*/
+///va+double_after_split+desc Double after split
+///va+double_after_split+detail Set if the player is allowed to double after
+///va+double_after_split+detail splitting. A value of zero means not allowed
+///va+double_after_split+detail and a non-zero means allowed.
+///va+double_after_split+detail This variable can also be shortened as `das`.
   else if (MATCH ("double_after_split") || MATCH ("das"))
     {
       if (blackjack_conf.double_after_split == -1)
@@ -211,6 +283,11 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
+///va+hit_soft_17+desc Hit soft seventeens
+///va+hit_soft_17+detail Set if the dealer must hit on soft 17s or not.
+///va+hit_soft_17+detail A value of zero means dealer must stand
+///va+hit_soft_17+detail and a non-zero means dealer must hit.
+///va+hit_soft_17+detail This variable can also be shortened as `h17`.
   else if (MATCH ("hit_soft_17") || MATCH ("h17"))
     {
       if (blackjack_conf.hit_soft_17 == -1)
@@ -219,7 +296,11 @@ fbj_conf_handler (const char *name, const char *value)
 	}
 
     }
-  else if (MATCH ("max_bet") || MATCH ("max_bet"))
+///va+max_bet+desc Maximum allowed bet
+///va+max_bet+detail Integer that limits the player's bet with
+///va+max_bet+detail respect to a minimum value of one.
+///va+max_bet+detail A value of zero means no limit.
+  else if (MATCH ("max_bet"))
     {
       if (blackjack_conf.max_bet == 0)
 	{
@@ -562,10 +643,12 @@ bjinit (char *cmdline_file_path)
   // non-zero defaults
   if (blackjack_conf.decks == 0)
     {
+///va+decks+default 6 
       blackjack_conf.decks = 6;
     }
   if (blackjack_conf.hands == 0)
     {
+///va+hands+default One million
       blackjack_conf.hands = 1e6;
     }
   if (blackjack_conf.no_negative_bankroll == -1)
@@ -574,14 +657,17 @@ bjinit (char *cmdline_file_path)
     }
   if (blackjack_conf.max_bet == -1)
     {
+///va+max_bet+default No limit     
       blackjack_conf.max_bet = 0;
     }
   if (blackjack_conf.double_after_split == -1)
     {
+///va+double_after_split+default Allowed
       blackjack_conf.double_after_split = 1;
     }
   if (blackjack_conf.hit_soft_17 == -1)
     {
+///va+hit_soft_17+default Dealer must hit soft 17s.
       blackjack_conf.hit_soft_17 = 1;
     }
   if (blackjack_conf.blackjack_pays == 0)
@@ -604,10 +690,12 @@ bjinit (char *cmdline_file_path)
 //  blackjack_confrng_type = gsl_rng_mt19937;
   if (blackjack_conf.penetration == 0)
     {
+///va+penetration+default 0.75           
       blackjack_conf.penetration = 0.75;
     }
   if (blackjack_conf.penetration_sigma == 0)
     {
+///va+penetration_sigma+default 0.05           
       blackjack_conf.penetration_sigma = 0.05;
     }
 
@@ -625,6 +713,7 @@ bjinit (char *cmdline_file_path)
 
   if (blackjack_conf.rng_seed == 0)
     {
+///va+rng_seed+default Get seed from `/dev/urandom`. 
       assert ((devrandom = fopen ("/dev/urandom", "r")));
       assert (fread
 	      (&blackjack_conf.rng_seed, sizeof (blackjack_conf.rng_seed), 1,
@@ -640,15 +729,15 @@ bjinit (char *cmdline_file_path)
 
   if (stdout_opts.isatty && stdout_opts.no_color == 0)
     {
-      strncpy (stdout_opts.black, "\x1B[0m", 8);
-      strncpy (stdout_opts.red, "\x1B[31m", 8);
-      strncpy (stdout_opts.green, "\x1B[32m", 8);
-      strncpy (stdout_opts.yellow, "\x1B[33m", 8);
-      strncpy (stdout_opts.blue, "\x1B[34m", 8);
+      strncpy (stdout_opts.black,   "\x1B[0m", 8);
+      strncpy (stdout_opts.red,     "\x1B[31m", 8);
+      strncpy (stdout_opts.green,   "\x1B[32m", 8);
+      strncpy (stdout_opts.yellow,  "\x1B[33m", 8);
+      strncpy (stdout_opts.blue,    "\x1B[34m", 8);
       strncpy (stdout_opts.magenta, "\x1B[35m", 8);
-      strncpy (stdout_opts.cyan, "\x1B[36m", 8);
-      strncpy (stdout_opts.white, "\x1B[37m", 8);
-      strncpy (stdout_opts.reset, "\033[0m", 8);
+      strncpy (stdout_opts.cyan,    "\x1B[36m", 8);
+      strncpy (stdout_opts.white,   "\x1B[37m", 8);
+      strncpy (stdout_opts.reset,   "\033[0m", 8);
     }
 
 
