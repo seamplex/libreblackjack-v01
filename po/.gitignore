@@ -1,8 +1,6 @@
 /*.po
 /LINGUAS
 /Makefile.in.in~
-/Makevars
-/Makevars.template
 /Rules-quot
 /boldquot.sed
 /en@boldquot.header
