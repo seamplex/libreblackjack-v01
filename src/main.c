@@ -50,12 +50,33 @@ main (int argc, char **argv)
   player_t *tmp;		// for the cleanup
 
   const struct option longopts[] = {
-    {"help", no_argument, NULL, 'h'},
-    {"version", no_argument, NULL, 'v'},
-    {"decks", required_argument, NULL, 'd'},
+///op+hands+option `-n`$n$  or `--hands=`$n$
+///op+hands+desc Specify the number of hands to play. Corresponds to the `hands` variable in the [configuration file].
     {"hands", required_argument, NULL, 'n'},
-    {"internal", no_argument, NULL, 'i'},
+    
+///op+decks+option `-d`$n$ or `--decks=`$n$
+///op+decks+desc Specify the number of decks to use in the shoe. Corresponds to the `decks` variable in the [configuration file].
+    {"decks", required_argument, NULL, 'd'},
+    
+///op+flatbet+option `-f` or `--flatbet`
+///op+flatbet+desc Do not ask for the amount to bet before starting a new hand and use a flat unit bet. Corresponds to the `flat_bet` variable in the [configuration file].
     {"flatbet", optional_argument, NULL, 'f'},
+
+///op+general+option `--`configuration_variable`[=`*value*`]`
+///op+general+desc Any configuration variable from the [configuration file] can be set from the command line.
+///op+general+desc For example, passing `--no_insurance` is like setting `no_insurance = 1` in the configuration file. Command-line options override configuration options.
+    
+///op+internal+option `-i` or `--internal`
+///op+internal+desc Use the internal player to play against itself. See [internal player] for details.
+    {"internal", no_argument, NULL, 'i'},
+    
+///op+help+option `-h` or `--help`
+///op+help+desc Print this informative help message on standard output and exit successfully.
+    {"help", no_argument, NULL, 'h'},
+    
+///op+version+option `-v` or `--version`
+///op+version+desc Print the version number and licensing information of Hello on standard output and then exit successfully.
+    {"version", no_argument, NULL, 'v'},
     {NULL, 0, NULL, 0}
   };
 
@@ -115,8 +136,7 @@ main (int argc, char **argv)
 	  else
 	    {
 	      *equal_sign = '\0';
-	      if (fbj_conf_handler (argument_for_conf + 2, equal_sign + 1) <=
-		  0)
+	      if (fbj_conf_handler (argument_for_conf + 2, equal_sign + 1) != 0)
 		{
 		  fprintf (stderr, _("Unkown option '%s'.\n"),
 			   argument_for_conf);

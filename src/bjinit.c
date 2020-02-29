@@ -672,6 +672,7 @@ bjinit (char *cmdline_file_path)
     }
   if (blackjack_conf.blackjack_pays == 0)
     {
+///va+blackjack_pays+default `3/2`
       blackjack_conf.blackjack_pays = 3.0 / 2.0;
     }
   if (blackjack_conf.error_standard_deviations == 0)
@@ -690,12 +691,12 @@ bjinit (char *cmdline_file_path)
 //  blackjack_confrng_type = gsl_rng_mt19937;
   if (blackjack_conf.penetration == 0)
     {
-///va+penetration+default 0.75           
+///va+penetration+default 0.75
       blackjack_conf.penetration = 0.75;
     }
   if (blackjack_conf.penetration_sigma == 0)
     {
-///va+penetration_sigma+default 0.05           
+///va+penetration_sigma+default 0.05
       blackjack_conf.penetration_sigma = 0.05;
     }
 

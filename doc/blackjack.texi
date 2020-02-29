@@ -48,7 +48,6 @@ February 20, 2020
 * Running blackjack::
 * Configuration file::
 * Commands::
-* Internal player::
 * Example automated players::
 @end menu
 
@@ -93,7 +92,8 @@ ASCII blackjack.
 @menu
 * Invocation::
 * Interactive game::
-* Automated playing::
+* Internal player::
+* Automated playing through IPC::
 @end menu
 
 @node Invocation
@@ -113,26 +113,35 @@ it is ready to start a blackjack game.
 The @code{blackjack} executable supports the following options:
 
 @table @asis
-@item @code{-h number} or @code{--hands=number}
+@item @code{-n}@math{n} or @code{--hands=}@math{n}
 
 Specify the number of hands to play. Corresponds to the @code{hands}
 variable in the @ref{#configuration-file,configuration file}.
 
-@item @code{-d number} or @code{--decks=number}
+@item @code{-d}@math{n} or @code{--decks=}@math{n}
 
 Specify the number of decks to use in the shoe. Corresponds to the
 @code{decks} variable in the @ref{#configuration-file,configuration
 file}.
 
-@item @code{--flatbet}
+@item @code{-f} or @code{--flatbet}
 
 Do not ask for the amount to bet before starting a new hand and use a
-flat unit bet.
+flat unit bet. Corresponds to the @code{flat_bet} variable in the
+@ref{#configuration-file,configuration file}.
+
+@item @code{--}configuration_variable@code{[=}@emph{value}@code{]}
+
+Any configuration variable from the
+@ref{#configuration-file,configuration file} can be set from the command
+line. For example, passing @code{--no_insurance} is like setting
+@code{no_insurance = 1} in the configuration file. Command-line options
+override configuration options.
 
 @item @code{-i} or @code{--internal}
 
 Use the internal player to play against itself. See
-@ref{#internal-player,internal player} for details.
+@ref{#internal-player-1,internal player} for details.
 
 @item @code{-h} or @code{--help}
 
@@ -150,13 +159,112 @@ output and then exit successfully.
 @section Interactive game
 @anchor{#interactive-game}
 
-@node Automated playing
-@section Automated playing
-@anchor{#automated-playing}
+@node Internal player
+@section Internal player
+@anchor{#internal-player}
+
+@node Automated playing through IPC
+@section Automated playing through IPC
+@anchor{#automated-playing-through-ipc}
+
+@menu
+* Standard input/output::
+* FIFO named pipes::
+* POSIX message queues::
+* POSIX shared memory objects synchronized with semaphores::
+* TCP through netcat::
+@end menu
+
+@node Standard input/output
+@subsection Standard input/output
+@anchor{#standard-inputoutput}
+
+@node FIFO named pipes
+@subsection FIFO named pipes
+@anchor{#fifo-named-pipes}
+
+@node POSIX message queues
+@subsection POSIX message queues
+@anchor{#posix-message-queues}
+
+@node POSIX shared memory objects synchronized with semaphores
+@subsection POSIX shared memory objects synchronized with semaphores
+@anchor{#posix-shared-memory-objects-synchronized-with-semaphores}
+
+@node TCP through netcat
+@subsection TCP (through @code{netcat})
+@anchor{#tcp-through-netcat}
 
 @node Configuration file
 @chapter Configuration file
 @anchor{#configuration-file}
+Libre@ Blackjacks reads a configuration file that contains
+
+@itemize
+@item
+settings about the rules of the game
+@itemize
+@item
+number of decks,
+@item
+whether if the dealer has to hit soft seventeen or not,
+@item
+blackjack payout,
+@item
+maximum bet allowed,
+@item
+etc@dots{}
+@end itemize
+
+@item
+how the player is supposed to play
+@itemize
+@item
+number of hands
+@item
+whether a flat or variable bet is going to be used,
+@item
+etc@dots{}
+@end itemize
+
+@item
+if there are any particular shoe arrangement, i.e.@ a predefined set of
+cards dealt in a certain order for instance to play one million hands of
+a sixteen against a dealer's ten
+@item
+what kind of information is shown in the interactive session
+@itemize
+@item
+if ASCII-art cards are supposed to be shown,
+@item
+a real-time delay to make the game smoother,
+@item
+etc.
+@end itemize
+
+@item
+how the automated player communicates with the dealer
+@itemize
+@item
+using standard input/output,
+@item
+FIFO named pipes,
+@item
+POSIX message queues,
+@item
+POSIX shared memory,
+@end itemize
+
+@end itemize
+
+The location of the configuration file can be given in the command line.
+If none is provided, a file named @code{blackjack.conf} in the current
+directory is used. If such file does not exists, the defaults values of
+each variable are used. Individual variables can be set from the command
+line by passing one or more times the option
+@code{--}configuration_variable@code{[=}@emph{value}@code{]} in the
+@ref{#invocation,invocation}.
+
 @table @asis
 @item @code{blackjack_pays}
 
@@ -165,7 +273,7 @@ Blackjack payout ratio
 Set how much a blackjack received by the player pays. It can be either a
 textual @code{3/2} or @code{6/5} or any floating-point number.
 
-@strong{Default:}
+@strong{Default:} @code{3/2}
 
 @item @code{burnt_cards}
 
@@ -268,12 +376,956 @@ repeteability in the order of the dealt cards.
 @chapter Commands
 @anchor{#commands}
 
-@node Internal player
-@chapter Internal player
-@anchor{#internal-player}
-
 @node Example automated players
 @chapter Example automated players
 @anchor{#example-automated-players}
+
+@menu
+* Internal player::
+* Always stand::
+* No-bust strategy::
+* Mimic the dealer::
+* Derivation of the basic strategy::
+@end menu
+
+@node Internal player
+@section Internal player
+@anchor{#internal-player-1}
+@quotation
+Difficulty: 00/100
+@end quotation
+If @code{libreblackjack} is called with the @code{-i} option, it uses an
+@emph{internal} player to play against itself. By default it plays basic
+strategy. Run
+
+@verbatim
+input(run.sh)```
+
+and you will get a report with the results of one million hands.
+
+```yaml
+---
+rules:
+  decks:                  6
+  hands:                  1e+06
+  hit_soft_17:            1
+  double_after_split:     1
+  blackjack_pays:         1.5
+  rng_seed:               -421186149
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  penetration:            0.75
+  penetration_sigma:      0.05
+cpu:
+  user:             1.88959
+  system:           0.32027
+  wall:             2.20904
+  second_per_hand:  2.2e-06
+  hands_per_second: 4.5e+05
+player: 
+  wins:               0.445075
+  pushes:             0.087039
+  losses:             0.492821
+  dealer_blackjacks:  0.047582
+  player_blackjacks:  0.047375
+  dealer_busts:       0.23537
+  player_busts:       0.160637
+  doubled_hands:      0.107207
+  doubled_wins:       0.0613
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    1e+06
+  number_of_shuffles: 23215
+  total_money_waged:  1.23935e+06
+  worst_bankroll:     -7212.5
+  final_bankroll:     -7111
+  return:             -0.007111
+  variance:            1.32892
+  deviation:           1.15279
+  error:               0.00115279
+  result:             "(-0.7 ± 0.2) %"
+...
+@end verbatim
+
+@node Always stand
+@section Always stand
+@anchor{#always-stand}
+@quotation
+Difficulty: 02/100
+@end quotation
+To play libreblackjack as an ``always-stander'' run the following
+command:
+
+@verbatim
+input(run.sh)```
+
+The UNIX command `yes stand` writes the string “stand” repeteadly to the standard output, which is piped to the executable `libreblackjack` (assumed to be installed system-wide). The arguments tell libreblackjack to play one hundred thousand hands (`-n1e5`) using a flat bet (`flat_bet`, it defaults to a unit bet in each hand) and without asking for insurance if the dealer shows an ace (`no_insurance`). As there is no `libreblackjack.ini` file, the rules are---as expected---the default ones (see the documentation for details).
+
+The `/dev/null` part is important, otherwise libreblackjack will think that there is a human at the other side of the table and will
+
+  1. run slower (it will add explicit delays to mimic an actual human dealer), and
+  2. give all the details of the dealt hands in the terminal as ASCII (actually UTF-8) art
+
+This example is only one-way (i.e. the player ignores what the dealer says) so it is better to redirect the standard output to `/dev/null` to save execution time. The results are written as a [YAML](http://yaml.org/)-formatted data to `stderr` by default once the hands are over, so they will show up in the terminal nevertheless. This format is human-friendly (far more than JSON) so it can be easily parsed, but it also allows complex objects to be represented (arrays, lists, etc.).
+
+
+As an exercise, verify that the analytical probability of getting a natural playing with a single deck (for both the dealer and the player) is 32/663 = 0.04826546...
+
+```yaml
+---
+rules:
+  decks:                  6
+  hands:                  100000
+  hit_soft_17:            1
+  double_after_split:     1
+  blackjack_pays:         1.5
+  rng_seed:               -2067081387
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  penetration:            0.75
+  penetration_sigma:      0.05
+cpu:
+  user:             0.238384
+  system:           0.226465
+  wall:             0.462519
+  second_per_hand:  4.6e-06
+  hands_per_second: 2.2e+05
+player: 
+  wins:               0.38547
+  pushes:             0.04744
+  losses:             0.56709
+  dealer_blackjacks:  0.04749
+  player_blackjacks:  0.04803
+  dealer_busts:       0.27168
+  player_busts:       0
+  doubled_hands:      0
+  doubled_wins:       0
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    100000
+  number_of_shuffles: 2070
+  total_money_waged:  100000
+  worst_bankroll:     -15870.5
+  final_bankroll:     -15868
+  return:             -0.15868
+  variance:            0.984727
+  deviation:           0.992334
+  error:               0.00313804
+  result:             "(-15.9 ± 0.6) %"
+...
+@end verbatim
+
+@node No-bust strategy
+@section No-bust strategy
+@anchor{#no-bust-strategy}
+@quotation
+Difficulty: 05/100
+@end quotation
+This directory shows how to play a ``no-bust'' strategy, i.e.@ not
+hitting any hand higher or equal to hard twelve with Libre@ Blackjack.
+The communication between the player and the back end is through
+standard input and output. The player reads from its standard input
+Libre@ Blackjack's commands and writes to its standard output the
+playing commands. In order to do this a FIFO (a.k.a. named pipe) is
+needed. So first, we create it (if it is not already created):
+
+@verbatim
+mkfifo fifo
+@end verbatim
+
+Then we execute @code{blackjack}, piping its output to the player (say
+@code{no-bust.pl}) and reading the standard input from @code{fifo},
+whilst at the same time we redirect the player's standard output to
+@code{fifo}:
+
+@verbatim
+input(run.sh)```
+
+As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
+
+```perl
+##!/usr/bin/perl
+## this is needed to avoid deadlock with the fifo
+STDOUT->autoflush(1);
+
+while ($command ne "bye") {
+  ## do not play more than a number of commands
+  ## if the argument -n was not passed to libreblackjack
+  if ($i++ == 123456789) {
+    print "quit\n";
+    exit;
+  }
+  
+  ## read and process the commands
+  chomp($command = <STDIN>);
+  
+  if ($command eq "bet?") {
+    print "1\n";
+  } elsif ($command eq "insurance?") {
+    print "no\n";
+  } elsif ($comm eq "play?") {
+    print "count\n";
+    chomp($count = <STDIN>); ## the count
+    chomp($play = <STDIN>);  ## again the "play?" query
+    if ($count < 12) {
+      print "hit\n";
+    } else {
+      print "stand\n";
+    }
+  }
+}
+@end verbatim
+
+The very same player may be implemented as a shell script:
+
+@verbatim
+##!/bin/sh
+
+while read command
+do
+  if test "${command}" = 'bye'; then
+    exit
+  elif test "${command}" = 'bet?'; then
+    echo 1  
+  elif test "${command}" = 'insurance?'; then
+    echo "no"
+  elif test "`echo ${command} | cut -c-5`" = 'play?'; then
+    echo "count"
+    read count
+    read play      ## libreblackjack will ask again for 'play?'
+    if test ${count} -lt 12; then
+      echo "hit"
+    else
+      echo "stand"
+    fi
+  fi
+done
+@end verbatim
+
+To check these two players give the same results, make them play agains
+libreblackjack with the same seed (say one) and send the YAML report to
+two different files:
+
+@verbatim
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
+diff perl.yml shell.yml 
+15,19c15,19
+<   user:             0
+<   system:           0.022603
+<   wall:             0.034317
+<   second_per_hand:  3.4e-05
+<   hands_per_second: 2.9e+04
+---
+>   user:             0.06838
+>   system:           0.13676
+>   wall:             11.1446
+>   second_per_hand:  1.1e-02
+>   hands_per_second: 9.0e+01
+@end verbatim
+
+As expected, the reports are the same. They just differ in the speed
+because the shell script is orders of magnitude slower than its
+Perl-based counterpart.
+
+@quotation
+Exercise: modifiy the players so they always insure aces and see if it
+improves or degrades the result.
+@end quotation
+
+@node Mimic the dealer
+@section Mimic the dealer
+@anchor{#mimic-the-dealer}
+@quotation
+Difficulty: 08/100
+@end quotation
+This example implements a ``mimic-the-dealer strategy,'' i.e.@ hits if
+the hand totals less than seventeen and stands on eighteen or more. The
+player stands on hard seventeen but hits on soft seventeen.
+
+This time, the configuration file @code{blackjack.conf} is used. If a
+file with this name exists in the directory where @code{blackjack} is
+executed, it is read and parsed. The options should be fairly self
+descriptive. See the @ref{#configuration-file,configuration file}
+section of the manual for a detailed explanation of the variables and
+values that can be entered. In particular, we ask to play one hundred
+thousand hands at a six-deck game where the dealer hits soft seventeens.
+If the random seed is set to a fixed value so each execution will lead
+to the very same sequence of cards.
+
+Now, there are two options that tell Libre@ Blackjack how the player is
+going to talk to the backend: @code{player2dealer} and
+@code{dealer2player}. The first one sets the communication mechanism
+from the player to the dealer (by default is @code{blackjack}'s standard
+input), and the second one sets the mechanism from the dealer to the
+player (by default @code{blackjack}'s standard output). In this case,
+the configuration file reads:
+
+@verbatim
+input(blackjack.conf)```
+
+This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by libreblackjack upon execution. 
+
+The player this time is implemented as an awk script, whose input should be read from `dealer2player` and whose output should be written to `player2dealer`. To run the game, execute libreblackjack in one terminal making sure the current directory is where the `libreblackjack.ini` file exists. It should print a message telling that it is waiting for someone to be at the other side of the named pipes:
+@end verbatim
+
+../../libreblackjack [@dots{}] waiting for dealer2player buffered fifo
+`dealer2player'@dots{}
+
+@verbatim
+
+In another terminal run the player
+@end verbatim
+
+./mimic-the-dealer.awk < dealer2player > player2dealer
+
+@verbatim
+
+Both dealer and player may be run in the same terminal putting the first one on the background:
+@end verbatim
+
+rm -f mimic_d2p mimic_p2d mkfifo mimic_d2p mimic_p2d blackjack & gawk -f
+mimic-the-dealer.awk < mimic_d2p > mimic_p2d
+
+@verbatim
+
+To understand the decisions taken by the player, we have to remember that when Libre Blackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
+
+```awk
+##!/usr/bin/gawk -f
+function abs(x){return ( x >= 0 ) ? x : -x } 
+
+/bet\?/ {
+  print "1";
+  fflush();
+}
+
+/insurance\?/ {
+  print "no";
+  fflush();
+}
+
+/play\?/ {
+  count = $2
+  ## mimic the dealer: hit until 17 (hit soft 17)
+  if (abs(count) < 17 || count == -17) {   ## soft hands are negative
+    print "hit";
+  } else {
+    print "stand";
+  }
+  fflush();  
+}
+
+/bye/ {
+  exit;
+}
+@end verbatim
+
+@quotation
+Exercise: modify the player and the ini file so both the dealer and the
+player may stand on soft seventeen. Analyze the four combinations
+(player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer
+h17, player s17 - dealer s17)
+@end quotation
+
+@node Derivation of the basic strategy
+@section Derivation of the basic strategy
+@anchor{#derivation-of-the-basic-strategy}
+@quotation
+Difficulty: 20/100
+@end quotation
+
+@menu
+* Quick run::
+* Full table with results::
+* Detailed explanation::
+* Implementation::
+@end menu
+
+@node Quick run
+@subsection Quick run
+@anchor{#quick-run}
+Execute the @code{run.sh} script. It should take a minute or so:
+
+@verbatim
+$ ./run.sh
+h20-2 (10 10) n=1000    s=0.634 (0.03)  d=-1.676 (0.03) h=-0.844 (0.02) stand
+h20-3 (10 10) n=1000    s=0.66 (0.03)   d=-1.744 (0.03) h=-0.847 (0.02) stand
+h20-4 (10 10) n=1000    s=0.65 (0.03)   d=-1.708 (0.03) h=-0.852 (0.02) stand
+[...]
+p2-T n=1000     y=-0.552 (0.05) n=-0.381 (0.03) no
+p2-A n=1000     y=-0.565 (0.04) n=-0.543 (0.03) uncertain
+p2-A n=10000    y=-0.6505 (0.01)        n=-0.5025 (0.008)       no
+@end verbatim
+
+A new text file called @code{bs.txt} with the strategy should be created
+from scratch:
+
+@verbatim
+##    2  3  4  5  6  7  8  9  T  A
+h20  s  s  s  s  s  s  s  s  s  s  
+h19  s  s  s  s  s  s  s  s  s  s  
+h18  s  s  s  s  s  s  s  s  s  s  
+h17  s  s  s  s  s  s  s  s  s  s  
+h16  s  s  s  s  s  h  h  h  s  h  
+h15  s  s  s  s  s  h  h  h  h  h  
+h14  s  s  s  s  s  h  h  h  h  h  
+h13  s  s  s  s  s  h  h  h  h  h  
+h12  h  h  s  s  s  h  h  h  h  h  
+h11  d  d  d  d  d  d  d  d  d  h  
+h10  d  d  d  d  d  d  d  d  h  d  
+h9   h  d  d  d  d  h  h  h  h  h  
+h8   h  h  h  h  h  h  h  h  h  h  
+h7   h  h  h  h  h  h  h  h  h  h  
+h6   h  h  h  h  h  h  h  h  h  h  
+h5   h  h  h  h  h  h  h  h  h  h  
+h4   h  h  h  h  h  h  h  h  h  h  
+##    2  3  4  5  6  7  8  9  T  A
+s20  s  s  s  s  s  s  s  s  s  s  
+s19  s  s  s  s  d  s  s  s  s  s  
+s18  d  d  d  d  d  s  s  h  h  h  
+s17  h  d  d  d  d  h  h  h  h  h  
+s16  h  h  d  d  d  h  h  h  h  h  
+s15  h  h  d  d  d  h  h  h  h  h  
+s14  h  h  h  d  d  h  h  h  h  h  
+s13  h  h  h  h  d  h  h  h  h  h  
+s12  h  h  h  h  d  h  h  h  h  h  
+##    2  3  4  5  6  7  8  9  T  A
+pA   y  y  y  y  y  y  y  y  y  y  
+pT   n  n  n  n  n  n  n  n  n  n  
+p9   y  y  y  y  y  n  y  y  n  n  
+p8   y  y  y  y  y  y  y  y  y  y  
+p7   y  y  y  y  y  y  n  n  n  n  
+p6   y  y  y  y  y  n  n  n  n  n  
+p5   n  n  n  n  n  n  n  n  n  n  
+p4   n  n  n  y  y  n  n  n  n  n  
+p3   y  y  y  y  y  y  n  n  n  n  
+p2   y  y  y  y  y  y  n  n  n  n  
+@end verbatim
+
+@node Full table with results
+@subsection Full table with results
+@anchor{#full-table-with-results}
+The script computes the expected value of each combination
+
+@enumerate 
+@item
+Player's hand (hard, soft and pair)
+@item
+Dealer upcard
+@item
+Hit, soft and stand (for hards and softs) and splitting or not (for
+pairs)
+@end enumerate
+
+The results are given as the expected value in percentage with the
+uncertainty (one standard deviation) in the last significant digit.
+
+@node Detailed explanation
+@subsection Detailed explanation
+@anchor{#detailed-explanation}
+We want to derive the basic strategy from scratch, i.e.@ without
+assuming anything. What we are going to do is to play a large (more on
+what @emph{large} means below) number of hands by fixing our first two
+cards and the dealer upcard and sequentially standing, doubling or
+hitting the first card. Then we will compare the results for the three
+cases and select as the proper strategy the better one.
+
+Standing and doubling are easy plays, because after we stand or double
+the dealer plays accordingly to the rules. She hits until seventeen
+(either soft or hard). But if we hit on our hand, we might need to make
+another decision wether to stand or hit again. As we do not want to
+assume anything, we have to play in such an order that if we do need to
+make another decision, we already know which is the better one.
+
+@menu
+* Hard hands::
+* Soft hands::
+* Pairs::
+* Number of hands::
+@end menu
+
+@node Hard hands
+@subsubsection Hard hands
+@anchor{#hard-hands}
+So we start by arranging the shoe so that the user gets hard twenty
+(i.e.@ two faces) and the dealer gets succesively upcards of two to ace.
+So we play each combination of dealer upcard (ten) three times each
+playing either
+
+@enumerate 
+@item
+always standing
+@item
+always doubling
+@item
+always hitting
+@end enumerate
+
+In general the first two plays are easy, because the game stops either
+after standing or after receiving only one card. The last one might lead
+to further hitting, but since we are starting with a hard twenty, that
+would either give the player twenty one or a bust. In any case, the game
+also ends. So we play a certain number of hands (say one thousand hands)
+each of these three plays for each of the ten upcard faces and record
+the outcome. The correct play for hard twenty against each of the ten
+upcards is the play that gave the better result, which is of course
+standing.
+
+Next, we do the same for a hard nineteen. In this case, the hitting play
+might not end after one card is drawn. But if that is the case,
+i.e.@ receiving an ace for a total of hard twenty, we already know what
+the best play is from the previous step so we play accordingly and we
+stand. Repeating this procedure down to hard four we can build the basic
+strategy table for any hard total against any dealer upcard.
+
+@node Soft hands
+@subsubsection Soft hands
+@anchor{#soft-hands}
+We can now switch to analyze soft hands. Starting from soft twenty
+(i.e.@ an ace and a nine) we do the same we did for the hard case. The
+only difference is that wehn hitting, we might end either in another
+soft hand which we would already analyzed because we start from twenty
+and go down, or in a hard hand, which we also already analyzed se we can
+play accordingly.
+
+@node Pairs
+@subsubsection Pairs
+@anchor{#pairs}
+When dealing with pairs, we have to decide wether to split or not. When
+we do not split, we end up in one of the already-analyzed cases: either
+a soft twelve of any even hard hand. When we split, we might end in a
+hard or soft hand (already analyzed) or in a new pair. But since the new
+pair can be only the same pair we are analyzing, we have to treat it
+like we treated the first pair: either to split it or not, so we know
+how to deal with it.
+
+@node Number of hands
+@subsubsection Number of hands
+@anchor{#number-of-hands}
+The output is the expected value@ @math{e} of the bankroll, which is a
+random variable with an associated uncertainty@ @math{\Delta e} (i.e.@ a
+certain numbers of standard deviations). For example, if we received
+only blackjacks, the expected value would be 1.5 (provided blackjacks
+pay 3 to 2). If we busted all of our hands without doubling or
+splitting, the expected value would be -1. In order to say that the best
+strategy is, let's say stand and not hitting or doubling, we have to
+make sure that @math{e_h-\Delta e_h > e_s+\Delta e_s} and
+@math{e_h-\Delta e_h > e_d+\Delta e_d}. If there is no play that can
+give a better expected value than the other two taking into account the
+uncertainties, then we have to play more hands in order to reduce the
+random uncertainty.
+
+@node Implementation
+@subsection Implementation
+@anchor{#implementation}
+The steps above can be written in a
+@uref{https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29,Bash} script
+that
+
+@itemize
+@item
+loops over hands and upcards,
+@item
+creates a strategy file for each possible play hit, double or stand (or
+split or not),
+@item
+runs @uref{https://www.seamplex.com/blackjack,Libre@ Blackjack},
+@item
+checks the results and picks the best play,
+@item
+updates the strategy file
+@end itemize
+
+@verbatim
+##!/bin/bash
+
+for i in grep cut bc awk; do
+ if [ -z "`which $i`" ]; then
+  echo "error: $i not installed"
+  exit 1
+ fi
+done
+
+debug=0
+
+declare -A strategy
+declare -A ev
+
+declare -A min
+min["hard"]=4   ## from 20 to 4 in hards
+min["soft"]=12  ## from 20 to 12 in softs
+
+rm -f hard.html soft.html pair.html
+
+## start with standing
+cp hard-stand.txt hard.txt
+cp soft-stand.txt soft.txt
+
+cat << EOF > table.md
+| Hand | \$n\$ | Stand | Double | Hit |
+| ---- | ----- | ----- | ------ | --- |
+EOF
+
+
+for type in hard soft; do
+ for hand in `seq 20 -1 ${min[${type}]}`; do
+ 
+  ## choose two random cards that make up the player's assumed total
+  if [ ${type} = "hard" ]; then
+   t="h"
+   card1=11
+   card2=11
+   while test $card1 -gt 10 -o $card2 -gt 10; do
+    card1=$((${RANDOM} % (${hand}-3) + 2))
+    card2=$((${hand} - ${card1}))
+   done
+  elif [ ${type} = "soft" ]; then
+   t="s"
+   ## one card is an ace
+   card1=1
+   card2=$((${hand} - 10 - ${card1}))
+  fi
+
+  cat << EOF >> ${type}.html
+ <tr>
+  <td>${t}${hand}</td>
+  <td>
+   <div class="text-right">s<span class="d-none d-lg-inline">tand</span></div>
+   <div class="text-right">h<span class="d-none d-lg-inline">it</span></div>
+   <div class="text-right">d<span class="d-none d-lg-inline">ouble</span></div>
+  </td>
+EOF
+  
+  for upcard in `seq 2 9` T A; do
+  
+   if [ "$upcard" = "T" ]; then
+     upcard_n=10
+   elif [ "$upcard" = "A" ]; then
+     upcard_n=1
+   else
+     upcard_n=$(($upcard))
+   fi
+ 
+   n=1000    ## start with n hands
+   best="x"  ## x means don't know what to so, so play
+   
+   while [ "${best}" = "x" ]; do
+    ## tell the user which combination we are trying and how many we will play
+    echo -n ${t}${hand}-${upcard} \($card1 $card2\) "n="${n}
+   
+    for play in s d h; do
+     
+     ## start with options.conf as a template and add some custom stuff
+     cp options.conf blackjack.conf
+     cat << EOF >> blackjack.conf
+hands = ${n}
+dealer2player = internal
+arranged_cards = ${card1} $((${upcard_n} + 13)) $((${card2} + 26))
+yaml_report = ${t}${hand}-${upcard}-${play}.yaml
+##log = ${t}${hand}-${upcard}-${play}.log
+EOF
+ 
+     ## read the current strategy
+     while read w p2 p3 p4 p5 p6 p7 p8 p9 pT pA; do
+      ## w already has the "h" or the "s"
+      strategy[${w},2]=$p2   
+      strategy[${w},3]=$p3
+      strategy[${w},4]=$p4    
+      strategy[${w},5]=$p5    
+      strategy[${w},6]=$p6    
+      strategy[${w},7]=$p7    
+      strategy[${w},8]=$p8    
+      strategy[${w},9]=$p9    
+      strategy[${w},T]=$pT    
+      strategy[${w},A]=$pA    
+     done < ${type}.txt
+     
+     ## override the read strategy with the explicit play: s, d or h
+     strategy[${t}${hand},${upcard}]=${play}
+     
+     ## save the new (temporary) strategy
+     rm -f ${type}.txt
+     for h in `seq 20 -1 ${min[${type}]}`; do
+      echo -n "${t}${h}  " >> ${type}.txt
+      
+      ## extra space if h < 10
+      if [ ${h} -lt 10 ]; then
+       echo -n " " >> ${type}.txt
+      fi 
+      
+      for u in `seq 2 9` T A; do
+       echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
+      done
+      echo >> ${type}.txt
+     done
+     
+     ## debug, comment for production
+     if [ "${debug}" != "0" ]; then
+      cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
+     fi
+    
+     ## ensamble the full bs.txt with no pairing
+     cat hard.txt soft.txt pair-no.txt > bs.txt
+    
+     ## play!
+     blackjack > /dev/null
+    
+     ## evaluate the results
+     ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
+     error[${t}${hand},${upcard},${play}]=`grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}'`
+     
+    done
+   
+    ## choose the best one
+    ev_s=`printf %g ${ev[${t}${hand},${upcard},s]}`
+    ev_d=`printf %g ${ev[${t}${hand},${upcard},d]}`
+    ev_h=`printf %g ${ev[${t}${hand},${upcard},h]}`
+   
+    
+    if [ $n -le 999999 ]; then 
+     ## if we still have room, take into account errors
+     error_s=${error[${t}${hand},${upcard},s]}
+     error_d=${error[${t}${hand},${upcard},d]}
+     error_h=${error[${t}${hand},${upcard},h]}
+    else
+     ## instead of running infinite hands, above a threshold asume errors are zero
+     error_s=0
+     error_d=0
+     error_h=0
+    fi  
+ 
+    echo -ne "\ts=${ev_s} (${error_s})"
+    echo -ne "\td=${ev_d} (${error_d})"
+    echo -ne "\th=${ev_h} (${error_h})"
+   
+    if   (( $(echo "${ev_s}-${error_s} > ${ev_d}+${error_d}" | bc -l) )) &&
+         (( $(echo "${ev_s}-${error_s} > ${ev_h}+${error_h}" | bc -l) )); then
+     best="s"
+     echo -e "\tstand"
+    elif (( $(echo "${ev_d}-${error_d} > ${ev_s}+${error_s}" | bc -l) )) &&
+         (( $(echo "${ev_d}-${error_d} > ${ev_h}+${error_h}" | bc -l) )); then
+     best="d"
+     echo -e "\tdouble"
+    elif (( $(echo "${ev_h}-${error_h} > ${ev_s}+${error_s}" | bc -l) )) &&
+         (( $(echo "${ev_h}-${error_h} > ${ev_d}+${error_d}" | bc -l) )); then
+     best="h"
+     echo -e "\thit"
+    else
+     best="x"
+     n=$((${n} * 10))
+     echo -e "\tuncertain"
+    fi
+   done
+
+   strategy[${t}${hand},${upcard}]=${best}
+   
+   
+   
+   echo "| ${t}${hand}-${upcard} | ${n} | ${ev_s} (${error_s}) | ${ev_h} (${error_h}) | ${ev_d} (${error_d}) |" >> table.md
+   
+   echo " <!-- ${upcard} -->" >> ${type}.html
+   echo " <td>" >> ${type}.html
+   echo ${ev_s} ${error_s} | awk -f cell.awk >> ${type}.html
+   echo ${ev_h} ${error_h} | awk -f cell.awk >> ${type}.html
+   echo ${ev_d} ${error_d} | awk -f cell.awk >> ${type}.html
+   echo " </td>" >> ${type}.html
+   
+   
+   ## save the strategy again with the best strategy
+   rm -f ${type}.txt
+   for h in `seq 20 -1 ${min[${type}]}`; do
+    echo -n "${t}${h}  " >> ${type}.txt
+    
+    ## extra space if h < 10
+    if [ ${h} -lt 10 ]; then
+     echo -n " " >> ${type}.txt
+    fi 
+    
+    for u in `seq 2 9` T A; do
+     echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
+    done
+    
+    echo >> ${type}.txt
+    
+   done
+  done
+  
+  echo "</tr>" >> ${type}.html
+  
+ done
+done
+
+
+cat << EOF >> table.md
+| ---- | ----- | ----- | ------ | --- |
+
+
+
+| Hand | \$n\$ |  Yes  |  No  |
+| ---- | ----- | ----- | ---- |
+EOF
+
+## pairs
+type="pair"
+t="p"
+cp pair-no.txt pair.txt
+
+for hand in A T `seq 9 -1 2`; do
+ if [ "${hand}" = "A" ]; then
+  pair=1
+ elif [ "${hand}" = "T" ]; then
+  pair=10
+ else
+  pair=$((${hand}))
+ fi
+  
+ cat << EOF >> ${type}.html
+ <tr>
+  <td>${t}${hand}</td>
+  <td>
+   <div class="text-right">y<span class="d-none d-lg-inline">es</span></div>
+   <div class="text-right">n<span class="d-none d-lg-inline">o</span></div>
+  </td>
+EOF
+  
+ for upcard in `seq 2 9` T A; do
+  if [ "$upcard" = "T" ]; then
+    upcard_n=10
+  elif [ "$upcard" = "A" ]; then
+    upcard_n=1
+  else
+    upcard_n=$(($upcard))
+  fi
+ 
+  n=1000    ## start with n hands
+  best="x"  ## x means don't know what to so, so play
+   
+  while [ "${best}" = "x" ]; do
+   ## tell the user which combination we are trying and how many we will play
+   echo -n ${t}${hand}-${upcard} "n="${n}
+   
+   for play in y n; do
+     
+    ## start with options.conf as a template and add some custom stuff
+    cp options.conf blackjack.conf
+    cat << EOF >> blackjack.conf
+hands = ${n}
+dealer2player = internal
+arranged_cards = ${pair} $((${upcard_n} + 13)) $((${pair} + 26))
+yaml_report = ${t}${hand}-${upcard}-${play}.yaml
+log = ${t}${hand}-${upcard}-${play}.log
+EOF
+ 
+    ## read the current strategy
+    while read w p2 p3 p4 p5 p6 p7 p8 p9 pT pA; do
+     ## w already has the "p"
+     strategy[${w},2]=$p2   
+     strategy[${w},3]=$p3
+     strategy[${w},4]=$p4    
+     strategy[${w},5]=$p5    
+     strategy[${w},6]=$p6    
+     strategy[${w},7]=$p7    
+     strategy[${w},8]=$p8    
+     strategy[${w},9]=$p9    
+     strategy[${w},T]=$pT    
+     strategy[${w},A]=$pA    
+    done < ${type}.txt
+     
+    ## override the read strategy with the explicit play: y or n
+    strategy[${t}${hand},${upcard}]=${play}
+     
+    ## save the new (temporary) strategy
+    rm -f ${type}.txt
+    for h in A T `seq 9 -1 2`; do
+     echo -n "${t}${h}   " >> ${type}.txt
+     for u in `seq 2 9` T A; do
+      echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
+     done
+     echo >> ${type}.txt
+    done
+     
+    if [ "${debug}" != "0" ]; then
+     cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
+    fi  
+    
+    ## ensamble the full bs.txt
+    cat hard.txt soft.txt pair.txt > bs.txt
+    
+    ## play!
+    blackjack > /dev/null
+    
+    ## evaluate the results
+    ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
+    error[${t}${hand},${upcard},${play}]=`grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}'`
+    
+   done
+   
+   ## choose the best one
+   ev_y=`printf %g ${ev[${t}${hand},${upcard},y]}`
+   ev_n=`printf %g ${ev[${t}${hand},${upcard},n]}`
+   
+   if [ $n -le 999999 ]; then 
+    ## if we still have room, take into account errors
+    error_y=${error[${t}${hand},${upcard},y]}
+    error_n=${error[${t}${hand},${upcard},n]}
+   else
+    ## instead of running infinite hands, above a threshold asume errors are zero
+    error_y=0
+    error_n=0
+   fi  
+ 
+   echo -ne "\ty=${ev_y} (${error_y})"
+   echo -ne "\tn=${ev_n} (${error_n})"
+   
+   if   (( $(echo "${ev_y}-${error_y} > ${ev_n}+${error_n}" | bc -l) )); then
+    best="y"
+    echo -e "\tyes"
+   elif (( $(echo "${ev_n}-${error_n} > ${ev_y}+${error_y}" | bc -l) )); then
+    best="n"
+    echo -e "\tno"
+   else
+    best="x"
+    n=$((${n} * 10))
+    echo -e "\tuncertain"
+   fi
+  done
+
+  echo "| ${t}${hand}-${upcard} | ${n} | ${ev_y} (${error_y}) | ${ev_n} (${error_n}) |" >> table.md
+  
+  echo " <!-- ${upcard} -->" >> ${type}.html
+  echo " <td>" >> ${type}.html
+  echo ${ev_y} ${error_y} | awk -f cell.awk >> ${type}.html
+  echo ${ev_n} ${error_n} | awk -f cell.awk >> ${type}.html
+  echo " </td>" >> ${type}.html
+  
+  
+  strategy[${t}${hand},${upcard}]=${best}
+   
+  ## save the strategy again with the best strategy
+  rm -f ${type}.txt
+  for h in A T `seq 9 -1 2`; do
+   echo -n "${t}${h}   " >> ${type}.txt
+   for u in `seq 2 9` T A; do
+    echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
+   done
+   echo >> ${type}.txt
+  done
+ done
+done
+
+echo "| ---- | ----- | ----- | ---- |" >> table.md
+
+ 
+cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt
+if [ "${debug}" == "0" ]; then
+ rm -f *.yaml
+ rm -f *.str
+ rm -f *.log
+fi
+ 
+@end verbatim
 
 @bye

@@ -61,14 +61,13 @@ src/version-vcs.h
 src/version-conf.h
 src/version.h
 src/.dirstamp
-libreblackjack
+blackjack
 *.tar.gz
 
 doc/version.texi
 doc/mdate-sh
 doc/stamp-vti
 doc/texinfo.tex
-doc/libreblackjack.*
 
 players/22-strategy-from-file/custom
 players/45-colored-tables/hard_hit

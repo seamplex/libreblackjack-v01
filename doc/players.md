@@ -1,6 +1,6 @@
 
 ---
-title: Internal player
+title_case: Internal player
 ...
 
 ## Internal player
@@ -9,15 +9,59 @@ title: Internal player
 
 If `libreblackjack` is called with the `-i` option, it uses an _internal_ player to play against itself. By default it plays basic strategy. Run 
 
-```
-libreblackjack -i
-```
+```terminal
+input(run.sh)```
 
 and you will get a report with the results of one million hands.
 
+```yaml
+---
+rules:
+  decks:                  6
+  hands:                  1e+06
+  hit_soft_17:            1
+  double_after_split:     1
+  blackjack_pays:         1.5
+  rng_seed:               -421186149
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  penetration:            0.75
+  penetration_sigma:      0.05
+cpu:
+  user:             1.88959
+  system:           0.32027
+  wall:             2.20904
+  second_per_hand:  2.2e-06
+  hands_per_second: 4.5e+05
+player: 
+  wins:               0.445075
+  pushes:             0.087039
+  losses:             0.492821
+  dealer_blackjacks:  0.047582
+  player_blackjacks:  0.047375
+  dealer_busts:       0.23537
+  player_busts:       0.160637
+  doubled_hands:      0.107207
+  doubled_wins:       0.0613
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    1e+06
+  number_of_shuffles: 23215
+  total_money_waged:  1.23935e+06
+  worst_bankroll:     -7212.5
+  final_bankroll:     -7111
+  return:             -0.007111
+  variance:            1.32892
+  deviation:           1.15279
+  error:               0.00115279
+  result:             "(-0.7 ± 0.2) %"
+...
+```
+
 
 ---
-title: Always stand
+title_case: Always stand
 ...
 
 ## Always stand
@@ -27,14 +71,13 @@ title: Always stand
 To play libreblackjack as an “always-stander” run the following command:
 
 ```
-yes stand | libreblackjack -n1e5 --flat_bet --no_insurance > /dev/null
-```
+input(run.sh)```
 
 The UNIX command `yes stand` writes the string “stand” repeteadly to the standard output, which is piped to the executable `libreblackjack` (assumed to be installed system-wide). The arguments tell libreblackjack to play one hundred thousand hands (`-n1e5`) using a flat bet (`flat_bet`, it defaults to a unit bet in each hand) and without asking for insurance if the dealer shows an ace (`no_insurance`). As there is no `libreblackjack.ini` file, the rules are---as expected---the default ones (see the documentation for details).
 
 The `/dev/null` part is important, otherwise libreblackjack will think that there is a human at the other side of the table and will
 
-  1. run slower, and
+  1. run slower (it will add explicit delays to mimic an actual human dealer), and
   2. give all the details of the dealt hands in the terminal as ASCII (actually UTF-8) art
 
 This example is only one-way (i.e. the player ignores what the dealer says) so it is better to redirect the standard output to `/dev/null` to save execution time. The results are written as a [YAML](http://yaml.org/)-formatted data to `stderr` by default once the hands are over, so they will show up in the terminal nevertheless. This format is human-friendly (far more than JSON) so it can be easily parsed, but it also allows complex objects to be represented (arrays, lists, etc.).
@@ -42,29 +85,70 @@ This example is only one-way (i.e. the player ignores what the dealer says) so i
 
 As an exercise, verify that the analytical probability of getting a natural playing with a single deck (for both the dealer and the player) is 32/663 = 0.04826546...
 
+```yaml
+---
+rules:
+  decks:                  6
+  hands:                  100000
+  hit_soft_17:            1
+  double_after_split:     1
+  blackjack_pays:         1.5
+  rng_seed:               -2067081387
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  penetration:            0.75
+  penetration_sigma:      0.05
+cpu:
+  user:             0.238384
+  system:           0.226465
+  wall:             0.462519
+  second_per_hand:  4.6e-06
+  hands_per_second: 2.2e+05
+player: 
+  wins:               0.38547
+  pushes:             0.04744
+  losses:             0.56709
+  dealer_blackjacks:  0.04749
+  player_blackjacks:  0.04803
+  dealer_busts:       0.27168
+  player_busts:       0
+  doubled_hands:      0
+  doubled_wins:       0
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    100000
+  number_of_shuffles: 2070
+  total_money_waged:  100000
+  worst_bankroll:     -15870.5
+  final_bankroll:     -15868
+  return:             -0.15868
+  variance:            0.984727
+  deviation:           0.992334
+  error:               0.00313804
+  result:             "(-15.9 ± 0.6) %"
+...
+```
+
 
 ---
-title: No-bust strategy
+title_case: No-bust strategy
 ...
 
 ## No-bust strategy
 
 > Difficulty: 05/100
 
-This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with libreblackjack. The communication between the player and the backend is through standard input and output. The player reads from its standard input libreblackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
+This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with Libre Blackjack. The communication between the player and the back end is through standard input and output. The player reads from its standard input Libre Blackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
 
-```
-$ mkfifo fifo
+```terminal
+mkfifo fifo
 ```
 
-Then we execute libreblackjack, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
+Then we execute `blackjack`, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
 
-```
-if test ! -e fifo; then
- mkfifo fifo
-fi
-libreblackjack -n1e5 < fifo | ./no-bust.pl > fifo
-```
+```terminal
+input(run.sh)```
 
 As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
 
@@ -125,27 +209,26 @@ do
     fi
   fi
 done
-
 ```
 
 To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
 
 ```
-$ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
-$ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
-$ diff perl.yml shell.yml 
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
+diff perl.yml shell.yml 
 15,19c15,19
-<   user:             0.005079
-<   system:           0.015238
-<   wall:             0.029194
-<   second_per_hand:  2.9e-05
-<   hands_per_second: 3.4e+04
+<   user:             0
+<   system:           0.022603
+<   wall:             0.034317
+<   second_per_hand:  3.4e-05
+<   hands_per_second: 2.9e+04
 ---
->   user:             0.128252
->   system:           0.119702
->   wall:             12.7548
->   second_per_hand:  1.3e-02
->   hands_per_second: 7.8e+01
+>   user:             0.06838
+>   system:           0.13676
+>   wall:             11.1446
+>   second_per_hand:  1.1e-02
+>   hands_per_second: 9.0e+01
 ```
 
 As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
@@ -154,7 +237,7 @@ As expected, the reports are the same. They just differ in the speed because the
 
 
 ---
-title: Mimic the dealer
+title_case: Mimic the dealer
 ...
 
 ## Mimic the dealer
@@ -163,14 +246,12 @@ title: Mimic the dealer
 
 This example implements a “mimic-the-dealer strategy,” i.e. hits if the hand totals less than seventeen and stands on eighteen or more. The player stands on hard seventeen but hits on soft seventeen. 
 
-This time, the configuration of the game is read from an ini file called `libreblackjack.ini`. In general, if this file exists in the directory where libreblackjack is executed, it is read and parsed. The options should be fairly self descriptive. See the documentation for a detailed explanation of the options that can be entered in the ini file. In particular, we ask to play one hundred thousand hands at a six-deck game where the dealer hits soft seventeens. If the random seed is set to a fixed value so each execution will lead to the very same sequence of cards.
+This time, the configuration file `blackjack.conf` is used. If a file with this name exists in the directory where `blackjack` is executed, it is read and parsed. The options should be fairly self descriptive. See the [configuration file] section of the manual for a detailed explanation of the variables and values that can be entered. In particular, we ask to play one hundred thousand hands at a six-deck game where the dealer hits soft seventeens. If the random seed is set to a fixed value so each execution will lead to the very same sequence of cards.
 
-Now, there are two options that tell libreblackjack how is the player going to talk to the backend: `player2dealer` and `dealer2player`. The first one sets the communication mechanism from the player to the dealer (by default is libreblackjack's standard input), and the second one sets the mechanism from the dealer to the player (by default libreblackjack's standard output). In this case, the ini file reads:
+Now, there are two options that tell Libre Blackjack how the player is going to talk to the backend: `player2dealer` and `dealer2player`. The first one sets the communication mechanism from the player to the dealer (by default is `blackjack`’s standard input), and the second one sets the mechanism from the dealer to the player (by default `blackjack`’s standard output). In this case, the configuration file reads:
 
 ```
-player2dealer = fifo player2dealer
-dealer2player = fifo dealer2player
-```
+input(blackjack.conf)```
 
 This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by libreblackjack upon execution. 
 
@@ -191,18 +272,13 @@ In another terminal run the player
 Both dealer and player may be run in the same terminal putting the first one on the background:
 
 ```
-if [ -z "`which gawk`" ]; then
-  echo "error: gawk is not installed"
-  exit 1
-fi      
-
 rm -f mimic_d2p mimic_p2d
 mkfifo mimic_d2p mimic_p2d
-libreblackjack &
-./mimic-the-dealer.awk < mimic_d2p > mimic_p2d
+blackjack &
+gawk -f mimic-the-dealer.awk < mimic_d2p > mimic_p2d
 ```
 
-To understand the decisions taken by the player, we have to remember that when libreblackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
+To understand the decisions taken by the player, we have to remember that when Libre Blackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
 
 ```awk
 ##!/usr/bin/gawk -f
@@ -238,7 +314,7 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 
 
 ---
-title: Derivation of the basic strategy
+title_case: Derivation of the basic strategy
 ...
 
 ## Derivation of the basic strategy
@@ -315,8 +391,8 @@ The script computes the expected value of each combination
 The results are given as the expected value in percentage with the uncertainty (one standard deviation) in the last significant digit.
  
 
-
  
+```{=html}
 <table class="table table-sm table-responsive table-hover small w-100">
  <thead>
   <tr>
@@ -1724,6 +1800,7 @@ The results are given as the expected value in percentage with the uncertainty (
 
  </tbody>
 </table>
+```
 
 ### Detailed explanation
 
@@ -1763,7 +1840,7 @@ The steps above can be written in a [Bash](https://en.wikipedia.org/wiki/Bash_%2
 
  * loops over hands and upcards,
  * creates a strategy file for each possible play hit, double or stand (or split or not),
- * runs [Libreblackjack](https://www.seamplex.com/blackjack),
+ * runs [Libre Blackjack](https://www.seamplex.com/blackjack),
  * checks the results and picks the best play,
  * updates the strategy file
 
@@ -1899,7 +1976,7 @@ EOF
      cat hard.txt soft.txt pair-no.txt > bs.txt
     
      ## play!
-     ../../libreblackjack > /dev/null
+     blackjack > /dev/null
     
      ## evaluate the results
      ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
@@ -2083,7 +2160,7 @@ EOF
     cat hard.txt soft.txt pair.txt > bs.txt
     
     ## play!
-    ../../libreblackjack > /dev/null
+    blackjack > /dev/null
     
     ## evaluate the results
     ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`

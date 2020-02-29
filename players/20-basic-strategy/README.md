@@ -77,8 +77,8 @@ The script computes the expected value of each combination
 The results are given as the expected value in percentage with the uncertainty (one standard deviation) in the last significant digit.
  
 
-
  
+```{=html}
 <table class="table table-sm table-responsive table-hover small w-100">
  <thead>
   <tr>
@@ -1486,6 +1486,7 @@ The results are given as the expected value in percentage with the uncertainty (
 
  </tbody>
 </table>
+```
 
 ## Detailed explanation
 
@@ -1525,7 +1526,7 @@ The steps above can be written in a [Bash](https://en.wikipedia.org/wiki/Bash_%2
 
  * loops over hands and upcards,
  * creates a strategy file for each possible play hit, double or stand (or split or not),
- * runs [Libreblackjack](https://www.seamplex.com/blackjack),
+ * runs [Libre Blackjack](https://www.seamplex.com/blackjack),
  * checks the results and picks the best play,
  * updates the strategy file
 
@@ -1662,7 +1663,7 @@ EOF
      cat hard.txt soft.txt pair-no.txt > bs.txt
     
      # play!
-     ../../libreblackjack > /dev/null
+     blackjack > /dev/null
     
      # evaluate the results
      ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
@@ -1847,7 +1848,7 @@ EOF
     cat hard.txt soft.txt pair.txt > bs.txt
     
     # play!
-    ../../libreblackjack > /dev/null
+    blackjack > /dev/null
     
     # evaluate the results
     ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`

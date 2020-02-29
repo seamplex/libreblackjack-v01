@@ -12,11 +12,11 @@ rules:
   penetration:            0.75
   penetration_sigma:      0.05
 cpu:
-  user:             0.005079
-  system:           0.015238
-  wall:             0.029194
-  second_per_hand:  2.9e-05
-  hands_per_second: 3.4e+04
+  user:             0
+  system:           0.022603
+  wall:             0.034317
+  second_per_hand:  3.4e-05
+  hands_per_second: 2.9e+04
 player: 
   wins:               0.4
   pushes:             0.054
@@ -38,5 +38,5 @@ player:
   variance:            0.973451
   deviation:           0.986636
   error:               0.0312002
-  result:             "(-13 ± 3) %"
+  result:             "(-13 ± 6) %"
 ...

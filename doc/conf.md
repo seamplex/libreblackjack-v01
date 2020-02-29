@@ -6,7 +6,8 @@
 It can be either a textual `3/2` or `6/5` or any
 floating-point number.
 
-:    **Default:** 
+:    **Default:** `3/2`
+
 
 `burnt_cards`
 
@@ -95,7 +96,7 @@ finished and a new show is started.
 If the value is zero, the sho is reshuffled after
 each hand.
 
-:    **Default:** 0.75           
+:    **Default:** 0.75
 
 
 `penetration_sigma`
@@ -111,7 +112,7 @@ centered at the fraction $\in [0:1]$ given by
 `penetration` and standard deviation given by this
 value.
 
-:    **Default:** 0.05           
+:    **Default:** 0.05
 
 
 `rng_seed`

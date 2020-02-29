@@ -28,35 +28,7 @@ With no options and no configuration file, `blackjack` starts in interactive mod
 The `blackjack` executable supports the following options:
 
 
-`-h number`  or `--hands=number`
-
-:   Specify the number of hands to play. Corresponds to the `hands` variable in the [configuration file].
-
-
-`-d number` or `--decks=number`
-
-:   Specify the number of decks to use in the shoe. Corresponds to the `decks` variable in the [configuration file].
-
-
-`--flatbet`
-
-:   Do not ask for the amount to bet before starting a new hand and use a flat unit bet.
-
-
-`-i` or `--internal`
-
-:   Use the internal player to play against itself. See [internal player] for details.
-
-
-`-h` or `--help`
-
-:   Print this informative help message on standard output and exit successfully.
-
-
-`-v` or `--version`
-
-:   Print the version number and licensing information of Hello on standard output and then exit successfully.
-
+include(help.md)
 
 ## Interactive game
 
@@ -66,7 +38,7 @@ The `blackjack` executable supports the following options:
 
 ### Standard input/output
 
-### FIFOs
+### FIFO named pipes
 
 ### POSIX message queues
 
@@ -75,6 +47,31 @@ The `blackjack` executable supports the following options:
 ### TCP (through `netcat`)
 
 # Configuration file
+
+Libre Blackjacks reads a configuration file that contains
+ 
+ * settings about the rules of the game
+    - number of decks,
+    - whether if the dealer has to hit soft seventeen or not,
+    - blackjack payout,
+    - maximum bet allowed,
+    - etc...
+ * how the player is supposed to play
+    - number of hands
+    - whether a flat or variable bet is going to be used,
+    - etc...
+ * if there are any particular shoe arrangement, i.e. a predefined set of cards dealt in a certain order for instance to play one million hands of a sixteen against a dealer’s ten
+ * what kind of information is shown in the interactive session
+    - if ASCII-art cards are supposed to be shown,
+    - a real-time delay to make the game smoother,
+    - etc.
+ * how the automated player communicates with the dealer
+    - using standard input/output,
+    - FIFO named pipes,
+    - POSIX message queues,
+    - POSIX shared memory,
+ 
+The location of the configuration file can be given in the command line. If none is provided, a file named `blackjack.conf` in the current directory is used. If such file does not exists, the defaults values of each variable are used. Individual variables can be set from the command line by passing one or more times the option `--`configuration_variable`[=`*value*`]` in the [invocation].
 
 include(conf.md)
 
@@ -86,7 +83,7 @@ include(conf.md)
 
 # Example automated players
 
-dnl include(players.md)
+include(players.md)
 
 
 

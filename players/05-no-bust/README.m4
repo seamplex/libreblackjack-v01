@@ -7,16 +7,16 @@ title: case_title
 
 > Difficulty: case_difficulty/100
 
-This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with libreblackjack. The communication between the player and the backend is through standard input and output. The player reads from its standard input libreblackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
+This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with Libre Blackjack. The communication between the player and the back end is through standard input and output. The player reads from its standard input Libre Blackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
 
-```
-$ mkfifo fifo
+```terminal
+mkfifo fifo
 ```
 
-Then we execute libreblackjack, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
+Then we execute `blackjack`, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
 
-```
-esyscmd(sed s_../../libreblackjack_libreblackjack_ run.sh)dnl
+```terminal
+input(run.sh)dnl
 ```
 
 As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
@@ -28,15 +28,15 @@ include(no-bust.pl)dnl
 The very same player may be implemented as a shell script:
 
 ```bash
-include(no-bust.sh)
+include(no-bust.sh)dnl
 ```
 
 To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
 
 ```
-$ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
-$ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
-$ diff perl.yml shell.yml 
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
+diff perl.yml shell.yml 
 esyscmd(diff perl.yml shell.yml)dnl
 ```
 

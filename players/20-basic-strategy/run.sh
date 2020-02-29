@@ -130,7 +130,7 @@ EOF
      cat hard.txt soft.txt pair-no.txt > bs.txt
     
      # play!
-     ../../libreblackjack > /dev/null
+     blackjack > /dev/null
     
      # evaluate the results
      ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
@@ -315,7 +315,7 @@ EOF
     cat hard.txt soft.txt pair.txt > bs.txt
     
     # play!
-    ../../libreblackjack > /dev/null
+    blackjack > /dev/null
     
     # evaluate the results
     ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`

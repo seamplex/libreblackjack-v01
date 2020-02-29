@@ -7,20 +7,16 @@ title: No-bust strategy
 
 > Difficulty: 05/100
 
-This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with libreblackjack. The communication between the player and the backend is through standard input and output. The player reads from its standard input libreblackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
+This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with Libre Blackjack. The communication between the player and the back end is through standard input and output. The player reads from its standard input Libre Blackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
 
-```
-$ mkfifo fifo
+```terminal
+mkfifo fifo
 ```
 
-Then we execute libreblackjack, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
+Then we execute `blackjack`, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
 
-```
-if test ! -e fifo; then
- mkfifo fifo
-fi
-libreblackjack -n1e5 < fifo | ./no-bust.pl > fifo
-```
+```terminal
+input(run.sh)```
 
 As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
 
@@ -81,27 +77,26 @@ do
     fi
   fi
 done
-
 ```
 
 To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
 
 ```
-$ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
-$ ../../libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
-$ diff perl.yml shell.yml 
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
+libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
+diff perl.yml shell.yml 
 15,19c15,19
-<   user:             0.005079
-<   system:           0.015238
-<   wall:             0.029194
-<   second_per_hand:  2.9e-05
-<   hands_per_second: 3.4e+04
+<   user:             0
+<   system:           0.022603
+<   wall:             0.034317
+<   second_per_hand:  3.4e-05
+<   hands_per_second: 2.9e+04
 ---
->   user:             0.128252
->   system:           0.119702
->   wall:             12.7548
->   second_per_hand:  1.3e-02
->   hands_per_second: 7.8e+01
+>   user:             0.06838
+>   system:           0.13676
+>   wall:             11.1446
+>   second_per_hand:  1.1e-02
+>   hands_per_second: 9.0e+01
 ```
 
 As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
