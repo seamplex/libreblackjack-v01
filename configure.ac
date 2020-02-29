@@ -9,7 +9,7 @@ dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 m4_include([version.m4])
-AC_INIT([libreblackjack],[libreblackjackversion],[jeremy@seamplex.com])
+AC_INIT([blackjack],[libreblackjackversion],[jeremy@seamplex.com])
 AM_INIT_AUTOMAKE
 AM_GNU_GETTEXT([external])
 

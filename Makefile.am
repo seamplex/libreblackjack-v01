@@ -10,12 +10,12 @@ dist_doc_DATA = README doc/blackjack.texi
 TESTS = check-internal.sh check-stand.sh
 EXTRA_DIST = config.rpath m4/ChangeLog  blackjack.conf players $(TESTS)
 
-# ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
-bin_PROGRAMS = libreblackjack
-libreblackjack_INCLUDES = $(all_includes)
-libreblackjack_LDADD = $(all_libraries) 
+ACLOCAL_AMFLAGS = -I m4
+bin_PROGRAMS = blackjack
+blackjack_INCLUDES = $(all_includes)
+blackjack_LDADD = $(all_libraries) 
 
-libreblackjack_SOURCES = \
+blackjack_SOURCES = \
  src/libreblackjack.h \
  src/version-vcs.h \
  src/main.c \
@@ -34,4 +34,3 @@ libreblackjack_SOURCES = \
  src/shmem.c \
  src/mqueue.c
 
-ACLOCAL_AMFLAGS = -I m4

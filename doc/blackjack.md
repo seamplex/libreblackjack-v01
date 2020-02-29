@@ -1,5 +1,5 @@
 ---
-title: LibreBlackjack
+title: Libre Blackjack
 subtitle:  A free blackjack back end
 desc: a completely free-as-in-freedom blackjack engine designed to study and analyze the game statistics using different playing strategies ranging from simple card counting up to other complex algorithms based on artificial intelligence.
 author: Jeremy Theler
@@ -12,57 +12,67 @@ infoname: blackjack
 
 include(overview.md)
 
-# Running `libreblackjack`
+# Running `blackjack`
 
 ## Invocation
 
-```{=texinfo}
-The format for running the @command{libreblackjack} program is:
+The format for running the `blackjack` program is:
 
-@example
-libreblackjack @var{options} @var{path_to_conf_file}
-@end example
-
-If no configuration file is given, a file named @file{blackjack.conf} in the current directory is used, provided it exists.
-With no options and no configuration file, `libreblackjack` starts in interactive mode and
-it is ready to start a blackjack game.
-
-@command{libreblackjack} supports the following options:
-
-@table @option
-@item --hands=number
-@itemx -h number
-Specify the number of hands to play.
-
-@item --decks=number
-@itemx -d number
-Specify the number of decks to use in the shoe.
-
-@item --flatbet
-@itemx -f
-Do not ask for the amount to bet before starting a new hand and use a flat unit bet.
-
-@item --internal
-@itemx -i
-Use the internal player to play against itself.
-
-@item --help
-@itemx -h
-Print an informative help message on standard output and exit
-successfully.
-
-@item --version
-@itemx -v
-Print the version number and licensing information of Hello on
-standard output and then exit successfully.
-
-@end table
 ```
+blackjack [options] [path_to_conf_file]
+```
+
+If no configuration file is given, a file named `blackjack.conf` in the current directory is used, provided it exists.
+With no options and no configuration file, `blackjack` starts in interactive mode and it is ready to start a blackjack game.
+
+The `blackjack` executable supports the following options:
+
+
+`-h number`  or `--hands=number`
+
+:   Specify the number of hands to play. Corresponds to the `hands` variable in the [configuration file].
+
+
+`-d number` or `--decks=number`
+
+:   Specify the number of decks to use in the shoe. Corresponds to the `decks` variable in the [configuration file].
+
+
+`--flatbet`
+
+:   Do not ask for the amount to bet before starting a new hand and use a flat unit bet.
+
+
+`-i` or `--internal`
+
+:   Use the internal player to play against itself. See [internal player] for details.
+
+
+`-h` or `--help`
+
+:   Print this informative help message on standard output and exit successfully.
+
+
+`-v` or `--version`
+
+:   Print the version number and licensing information of Hello on standard output and then exit successfully.
+
 
 ## Interactive game
 
-## Automated playing
+## Internal player 
 
+## Automated playing through IPC
+
+### Standard input/output
+
+### FIFOs
+
+### POSIX message queues
+
+### POSIX shared memory objects synchronized with semaphores
+
+### TCP (through `netcat`)
 
 # Configuration file
 
@@ -76,7 +86,7 @@ include(conf.md)
 
 # Example automated players
 
-include(players.md)
+dnl include(players.md)
 
 
 

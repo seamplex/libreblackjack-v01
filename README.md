@@ -1,16 +1,16 @@
 ---
-title: LibreBlackjack, a free blackjack back end
+title: Libre Blackjack, a free blackjack back end
 lang: en-US
 ...
 
 
-# LibreBlackjack
+# Libre Blackjack
 
 > A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
 
 [Link to the derivation of the basic strategy](https://www.seamplex.com/blackjack/players/20-basic-strategy/)
 
-[LibreBlackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals (digital) cards and understands plain-text commands such as `hit` or `stand`. The basic idea is that one or more players can talk to LibreBlackjack either in an interactive or in an automated way through
+[Libre Blackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals (digital) cards and understands plain-text commands such as `hit` or `stand`. The basic idea is that one or more players can talk to Libre Blackjack either in an interactive or in an automated way through
  
  * the standard input and/or output,
  * named pipes,
@@ -34,14 +34,14 @@ These players can be actual human players playing in real-time through a front e
 > [Norman Wattenberger, Modern Blackjack, 2009]{.blockquote-footer}
 :::
 
-With LibreBlackjack you do not have to trust other people anymore. You have a free blackjack engine which you can
+With Libre Blackjack you do not have to trust other people anymore. You have a free blackjack engine which you can
 
  0. run as you wish, to see the results of billions of blackjack hands,
  1. study to see how it works and change it if you do not like it,
  2. share it with your friends and colleagues, and
  3. distribute copies of your modified versions.
 
-If you do not know how to program, you have the _freedom_ to hire a programmer to do it for you. That is why [LibreBlackjack](https://www.seamplex.com/blackjack) is [free software](https://www.gnu.org/philosophy/free-sw.html).
+If you do not know how to program, you have the _freedom_ to hire a programmer to do it for you. That is why [Libre Blackjack](https://www.seamplex.com/blackjack) is [free software](https://www.gnu.org/philosophy/free-sw.html).
 
 
 ## How 
@@ -71,7 +71,7 @@ make
 sudo make install
 ```
 
-Note that LibreBlackjack depends on two optional GNU libraries:
+Note that Libre Blackjack depends on two optional GNU libraries:
 
  * [GNU Scientific Library](https://www.gnu.org/software/gsl/) for an improved random number generator
  * [GNU Readline](http://tiswww.case.edu/php/chet/readline/rltop.html) for an improved interactive stdin prompt
@@ -85,10 +85,10 @@ Run as test suite to check the code work as expected.
 $ make check
 ```
 
-The subdirectory `players` contains some automatic players that play against LibreBlackjack. These players are coded in different languages and communicate with LibreBlackjack in a variety of ways in order to illustrate the design basis:
+The subdirectory `players` contains some automatic players that play against Libre Blackjack. These players are coded in different languages and communicate with Libre Blackjack in a variety of ways in order to illustrate the design basis:
 
  * [00-internal](players/00-internal) uses the internal player that defaults to playing one million hands of basic strategy
- * [02-always-stand](players/02-always-stand), using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to libreblackjack’s standard input) no matter what the cards are
+ * [02-always-stand](players/02-always-stand), using the UNIX tool `yes` this player always says “stand” into the standard output (which is piped to `blackjack`’s standard input) no matter what the cards are
  * [05-no-bust](players/05-no-bust) is a PERL-based player does not bust (i.e. hits if the hard total is less than twelve) that receives the cards through the standard input but draws or stands using a FIFO to talk back to the dealer
  * [08-mimic-the-dealer](players/08-mimic-the-dealer) follows what the dealer does (i.e. hits soft seventeens). It is implemented in AWK using two FIFOs.
  * [20-basic-strategy](players/20-basic-strategy) derives the basic strategy from scratch in less than one minute by creating all the possible combination of hitting/standing/doubling/pairing strategies in an ASCII text file that the internal player can read and use.
@@ -96,7 +96,7 @@ The subdirectory `players` contains some automatic players that play against Lib
 
 # Play
 
-Run LibreBlackjack with no arguments to play Blackjack interactively in ASCII (actually UTF-8) mode.
+Run Libre Blackjack with no arguments to play Blackjack interactively in ASCII (actually UTF-8) mode.
 
 ```{=html}
 <asciinema-player src="doc/libreblackjack2.cast" cols="89" rows="28" preload="true" poster="npt:0:20"></asciinema-player>
@@ -106,7 +106,7 @@ Edit the file [`blackjack.conf`](https://github.com/seamplex/libreblackjack/blob
 
 ## Automatic playing
 
-The differential value of LibreBlackjack is that players can be programmed to play employing different strategies, card-counting techniques or even state-of-the-art AI algorithms.
+The differential value of Libre Blackjack is that players can be programmed to play employing different strategies, card-counting techniques or even state-of-the-art AI algorithms.
 
 See the directory [`players`](players) for examples of how to write players in
 
@@ -119,10 +119,10 @@ See the directory [`players`](players) for examples of how to write players in
  
 ## TCP Sockets
 
-To play through a TCP socket, call `libreblackjack` from `netcat`. On one host, do
+To play through a TCP socket, call `blackjack` from `netcat`. On one host, do
 
 ```
-nc -l -p1234 -e libreblackjack
+nc -l -p1234 -e blackjack
 ```
 
 On the other one, connect to the first host on port 1234:
@@ -133,7 +133,7 @@ nc host 1234
 
 # Licensing
 
-LibreBlackjack is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+Libre Blackjack is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
 # Further information
 
@@ -144,8 +144,8 @@ Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtub
 
 ----------------------------------------------------
 
-libreblackjack is copyright (C) 2016,2020 Jeremy Theler  
-libreblackjack is licensed under [GNU GPL version 3](http://www.gnu.org/copyleft/gpl.html) or (at your option) any later version.  
-libreblackjack is free software: you are free to change and redistribute it.  
+Libre Blackjack is copyright (C) 2016,2020 Jeremy Theler  
+Libre Blackjack is licensed under [GNU GPL version 3](http://www.gnu.org/copyleft/gpl.html) or (at your option) any later version.  
+Libre Blackjack is free software: you are free to change and redistribute it.  
 There is NO WARRANTY, to the extent permitted by law.  
 See the file `COPYING` for copying conditions.  

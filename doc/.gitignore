@@ -1,3 +1,6 @@
+Makefile
+Makefile.in
+
 *.aux
 *.dvi
 *.info*
@@ -8,3 +11,4 @@ wwwtemp
 blackjack.t2p/
 blackjack.pdf
 blackjack.html
+blackjack.info
