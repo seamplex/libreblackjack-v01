@@ -11,7 +11,7 @@ title: case_title
 
 Execute the `run.sh` script. It should take a minute or so:
 
-```
+```terminal
 $ ./run.sh
 h20-2 (10 10) n=1000    s=0.634 (0.03)  d=-1.676 (0.03) h=-0.844 (0.02) stand
 h20-3 (10 10) n=1000    s=0.66 (0.03)   d=-1.744 (0.03) h=-0.847 (0.02) stand
@@ -72,6 +72,8 @@ include(hard.html)
  </tbody>
 </table>
 ```
+
+include(table.md)
 
 ## Detailed explanation
 

@@ -16,7 +16,7 @@ mkfifo fifo
 Then we execute `blackjack`, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
 
 ```terminal
-input(run.sh)dnl
+include(run.sh)dnl
 ```
 
 As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
@@ -33,10 +33,8 @@ include(no-bust.sh)dnl
 
 To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
 
-```
-libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
-libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
-diff perl.yml shell.yml 
+```terminal
+include(diff.sh)
 esyscmd(diff perl.yml shell.yml)dnl
 ```
 

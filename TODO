@@ -1,3 +1,4 @@
+ * use TOML for configuration?
  * have different dealers for different game variations (spanish 21, 
  * different colors in interactive output for actual commands and information
  * verbose dealer/quiet dealer

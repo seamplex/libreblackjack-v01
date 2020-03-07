@@ -18,7 +18,7 @@ fi
 # expected results
 declare -A expected=(\
 ["00-internal"]="-0.004" \
-["02-always-stand"]="-0.15" \
+["02-always-stand"]="-0.150" \
 ["05-no-bust"]="-0.075" \
 ["08-mimic-the-dealer"]="-0.055")
 
@@ -32,19 +32,25 @@ else
   player="${!expected[@]}"
 fi
 
-echo ' Name | Expected |  Result | Error | Speed | Status '
-echo ' ---- | -------- |  ------ | ----- | ----- | ------ '
+# Markdown | Less | Pretty
+# --- | --- | ---
+# *Still* | `renders` | **nicely**
+# 1 | 2 | 3
+
+
+echo 'Name            | Expected      | Result         | Error         | Speed   | Status'
+echo '--------------- | ------------- | -------------- | ------------- | ------- | ------'
 for i in $player; do
   if test -d $i -a -x $i/run.sh; then
     cd $i
-    echo -ne ${i}' | '${expected["$i"]}' | '
+    echo -ne ${i}\\t'| '${expected["$i"]}\\t'| '
     ./run.sh 1>/dev/null 2> ../$i.yaml
     
     return=`grep return ../${i}.yaml | awk '{print $2}'`
     error=`grep error ../${i}.yaml | awk '{print $2}'`
     hands_per_second=`grep hands_per_second ../${i}.yaml | awk '{print $2}'`
     
-    echo -ne ${return}' | '${error}' | '${hands_per_second}' | '
+    echo -ne ${return}\\t' | '${error}\\t' | '${hands_per_second}' | '
     echo ${return} | awk -v e=${expected["$i"]} -v s=${sigma} 'END {ok = ($1>(e-s)&&$1<(e+s)); print ok?"ok":"failed"; exit !ok }'
     result=$?
     cd ..

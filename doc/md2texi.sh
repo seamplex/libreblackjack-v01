@@ -18,3 +18,6 @@ done
 pandoc help.md -t plain > help.txt
 
 m4 header.m4 blackjack.md | pandoc --toc --template template.texi -o blackjack.texi
+
+# m4 header.m4 blackjack.md > tmp.md
+# pandoc tmp.md --toc --template template.texi -o blackjack.texi

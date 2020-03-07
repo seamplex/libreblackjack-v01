@@ -9,8 +9,9 @@ title: Always stand
 
 To play libreblackjack as an “always-stander” run the following command:
 
+```terminal
+yes stand | blackjack -n1e5 --flat_bet --no_insurance > /dev/null
 ```
-input(run.sh)```
 
 The UNIX command `yes stand` writes the string “stand” repeteadly to the standard output, which is piped to the executable `libreblackjack` (assumed to be installed system-wide). The arguments tell libreblackjack to play one hundred thousand hands (`-n1e5`) using a flat bet (`flat_bet`, it defaults to a unit bet in each hand) and without asking for insurance if the dealer shows an ace (`no_insurance`). As there is no `libreblackjack.ini` file, the rules are---as expected---the default ones (see the documentation for details).
 
@@ -67,6 +68,7 @@ player:
   error:               0.00313804
   result:             "(-15.9 ± 0.6) %"
 ...
+
 ```
 
 -------

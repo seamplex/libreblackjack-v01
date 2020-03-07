@@ -32,7 +32,7 @@ include(help.md)
 
 ## Interactive game
 
-## Internal player 
+## Automatic internal player
 
 ## Automated playing through IPC
 

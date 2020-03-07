@@ -13,28 +13,37 @@ This time, the configuration file `blackjack.conf` is used. If a file with this 
 
 Now, there are two options that tell Libre Blackjack how the player is going to talk to the backend: `player2dealer` and `dealer2player`. The first one sets the communication mechanism from the player to the dealer (by default is `blackjack`’s standard input), and the second one sets the mechanism from the dealer to the player (by default `blackjack`’s standard output). In this case, the configuration file reads:
 
+```ini
+hands = 1e5
+decks = 6
+hit_soft_17 = 1
+# uncomment to obtain the same cards each time
+# rng_seed = 1  
+
+player2dealer = fifo mimic_p2d
+dealer2player = fifo mimic_d2p
+buffered_fifo = 1
 ```
-input(blackjack.conf)```
 
 This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by libreblackjack upon execution. 
 
 The player this time is implemented as an awk script, whose input should be read from `dealer2player` and whose output should be written to `player2dealer`. To run the game, execute libreblackjack in one terminal making sure the current directory is where the `libreblackjack.ini` file exists. It should print a message telling that it is waiting for someone to be at the other side of the named pipes:
 
-```
-../../libreblackjack
+```terminal
+$ libreblackjack
 [...]
 waiting for dealer2player buffered fifo 'dealer2player'...
 ```
 
 In another terminal run the player
 
-```
-./mimic-the-dealer.awk < dealer2player > player2dealer
+```terminal
+$ ./mimic-the-dealer.awk < dealer2player > player2dealer
 ```
 
 Both dealer and player may be run in the same terminal putting the first one on the background:
 
-```
+```terminal
 rm -f mimic_d2p mimic_p2d
 mkfifo mimic_d2p mimic_p2d
 blackjack &
@@ -71,6 +80,52 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 /bye/ {
   exit;
 }
+```
+
+```yaml
+---
+rules:
+  decks:                  6
+  hands:                  100000
+  hit_soft_17:            1
+  double_after_split:     1
+  blackjack_pays:         1.5
+  rng_seed:               -1448949563
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  penetration:            0.75
+  penetration_sigma:      0.05
+cpu:
+  user:             0.631905
+  system:           1.19576
+  wall:             2.15273
+  second_per_hand:  2.2e-05
+  hands_per_second: 4.6e+04
+player: 
+  wins:               0.41044
+  pushes:             0.09695
+  losses:             0.49261
+  dealer_blackjacks:  0.04658
+  player_blackjacks:  0.04663
+  dealer_busts:       0.18984
+  player_busts:       0.27268
+  doubled_hands:      0
+  doubled_wins:       0
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    100000
+  number_of_shuffles: 2326
+  total_money_waged:  100000
+  worst_bankroll:     -5996.5
+  final_bankroll:     -5994.5
+  return:             -0.059945
+  variance:            0.955017
+  deviation:           0.97725
+  error:               0.00309034
+  result:             "(-6.0 ± 0.6) %"
+...
+
 ```
 
 > Exercise: modify the player and the ini file so both the dealer and the player may stand on soft seventeen. Analyze the four combinations (player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer h17, player s17 - dealer s17)

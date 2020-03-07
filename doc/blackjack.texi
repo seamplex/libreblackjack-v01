@@ -92,7 +92,7 @@ ASCII blackjack.
 @menu
 * Invocation::
 * Interactive game::
-* Internal player::
+* Automatic internal player::
 * Automated playing through IPC::
 @end menu
 
@@ -141,7 +141,7 @@ override configuration options.
 @item @code{-i} or @code{--internal}
 
 Use the internal player to play against itself. See
-@ref{#internal-player-1,internal player} for details.
+@ref{#internal-player,internal player} for details.
 
 @item @code{-h} or @code{--help}
 
@@ -159,9 +159,9 @@ output and then exit successfully.
 @section Interactive game
 @anchor{#interactive-game}
 
-@node Internal player
-@section Internal player
-@anchor{#internal-player}
+@node Automatic internal player
+@section Automatic internal player
+@anchor{#automatic-internal-player}
 
 @node Automated playing through IPC
 @section Automated playing through IPC
@@ -390,7 +390,7 @@ repeteability in the order of the dealt cards.
 
 @node Internal player
 @section Internal player
-@anchor{#internal-player-1}
+@anchor{#internal-player}
 @quotation
 Difficulty: 00/100
 @end quotation
@@ -399,11 +399,12 @@ If @code{libreblackjack} is called with the @code{-i} option, it uses an
 strategy. Run
 
 @verbatim
-input(run.sh)```
+blackjack -i
+@end verbatim
 
 and you will get a report with the results of one million hands.
 
-```yaml
+@verbatim
 ---
 rules:
   decks:                  6
@@ -458,21 +459,45 @@ To play libreblackjack as an ``always-stander'' run the following
 command:
 
 @verbatim
-input(run.sh)```
+yes stand | blackjack -n1e5 --flat_bet --no_insurance > /dev/null
+@end verbatim
 
-The UNIX command `yes stand` writes the string “stand” repeteadly to the standard output, which is piped to the executable `libreblackjack` (assumed to be installed system-wide). The arguments tell libreblackjack to play one hundred thousand hands (`-n1e5`) using a flat bet (`flat_bet`, it defaults to a unit bet in each hand) and without asking for insurance if the dealer shows an ace (`no_insurance`). As there is no `libreblackjack.ini` file, the rules are---as expected---the default ones (see the documentation for details).
+The UNIX command @code{yes stand} writes the string ``stand'' repeteadly
+to the standard output, which is piped to the executable
+@code{libreblackjack} (assumed to be installed system-wide). The
+arguments tell libreblackjack to play one hundred thousand hands
+(@code{-n1e5}) using a flat bet (@code{flat_bet}, it defaults to a unit
+bet in each hand) and without asking for insurance if the dealer shows
+an ace (@code{no_insurance}). As there is no @code{libreblackjack.ini}
+file, the rules are---as expected---the default ones (see the
+documentation for details).
 
-The `/dev/null` part is important, otherwise libreblackjack will think that there is a human at the other side of the table and will
+The @code{/dev/null} part is important, otherwise libreblackjack will
+think that there is a human at the other side of the table and will
 
-  1. run slower (it will add explicit delays to mimic an actual human dealer), and
-  2. give all the details of the dealt hands in the terminal as ASCII (actually UTF-8) art
+@enumerate 
+@item
+run slower (it will add explicit delays to mimic an actual human
+dealer), and
+@item
+give all the details of the dealt hands in the terminal as ASCII
+(actually UTF-8) art
+@end enumerate
 
-This example is only one-way (i.e. the player ignores what the dealer says) so it is better to redirect the standard output to `/dev/null` to save execution time. The results are written as a [YAML](http://yaml.org/)-formatted data to `stderr` by default once the hands are over, so they will show up in the terminal nevertheless. This format is human-friendly (far more than JSON) so it can be easily parsed, but it also allows complex objects to be represented (arrays, lists, etc.).
+This example is only one-way (i.e.@ the player ignores what the dealer
+says) so it is better to redirect the standard output to
+@code{/dev/null} to save execution time. The results are written as a
+@uref{http://yaml.org/,YAML}-formatted data to @code{stderr} by default
+once the hands are over, so they will show up in the terminal
+nevertheless. This format is human-friendly (far more than JSON) so it
+can be easily parsed, but it also allows complex objects to be
+represented (arrays, lists, etc.).
 
+As an exercise, verify that the analytical probability of getting a
+natural playing with a single deck (for both the dealer and the player)
+is 32/663 = 0.04826546@dots{}
 
-As an exercise, verify that the analytical probability of getting a natural playing with a single deck (for both the dealer and the player) is 32/663 = 0.04826546...
-
-```yaml
+@verbatim
 ---
 rules:
   decks:                  6
@@ -541,11 +566,19 @@ whilst at the same time we redirect the player's standard output to
 @code{fifo}:
 
 @verbatim
-input(run.sh)```
+if test ! -e fifo; then
+ mkfifo fifo
+fi
+blackjack -n1e5 < fifo | ./no-bust.pl > fifo
+@end verbatim
 
-As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
+As this time the player is coded in an interpreted langauge, it is far
+smarter than the previous @code{yes}-based player. So the player can
+handle bets and insurances, and there is not need to pass the options
+@code{--flat_bet} nor @code{--no_insurance} (though they can be passed
+anyway). Let us take a look at the Perl implementation:
 
-```perl
+@verbatim
 ##!/usr/bin/perl
 ## this is needed to avoid deadlock with the fifo
 STDOUT->autoflush(1);
@@ -609,9 +642,12 @@ libreblackjack with the same seed (say one) and send the YAML report to
 two different files:
 
 @verbatim
-libreblackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml  < fifo | ./no-bust.pl > fifo
-libreblackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml < fifo | ./no-bust.sh > fifo
+blackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml \
+    < fifo | ./no-bust.pl > fifo
+blackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml \
+    < fifo | ./no-bust.sh > fifo
 diff perl.yml shell.yml 
+
 15,19c15,19
 <   user:             0
 <   system:           0.022603
@@ -664,36 +700,59 @@ player (by default @code{blackjack}'s standard output). In this case,
 the configuration file reads:
 
 @verbatim
-input(blackjack.conf)```
+hands = 1e5
+decks = 6
+hit_soft_17 = 1
+## uncomment to obtain the same cards each time
+## rng_seed = 1  
 
-This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by libreblackjack upon execution. 
-
-The player this time is implemented as an awk script, whose input should be read from `dealer2player` and whose output should be written to `player2dealer`. To run the game, execute libreblackjack in one terminal making sure the current directory is where the `libreblackjack.ini` file exists. It should print a message telling that it is waiting for someone to be at the other side of the named pipes:
+player2dealer = fifo mimic_p2d
+dealer2player = fifo mimic_d2p
+buffered_fifo = 1
 @end verbatim
 
-../../libreblackjack [@dots{}] waiting for dealer2player buffered fifo
-`dealer2player'@dots{}
+This means that two FIFOs (a.k.a. named pipes) are to be used for
+communication, @code{player2dealer} from the player to the dealer and
+@code{dealer2player} for the dealer to the player. If these FIFOs do not
+exist, they are created by libreblackjack upon execution.
+
+The player this time is implemented as an awk script, whose input should
+be read from @code{dealer2player} and whose output should be written to
+@code{player2dealer}. To run the game, execute libreblackjack in one
+terminal making sure the current directory is where the
+@code{libreblackjack.ini} file exists. It should print a message telling
+that it is waiting for someone to be at the other side of the named
+pipes:
 
 @verbatim
+$ libreblackjack
+[...]
+waiting for dealer2player buffered fifo 'dealer2player'...
+@end verbatim
 
 In another terminal run the player
-@end verbatim
-
-./mimic-the-dealer.awk < dealer2player > player2dealer
 
 @verbatim
-
-Both dealer and player may be run in the same terminal putting the first one on the background:
+$ ./mimic-the-dealer.awk < dealer2player > player2dealer
 @end verbatim
 
-rm -f mimic_d2p mimic_p2d mkfifo mimic_d2p mimic_p2d blackjack & gawk -f
-mimic-the-dealer.awk < mimic_d2p > mimic_p2d
+Both dealer and player may be run in the same terminal putting the first
+one on the background:
 
 @verbatim
+rm -f mimic_d2p mimic_p2d
+mkfifo mimic_d2p mimic_p2d
+blackjack &
+gawk -f mimic-the-dealer.awk < mimic_d2p > mimic_p2d
+@end verbatim
 
-To understand the decisions taken by the player, we have to remember that when Libre Blackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
+To understand the decisions taken by the player, we have to remember
+that when Libre@ Blackjack receives the command @code{count} asking for
+the current player's count, it returns a positive number for hard hands
+and a negative number for soft hands. The instructions @code{fflush()}
+are needed in order to avoid deadlocks on the named pipes:
 
-```awk
+@verbatim
 ##!/usr/bin/gawk -f
 function abs(x){return ( x >= 0 ) ? x : -x } 
 
@@ -721,6 +780,51 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 /bye/ {
   exit;
 }
+@end verbatim
+
+@verbatim
+---
+rules:
+  decks:                  6
+  hands:                  100000
+  hit_soft_17:            1
+  double_after_split:     1
+  blackjack_pays:         1.5
+  rng_seed:               -1448949563
+  number_of_burnt_cards:  0
+  no_negative_bankroll:   0
+  max_bet:                0
+  penetration:            0.75
+  penetration_sigma:      0.05
+cpu:
+  user:             0.631905
+  system:           1.19576
+  wall:             2.15273
+  second_per_hand:  2.2e-05
+  hands_per_second: 4.6e+04
+player: 
+  wins:               0.41044
+  pushes:             0.09695
+  losses:             0.49261
+  dealer_blackjacks:  0.04658
+  player_blackjacks:  0.04663
+  dealer_busts:       0.18984
+  player_busts:       0.27268
+  doubled_hands:      0
+  doubled_wins:       0
+  insured_hands:      0
+  insured_wins:       0
+  number_of_hands:    100000
+  number_of_shuffles: 2326
+  total_money_waged:  100000
+  worst_bankroll:     -5996.5
+  final_bankroll:     -5994.5
+  return:             -0.059945
+  variance:            0.955017
+  deviation:           0.97725
+  error:               0.00309034
+  result:             "(-6.0 ± 0.6) %"
+...
 @end verbatim
 
 @quotation
@@ -822,6 +926,2083 @@ pairs)
 
 The results are given as the expected value in percentage with the
 uncertainty (one standard deviation) in the last significant digit.
+
+@multitable {s12-A} {Number of hands} {-0.11506 (0.006)} {-0.21475 (0.003)} {-0.24466 (0.005)} 
+@headitem 
+Hand
+ @tab Number of hands
+ @tab Stand
+ @tab Double
+ @tab Hit
+@item 
+h20-2
+ @tab 1000
+ @tab 0.631 (0.03)
+ @tab -0.844 (0.02)
+ @tab -1.722 (0.03)
+@item 
+h20-3
+ @tab 1000
+ @tab 0.618 (0.03)
+ @tab -0.866 (0.02)
+ @tab -1.714 (0.03)
+@item 
+h20-4
+ @tab 1000
+ @tab 0.648 (0.03)
+ @tab -0.899 (0.01)
+ @tab -1.718 (0.03)
+@item 
+h20-5
+ @tab 1000
+ @tab 0.673 (0.03)
+ @tab -0.874 (0.02)
+ @tab -1.718 (0.03)
+@item 
+h20-6
+ @tab 1000
+ @tab 0.684 (0.03)
+ @tab -0.855 (0.02)
+ @tab -1.722 (0.03)
+@item 
+h20-7
+ @tab 1000
+ @tab 0.759 (0.03)
+ @tab -0.844 (0.02)
+ @tab -1.698 (0.03)
+@item 
+h20-8
+ @tab 1000
+ @tab 0.76 (0.03)
+ @tab -0.846 (0.02)
+ @tab -1.692 (0.03)
+@item 
+h20-9
+ @tab 1000
+ @tab 0.756 (0.03)
+ @tab -0.83 (0.02)
+ @tab -1.7 (0.03)
+@item 
+h20-T
+ @tab 1000
+ @tab 0.477 (0.03)
+ @tab -0.853 (0.02)
+ @tab -1.62 (0.03)
+@item 
+h20-A
+ @tab 1000
+ @tab 0.034 (0.03)
+ @tab -0.888 (0.01)
+ @tab -1.518 (0.03)
+@item 
+h19-2
+ @tab 1000
+ @tab 0.375 (0.04)
+ @tab -0.741 (0.02)
+ @tab -1.43 (0.04)
+@item 
+h19-3
+ @tab 1000
+ @tab 0.434 (0.04)
+ @tab -0.704 (0.02)
+ @tab -1.474 (0.04)
+@item 
+h19-4
+ @tab 1000
+ @tab 0.426 (0.04)
+ @tab -0.756 (0.02)
+ @tab -1.436 (0.04)
+@item 
+h19-5
+ @tab 1000
+ @tab 0.44 (0.04)
+ @tab -0.725 (0.02)
+ @tab -1.414 (0.04)
+@item 
+h19-6
+ @tab 1000
+ @tab 0.436 (0.04)
+ @tab -0.734 (0.02)
+ @tab -1.394 (0.04)
+@item 
+h19-7
+ @tab 1000
+ @tab 0.609 (0.04)
+ @tab -0.734 (0.02)
+ @tab -1.418 (0.04)
+@item 
+h19-8
+ @tab 1000
+ @tab 0.673 (0.05)
+ @tab -0.727 (0.02)
+ @tab -1.378 (0.05)
+@item 
+h19-9
+ @tab 1000
+ @tab 0.298 (0.04)
+ @tab -0.705 (0.02)
+ @tab -1.486 (0.04)
+@item 
+h19-T
+ @tab 1000
+ @tab -0.015 (0.04)
+ @tab -0.758 (0.02)
+ @tab -1.413 (0.04)
+@item 
+h19-A
+ @tab 1000
+ @tab -0.163 (0.04)
+ @tab -0.823 (0.02)
+ @tab -1.336 (0.04)
+@item 
+h18-2
+ @tab 1000
+ @tab 0.094 (0.05)
+ @tab -0.652 (0.02)
+ @tab -1.276 (0.05)
+@item 
+h18-3
+ @tab 1000
+ @tab 0.173 (0.05)
+ @tab -0.624 (0.02)
+ @tab -1.266 (0.05)
+@item 
+h18-4
+ @tab 1000
+ @tab 0.162 (0.05)
+ @tab -0.631 (0.02)
+ @tab -1.23 (0.05)
+@item 
+h18-5
+ @tab 1000
+ @tab 0.171 (0.05)
+ @tab -0.598 (0.02)
+ @tab -1.27 (0.05)
+@item 
+h18-6
+ @tab 1000
+ @tab 0.216 (0.05)
+ @tab -0.627 (0.02)
+ @tab -1.204 (0.05)
+@item 
+h18-7
+ @tab 1000
+ @tab 0.398 (0.05)
+ @tab -0.568 (0.03)
+ @tab -1.212 (0.05)
+@item 
+h18-8
+ @tab 1000
+ @tab 0.125 (0.05)
+ @tab -0.628 (0.02)
+ @tab -1.188 (0.05)
+@item 
+h18-9
+ @tab 1000
+ @tab -0.202 (0.05)
+ @tab -0.583 (0.02)
+ @tab -1.238 (0.05)
+@item 
+h18-T
+ @tab 1000
+ @tab -0.236 (0.05)
+ @tab -0.726 (0.02)
+ @tab -1.221 (0.05)
+@item 
+h18-A
+ @tab 1000
+ @tab -0.448 (0.04)
+ @tab -0.753 (0.02)
+ @tab -1.14 (0.04)
+@item 
+h17-2
+ @tab 1000
+ @tab -0.156 (0.05)
+ @tab -0.57 (0.03)
+ @tab -0.992 (0.05)
+@item 
+h17-3
+ @tab 1000
+ @tab -0.158 (0.05)
+ @tab -0.557 (0.03)
+ @tab -1.058 (0.05)
+@item 
+h17-4
+ @tab 1000
+ @tab -0.088 (0.05)
+ @tab -0.548 (0.03)
+ @tab -1.074 (0.05)
+@item 
+h17-5
+ @tab 1000
+ @tab -0.021 (0.05)
+ @tab -0.531 (0.03)
+ @tab -1.058 (0.05)
+@item 
+h17-6
+ @tab 1000
+ @tab 0.042 (0.05)
+ @tab -0.533 (0.03)
+ @tab -1.054 (0.05)
+@item 
+h17-7
+ @tab 1000
+ @tab -0.125 (0.05)
+ @tab -0.494 (0.03)
+ @tab -1.03 (0.05)
+@item 
+h17-8
+ @tab 1000
+ @tab -0.375 (0.05)
+ @tab -0.574 (0.03)
+ @tab -1.05 (0.05)
+@item 
+h17-9
+ @tab 1000
+ @tab -0.402 (0.05)
+ @tab -0.525 (0.03)
+ @tab -1.138 (0.05)
+@item 
+h17-T
+ @tab 1000
+ @tab -0.489 (0.05)
+ @tab -0.623 (0.02)
+ @tab -1.211 (0.05)
+@item 
+h17-A
+ @tab 1000
+ @tab -0.651 (0.04)
+ @tab -0.721 (0.02)
+ @tab -1.093 (0.04)
+@item 
+h16-2
+ @tab 1000
+ @tab -0.282 (0.05)
+ @tab -0.438 (0.03)
+ @tab -1.01 (0.05)
+@item 
+h16-3
+ @tab 1000
+ @tab -0.24 (0.05)
+ @tab -0.508 (0.03)
+ @tab -0.99 (0.05)
+@item 
+h16-4
+ @tab 1000
+ @tab -0.196 (0.05)
+ @tab -0.469 (0.03)
+ @tab -0.976 (0.05)
+@item 
+h16-5
+ @tab 1000
+ @tab -0.222 (0.06)
+ @tab -0.423 (0.03)
+ @tab -0.874 (0.06)
+@item 
+h16-6
+ @tab 1000
+ @tab -0.106 (0.05)
+ @tab -0.473 (0.03)
+ @tab -0.976 (0.05)
+@item 
+h16-7
+ @tab 1000
+ @tab -0.522 (0.06)
+ @tab -0.412 (0.03)
+ @tab -0.788 (0.06)
+@item 
+h16-8
+ @tab 1000
+ @tab -0.524 (0.05)
+ @tab -0.433 (0.03)
+ @tab -0.934 (0.05)
+@item 
+h16-9
+ @tab 10000
+ @tab -0.5468 (0.02)
+ @tab -0.4897 (0.008)
+ @tab -1.0266 (0.02)
+@item 
+h16-T
+ @tab 1000000
+ @tab -0.575524 (0)
+ @tab -0.575795 (0)
+ @tab -1.07298 (0)
+@item 
+h16-A
+ @tab 10000
+ @tab -0.7306 (0.01)
+ @tab -0.6893 (0.007)
+ @tab -1.045 (0.01)
+@item 
+h15-2
+ @tab 1000
+ @tab -0.304 (0.05)
+ @tab -0.42 (0.03)
+ @tab -0.96 (0.05)
+@item 
+h15-3
+ @tab 1000
+ @tab -0.186 (0.05)
+ @tab -0.353 (0.03)
+ @tab -0.88 (0.05)
+@item 
+h15-4
+ @tab 1000
+ @tab -0.176 (0.06)
+ @tab -0.384 (0.03)
+ @tab -0.7 (0.06)
+@item 
+h15-5
+ @tab 1000
+ @tab -0.152 (0.06)
+ @tab -0.371 (0.03)
+ @tab -0.682 (0.06)
+@item 
+h15-6
+ @tab 1000
+ @tab -0.166 (0.06)
+ @tab -0.348 (0.03)
+ @tab -0.73 (0.06)
+@item 
+h15-7
+ @tab 1000
+ @tab -0.524 (0.06)
+ @tab -0.382 (0.03)
+ @tab -0.776 (0.06)
+@item 
+h15-8
+ @tab 10000
+ @tab -0.5124 (0.02)
+ @tab -0.4169 (0.009)
+ @tab -0.8406 (0.02)
+@item 
+h15-9
+ @tab 1000
+ @tab -0.596 (0.05)
+ @tab -0.425 (0.03)
+ @tab -0.942 (0.05)
+@item 
+h15-T
+ @tab 100000
+ @tab -0.57872 (0.005)
+ @tab -0.54447 (0.003)
+ @tab -1.01351 (0.005)
+@item 
+h15-A
+ @tab 1000
+ @tab -0.724 (0.04)
+ @tab -0.662 (0.02)
+ @tab -1.028 (0.04)
+@item 
+h14-2
+ @tab 10000
+ @tab -0.3006 (0.02)
+ @tab -0.3675 (0.009)
+ @tab -0.7454 (0.02)
+@item 
+h14-3
+ @tab 10000
+ @tab -0.2476 (0.02)
+ @tab -0.3417 (0.009)
+ @tab -0.6788 (0.02)
+@item 
+h14-4
+ @tab 1000
+ @tab -0.222 (0.06)
+ @tab -0.381 (0.03)
+ @tab -0.688 (0.06)
+@item 
+h14-5
+ @tab 1000
+ @tab -0.128 (0.06)
+ @tab -0.271 (0.03)
+ @tab -0.734 (0.06)
+@item 
+h14-6
+ @tab 10000
+ @tab -0.1314 (0.02)
+ @tab -0.3164 (0.009)
+ @tab -0.619 (0.02)
+@item 
+h14-7
+ @tab 1000
+ @tab -0.49 (0.06)
+ @tab -0.322 (0.03)
+ @tab -0.62 (0.06)
+@item 
+h14-8
+ @tab 1000
+ @tab -0.54 (0.06)
+ @tab -0.366 (0.03)
+ @tab -0.828 (0.06)
+@item 
+h14-9
+ @tab 1000
+ @tab -0.538 (0.05)
+ @tab -0.411 (0.03)
+ @tab -0.924 (0.05)
+@item 
+h14-T
+ @tab 10000
+ @tab -0.5848 (0.02)
+ @tab -0.5143 (0.008)
+ @tab -0.9248 (0.02)
+@item 
+h14-A
+ @tab 1000
+ @tab -0.718 (0.04)
+ @tab -0.576 (0.02)
+ @tab -0.902 (0.04)
+@item 
+h13-2
+ @tab 100000
+ @tab -0.28324 (0.006)
+ @tab -0.30386 (0.003)
+ @tab -0.62712 (0.006)
+@item 
+h13-3
+ @tab 10000
+ @tab -0.2492 (0.02)
+ @tab -0.2861 (0.009)
+ @tab -0.5528 (0.02)
+@item 
+h13-4
+ @tab 1000
+ @tab -0.206 (0.06)
+ @tab -0.318 (0.03)
+ @tab -0.576 (0.06)
+@item 
+h13-5
+ @tab 1000
+ @tab -0.18 (0.06)
+ @tab -0.278 (0.03)
+ @tab -0.42 (0.06)
+@item 
+h13-6
+ @tab 1000
+ @tab -0.068 (0.06)
+ @tab -0.219 (0.03)
+ @tab -0.516 (0.06)
+@item 
+h13-7
+ @tab 1000
+ @tab -0.478 (0.06)
+ @tab -0.223 (0.03)
+ @tab -0.602 (0.06)
+@item 
+h13-8
+ @tab 1000
+ @tab -0.506 (0.06)
+ @tab -0.334 (0.03)
+ @tab -0.708 (0.06)
+@item 
+h13-9
+ @tab 1000
+ @tab -0.516 (0.06)
+ @tab -0.394 (0.03)
+ @tab -0.746 (0.06)
+@item 
+h13-T
+ @tab 1000
+ @tab -0.598 (0.05)
+ @tab -0.5 (0.03)
+ @tab -0.947 (0.05)
+@item 
+h13-A
+ @tab 1000
+ @tab -0.734 (0.04)
+ @tab -0.625 (0.02)
+ @tab -0.99 (0.04)
+@item 
+h12-2
+ @tab 100000
+ @tab -0.28482 (0.006)
+ @tab -0.24941 (0.003)
+ @tab -0.50748 (0.006)
+@item 
+h12-3
+ @tab 100000
+ @tab -0.24648 (0.006)
+ @tab -0.23454 (0.003)
+ @tab -0.4634 (0.006)
+@item 
+h12-4
+ @tab 100000
+ @tab -0.20318 (0.006)
+ @tab -0.21475 (0.003)
+ @tab -0.43554 (0.006)
+@item 
+h12-5
+ @tab 10000
+ @tab -0.1632 (0.02)
+ @tab -0.1934 (0.01)
+ @tab -0.4412 (0.02)
+@item 
+h12-6
+ @tab 10000
+ @tab -0.1184 (0.02)
+ @tab -0.1702 (0.01)
+ @tab -0.3416 (0.02)
+@item 
+h12-7
+ @tab 1000
+ @tab -0.462 (0.06)
+ @tab -0.264 (0.03)
+ @tab -0.538 (0.06)
+@item 
+h12-8
+ @tab 1000
+ @tab -0.526 (0.06)
+ @tab -0.281 (0.03)
+ @tab -0.552 (0.06)
+@item 
+h12-9
+ @tab 1000
+ @tab -0.536 (0.06)
+ @tab -0.366 (0.03)
+ @tab -0.706 (0.06)
+@item 
+h12-T
+ @tab 1000
+ @tab -0.556 (0.05)
+ @tab -0.434 (0.03)
+ @tab -0.745 (0.05)
+@item 
+h12-A
+ @tab 1000
+ @tab -0.728 (0.05)
+ @tab -0.543 (0.03)
+ @tab -0.841 (0.05)
+@item 
+h11-2
+ @tab 1000
+ @tab -0.316 (0.06)
+ @tab 0.25 (0.03)
+ @tab 0.476 (0.06)
+@item 
+h11-3
+ @tab 1000
+ @tab -0.204 (0.06)
+ @tab 0.288 (0.03)
+ @tab 0.566 (0.06)
+@item 
+h11-4
+ @tab 1000
+ @tab -0.224 (0.06)
+ @tab 0.296 (0.03)
+ @tab 0.636 (0.06)
+@item 
+h11-5
+ @tab 1000
+ @tab -0.192 (0.06)
+ @tab 0.286 (0.03)
+ @tab 0.62 (0.06)
+@item 
+h11-6
+ @tab 1000
+ @tab -0.14 (0.06)
+ @tab 0.282 (0.03)
+ @tab 0.626 (0.06)
+@item 
+h11-7
+ @tab 1000
+ @tab -0.516 (0.06)
+ @tab 0.271 (0.03)
+ @tab 0.46 (0.06)
+@item 
+h11-8
+ @tab 1000
+ @tab -0.494 (0.06)
+ @tab 0.193 (0.03)
+ @tab 0.342 (0.06)
+@item 
+h11-9
+ @tab 10000
+ @tab -0.5302 (0.02)
+ @tab 0.184 (0.009)
+ @tab 0.279 (0.02)
+@item 
+h11-T
+ @tab 10000
+ @tab -0.5806 (0.02)
+ @tab 0.0312 (0.01)
+ @tab 0.076 (0.02)
+@item 
+h11-A
+ @tab 100000
+ @tab -0.72378 (0.005)
+ @tab -0.2353 (0.003)
+ @tab -0.24466 (0.005)
+@item 
+h10-2
+ @tab 1000
+ @tab -0.318 (0.06)
+ @tab 0.116 (0.03)
+ @tab 0.386 (0.06)
+@item 
+h10-3
+ @tab 1000
+ @tab -0.226 (0.06)
+ @tab 0.146 (0.03)
+ @tab 0.466 (0.06)
+@item 
+h10-4
+ @tab 1000
+ @tab -0.212 (0.06)
+ @tab 0.235 (0.03)
+ @tab 0.582 (0.06)
+@item 
+h10-5
+ @tab 1000
+ @tab -0.184 (0.06)
+ @tab 0.279 (0.03)
+ @tab 0.45 (0.06)
+@item 
+h10-6
+ @tab 1000
+ @tab -0.118 (0.06)
+ @tab 0.314 (0.03)
+ @tab 0.592 (0.06)
+@item 
+h10-7
+ @tab 1000
+ @tab -0.46 (0.06)
+ @tab 0.267 (0.03)
+ @tab 0.514 (0.06)
+@item 
+h10-8
+ @tab 10000
+ @tab -0.517 (0.02)
+ @tab 0.1957 (0.009)
+ @tab 0.2802 (0.02)
+@item 
+h10-9
+ @tab 1000
+ @tab -0.546 (0.06)
+ @tab 0.129 (0.03)
+ @tab 0.22 (0.06)
+@item 
+h10-T
+ @tab 10000
+ @tab -0.5862 (0.02)
+ @tab -0.0588 (0.009)
+ @tab -0.1086 (0.02)
+@item 
+h10-A
+ @tab 1000
+ @tab -0.696 (0.05)
+ @tab -0.29 (0.03)
+ @tab -0.206 (0.05)
+@item 
+h9-2
+ @tab 1000
+ @tab -0.248 (0.06)
+ @tab 0.088 (0.03)
+ @tab -0.006 (0.06)
+@item 
+h9-3
+ @tab 10000
+ @tab -0.255 (0.02)
+ @tab 0.0932 (0.01)
+ @tab 0.1294 (0.02)
+@item 
+h9-4
+ @tab 10000
+ @tab -0.2024 (0.02)
+ @tab 0.1175 (0.01)
+ @tab 0.19 (0.02)
+@item 
+h9-5
+ @tab 1000
+ @tab -0.182 (0.06)
+ @tab 0.168 (0.03)
+ @tab 0.272 (0.06)
+@item 
+h9-6
+ @tab 10000
+ @tab -0.1058 (0.02)
+ @tab 0.1937 (0.009)
+ @tab 0.2904 (0.02)
+@item 
+h9-7
+ @tab 10000
+ @tab -0.4702 (0.02)
+ @tab 0.1666 (0.009)
+ @tab 0.0708 (0.02)
+@item 
+h9-8
+ @tab 1000
+ @tab -0.524 (0.06)
+ @tab 0.093 (0.03)
+ @tab -0.024 (0.06)
+@item 
+h9-9
+ @tab 1000
+ @tab -0.536 (0.06)
+ @tab -0.067 (0.03)
+ @tab -0.298 (0.06)
+@item 
+h9-T
+ @tab 1000
+ @tab -0.618 (0.06)
+ @tab -0.191 (0.03)
+ @tab -0.527 (0.06)
+@item 
+h9-A
+ @tab 1000
+ @tab -0.708 (0.05)
+ @tab -0.383 (0.03)
+ @tab -0.65 (0.05)
+@item 
+h8-2
+ @tab 1000
+ @tab -0.286 (0.06)
+ @tab -0.037 (0.03)
+ @tab -0.18 (0.06)
+@item 
+h8-3
+ @tab 1000
+ @tab -0.226 (0.06)
+ @tab -0.092 (0.03)
+ @tab -0.198 (0.06)
+@item 
+h8-4
+ @tab 1000
+ @tab -0.22 (0.06)
+ @tab 0.084 (0.03)
+ @tab -0.168 (0.06)
+@item 
+h8-5
+ @tab 10000
+ @tab -0.164 (0.02)
+ @tab 0.0565 (0.01)
+ @tab 0.0248 (0.02)
+@item 
+h8-6
+ @tab 100000
+ @tab -0.11954 (0.006)
+ @tab 0.10471 (0.003)
+ @tab 0.08198 (0.006)
+@item 
+h8-7
+ @tab 1000
+ @tab -0.54 (0.06)
+ @tab 0.088 (0.03)
+ @tab -0.212 (0.06)
+@item 
+h8-8
+ @tab 1000
+ @tab -0.516 (0.06)
+ @tab 0 (0.03)
+ @tab -0.458 (0.06)
+@item 
+h8-9
+ @tab 1000
+ @tab -0.548 (0.06)
+ @tab -0.195 (0.03)
+ @tab -0.668 (0.06)
+@item 
+h8-T
+ @tab 1000
+ @tab -0.608 (0.05)
+ @tab -0.323 (0.03)
+ @tab -0.774 (0.05)
+@item 
+h8-A
+ @tab 1000
+ @tab -0.75 (0.05)
+ @tab -0.464 (0.03)
+ @tab -0.884 (0.05)
+@item 
+h7-2
+ @tab 1000
+ @tab -0.326 (0.06)
+ @tab -0.073 (0.03)
+ @tab -0.414 (0.06)
+@item 
+h7-3
+ @tab 1000
+ @tab -0.21 (0.06)
+ @tab -0.075 (0.03)
+ @tab -0.348 (0.06)
+@item 
+h7-4
+ @tab 1000
+ @tab -0.21 (0.06)
+ @tab -0.02 (0.03)
+ @tab -0.36 (0.06)
+@item 
+h7-5
+ @tab 1000
+ @tab -0.132 (0.06)
+ @tab 0.075 (0.03)
+ @tab -0.13 (0.06)
+@item 
+h7-6
+ @tab 1000
+ @tab -0.122 (0.06)
+ @tab 0.076 (0.03)
+ @tab -0.13 (0.06)
+@item 
+h7-7
+ @tab 1000
+ @tab -0.452 (0.06)
+ @tab -0.066 (0.03)
+ @tab -0.492 (0.06)
+@item 
+h7-8
+ @tab 1000
+ @tab -0.522 (0.05)
+ @tab -0.198 (0.03)
+ @tab -0.892 (0.05)
+@item 
+h7-9
+ @tab 1000
+ @tab -0.562 (0.05)
+ @tab -0.275 (0.03)
+ @tab -0.994 (0.05)
+@item 
+h7-T
+ @tab 1000
+ @tab -0.57 (0.05)
+ @tab -0.351 (0.03)
+ @tab -0.923 (0.05)
+@item 
+h7-A
+ @tab 1000
+ @tab -0.716 (0.04)
+ @tab -0.546 (0.03)
+ @tab -1.077 (0.04)
+@item 
+h6-2
+ @tab 1000
+ @tab -0.254 (0.06)
+ @tab -0.126 (0.03)
+ @tab -0.472 (0.06)
+@item 
+h6-3
+ @tab 10000
+ @tab -0.244 (0.02)
+ @tab -0.1126 (0.01)
+ @tab -0.4712 (0.02)
+@item 
+h6-4
+ @tab 1000
+ @tab -0.192 (0.06)
+ @tab -0.036 (0.03)
+ @tab -0.396 (0.06)
+@item 
+h6-5
+ @tab 1000
+ @tab -0.216 (0.06)
+ @tab -0.097 (0.03)
+ @tab -0.322 (0.06)
+@item 
+h6-6
+ @tab 1000
+ @tab -0.12 (0.06)
+ @tab -0.008 (0.03)
+ @tab -0.178 (0.06)
+@item 
+h6-7
+ @tab 1000
+ @tab -0.488 (0.05)
+ @tab -0.153 (0.03)
+ @tab -0.942 (0.05)
+@item 
+h6-8
+ @tab 1000
+ @tab -0.536 (0.05)
+ @tab -0.221 (0.03)
+ @tab -0.998 (0.05)
+@item 
+h6-9
+ @tab 1000
+ @tab -0.536 (0.05)
+ @tab -0.309 (0.03)
+ @tab -1.058 (0.05)
+@item 
+h6-T
+ @tab 1000
+ @tab -0.58 (0.05)
+ @tab -0.406 (0.03)
+ @tab -1.127 (0.05)
+@item 
+h6-A
+ @tab 1000
+ @tab -0.706 (0.04)
+ @tab -0.578 (0.02)
+ @tab -1.111 (0.04)
+@item 
+h5-2
+ @tab 1000
+ @tab -0.284 (0.06)
+ @tab -0.114 (0.03)
+ @tab -0.576 (0.06)
+@item 
+h5-3
+ @tab 1000
+ @tab -0.22 (0.06)
+ @tab -0.127 (0.03)
+ @tab -0.44 (0.06)
+@item 
+h5-4
+ @tab 1000
+ @tab -0.232 (0.06)
+ @tab -0.058 (0.03)
+ @tab -0.504 (0.06)
+@item 
+h5-5
+ @tab 1000
+ @tab -0.174 (0.06)
+ @tab -0.02 (0.03)
+ @tab -0.224 (0.06)
+@item 
+h5-6
+ @tab 1000
+ @tab -0.134 (0.06)
+ @tab -0.015 (0.03)
+ @tab -0.248 (0.06)
+@item 
+h5-7
+ @tab 1000
+ @tab -0.454 (0.06)
+ @tab -0.167 (0.03)
+ @tab -0.964 (0.06)
+@item 
+h5-8
+ @tab 1000
+ @tab -0.536 (0.05)
+ @tab -0.244 (0.03)
+ @tab -1.088 (0.05)
+@item 
+h5-9
+ @tab 1000
+ @tab -0.556 (0.05)
+ @tab -0.324 (0.03)
+ @tab -1.08 (0.05)
+@item 
+h5-T
+ @tab 1000
+ @tab -0.526 (0.05)
+ @tab -0.392 (0.03)
+ @tab -1.112 (0.05)
+@item 
+h5-A
+ @tab 1000
+ @tab -0.744 (0.04)
+ @tab -0.522 (0.03)
+ @tab -1.1 (0.04)
+@item 
+h4-2
+ @tab 1000
+ @tab -0.286 (0.06)
+ @tab -0.182 (0.03)
+ @tab -0.512 (0.06)
+@item 
+h4-3
+ @tab 1000
+ @tab -0.252 (0.06)
+ @tab -0.141 (0.03)
+ @tab -0.496 (0.06)
+@item 
+h4-4
+ @tab 1000
+ @tab -0.206 (0.06)
+ @tab -0.052 (0.03)
+ @tab -0.348 (0.06)
+@item 
+h4-5
+ @tab 1000
+ @tab -0.156 (0.06)
+ @tab -0.013 (0.03)
+ @tab -0.296 (0.06)
+@item 
+h4-6
+ @tab 1000
+ @tab -0.104 (0.06)
+ @tab 0.02 (0.03)
+ @tab -0.184 (0.06)
+@item 
+h4-7
+ @tab 1000
+ @tab -0.478 (0.06)
+ @tab -0.137 (0.03)
+ @tab -0.94 (0.06)
+@item 
+h4-8
+ @tab 1000
+ @tab -0.526 (0.05)
+ @tab -0.193 (0.03)
+ @tab -1.108 (0.05)
+@item 
+h4-9
+ @tab 1000
+ @tab -0.528 (0.05)
+ @tab -0.283 (0.03)
+ @tab -1.084 (0.05)
+@item 
+h4-T
+ @tab 1000
+ @tab -0.612 (0.05)
+ @tab -0.399 (0.03)
+ @tab -1.072 (0.05)
+@item 
+h4-A
+ @tab 1000
+ @tab -0.74 (0.04)
+ @tab -0.557 (0.03)
+ @tab -1.081 (0.04)
+@item 
+s20-2
+ @tab 1000
+ @tab 0.646 (0.06)
+ @tab 0.217 (0.03)
+ @tab 0.312 (0.06)
+@item 
+s20-3
+ @tab 1000
+ @tab 0.677 (0.06)
+ @tab 0.181 (0.03)
+ @tab 0.338 (0.06)
+@item 
+s20-4
+ @tab 1000
+ @tab 0.637 (0.06)
+ @tab 0.213 (0.03)
+ @tab 0.436 (0.06)
+@item 
+s20-5
+ @tab 10000
+ @tab 0.6604 (0.02)
+ @tab 0.2455 (0.009)
+ @tab 0.5394 (0.02)
+@item 
+s20-6
+ @tab 1000
+ @tab 0.694 (0.06)
+ @tab 0.281 (0.03)
+ @tab 0.524 (0.06)
+@item 
+s20-7
+ @tab 1000
+ @tab 0.753 (0.06)
+ @tab 0.304 (0.03)
+ @tab 0.488 (0.06)
+@item 
+s20-8
+ @tab 1000
+ @tab 0.777 (0.06)
+ @tab 0.229 (0.03)
+ @tab 0.274 (0.06)
+@item 
+s20-9
+ @tab 1000
+ @tab 0.733 (0.06)
+ @tab 0.138 (0.03)
+ @tab 0.098 (0.06)
+@item 
+s20-T
+ @tab 1000
+ @tab 0.438 (0.06)
+ @tab -0.057 (0.03)
+ @tab -0.038 (0.06)
+@item 
+s20-A
+ @tab 1000
+ @tab 0.067 (0.05)
+ @tab -0.272 (0.03)
+ @tab -0.341 (0.05)
+@item 
+s19-2
+ @tab 1000
+ @tab 0.389 (0.06)
+ @tab 0.092 (0.03)
+ @tab 0.256 (0.06)
+@item 
+s19-3
+ @tab 10000
+ @tab 0.39 (0.02)
+ @tab 0.1464 (0.009)
+ @tab 0.3168 (0.02)
+@item 
+s19-4
+ @tab 10000
+ @tab 0.4082 (0.02)
+ @tab 0.1816 (0.009)
+ @tab 0.3286 (0.02)
+@item 
+s19-5
+ @tab 100000
+ @tab 0.43517 (0.006)
+ @tab 0.20004 (0.003)
+ @tab 0.398 (0.006)
+@item 
+s19-6
+ @tab 1000000
+ @tab 0.453457 (0)
+ @tab 0.231529 (0)
+ @tab 0.460572 (0)
+@item 
+s19-7
+ @tab 1000
+ @tab 0.633 (0.06)
+ @tab 0.231 (0.03)
+ @tab 0.372 (0.06)
+@item 
+s19-8
+ @tab 1000
+ @tab 0.59 (0.06)
+ @tab 0.122 (0.03)
+ @tab 0.192 (0.06)
+@item 
+s19-9
+ @tab 1000
+ @tab 0.301 (0.06)
+ @tab -0.013 (0.03)
+ @tab -0.122 (0.06)
+@item 
+s19-T
+ @tab 1000
+ @tab -0.032 (0.06)
+ @tab -0.175 (0.03)
+ @tab -0.395 (0.06)
+@item 
+s19-A
+ @tab 1000
+ @tab -0.133 (0.05)
+ @tab -0.331 (0.03)
+ @tab -0.48 (0.05)
+@item 
+s18-2
+ @tab 1000000
+ @tab 0.109892 (0)
+ @tab 0.058827 (0)
+ @tab 0.117848 (0)
+@item 
+s18-3
+ @tab 10000
+ @tab 0.1328 (0.02)
+ @tab 0.1039 (0.01)
+ @tab 0.2114 (0.02)
+@item 
+s18-4
+ @tab 10000
+ @tab 0.1586 (0.02)
+ @tab 0.1282 (0.01)
+ @tab 0.2484 (0.02)
+@item 
+s18-5
+ @tab 1000
+ @tab 0.203 (0.06)
+ @tab 0.135 (0.03)
+ @tab 0.344 (0.06)
+@item 
+s18-6
+ @tab 10000
+ @tab 0.2239 (0.02)
+ @tab 0.1889 (0.009)
+ @tab 0.3842 (0.02)
+@item 
+s18-7
+ @tab 10000
+ @tab 0.3993 (0.02)
+ @tab 0.169 (0.009)
+ @tab 0.1994 (0.02)
+@item 
+s18-8
+ @tab 10000
+ @tab 0.1101 (0.02)
+ @tab 0.0447 (0.009)
+ @tab -0.0398 (0.02)
+@item 
+s18-9
+ @tab 10000
+ @tab -0.1749 (0.02)
+ @tab -0.0937 (0.009)
+ @tab -0.2754 (0.02)
+@item 
+s18-T
+ @tab 10000
+ @tab -0.2431 (0.02)
+ @tab -0.2043 (0.009)
+ @tab -0.388 (0.02)
+@item 
+s18-A
+ @tab 1000
+ @tab -0.494 (0.05)
+ @tab -0.405 (0.03)
+ @tab -0.662 (0.05)
+@item 
+s17-2
+ @tab 1000000
+ @tab -0.155882 (0)
+ @tab -0.006551 (0)
+ @tab -0.012158 (0)
+@item 
+s17-3
+ @tab 1000
+ @tab -0.113 (0.06)
+ @tab -0.008 (0.03)
+ @tab 0.096 (0.06)
+@item 
+s17-4
+ @tab 1000
+ @tab -0.06 (0.06)
+ @tab 0.018 (0.03)
+ @tab 0.112 (0.06)
+@item 
+s17-5
+ @tab 1000
+ @tab -0.003 (0.06)
+ @tab 0.071 (0.03)
+ @tab 0.314 (0.06)
+@item 
+s17-6
+ @tab 1000
+ @tab -0.015 (0.06)
+ @tab 0.11 (0.03)
+ @tab 0.252 (0.06)
+@item 
+s17-7
+ @tab 1000
+ @tab -0.086 (0.06)
+ @tab 0.059 (0.03)
+ @tab -0.042 (0.06)
+@item 
+s17-8
+ @tab 1000
+ @tab -0.349 (0.06)
+ @tab -0.064 (0.03)
+ @tab -0.234 (0.06)
+@item 
+s17-9
+ @tab 1000
+ @tab -0.408 (0.06)
+ @tab -0.211 (0.03)
+ @tab -0.332 (0.06)
+@item 
+s17-T
+ @tab 1000
+ @tab -0.455 (0.06)
+ @tab -0.209 (0.03)
+ @tab -0.507 (0.06)
+@item 
+s17-A
+ @tab 1000
+ @tab -0.649 (0.05)
+ @tab -0.479 (0.03)
+ @tab -0.649 (0.05)
+@item 
+s16-2
+ @tab 1000
+ @tab -0.258 (0.06)
+ @tab 0.002 (0.03)
+ @tab -0.158 (0.06)
+@item 
+s16-3
+ @tab 10000
+ @tab -0.2604 (0.02)
+ @tab 0.0147 (0.01)
+ @tab -0.0448 (0.02)
+@item 
+s16-4
+ @tab 1000
+ @tab -0.162 (0.06)
+ @tab -0.037 (0.03)
+ @tab 0.07 (0.06)
+@item 
+s16-5
+ @tab 10000
+ @tab -0.1576 (0.02)
+ @tab 0.063 (0.01)
+ @tab 0.133 (0.02)
+@item 
+s16-6
+ @tab 10000
+ @tab -0.1218 (0.02)
+ @tab 0.0883 (0.01)
+ @tab 0.183 (0.02)
+@item 
+s16-7
+ @tab 1000
+ @tab -0.484 (0.06)
+ @tab 0.027 (0.03)
+ @tab -0.194 (0.06)
+@item 
+s16-8
+ @tab 1000
+ @tab -0.556 (0.06)
+ @tab -0.06 (0.03)
+ @tab -0.346 (0.06)
+@item 
+s16-9
+ @tab 1000
+ @tab -0.548 (0.06)
+ @tab -0.105 (0.03)
+ @tab -0.482 (0.06)
+@item 
+s16-T
+ @tab 1000
+ @tab -0.562 (0.06)
+ @tab -0.271 (0.03)
+ @tab -0.474 (0.06)
+@item 
+s16-A
+ @tab 1000
+ @tab -0.724 (0.05)
+ @tab -0.471 (0.03)
+ @tab -0.679 (0.05)
+@item 
+s15-2
+ @tab 10000
+ @tab -0.2686 (0.02)
+ @tab -0.0012 (0.01)
+ @tab -0.0432 (0.02)
+@item 
+s15-3
+ @tab 100000
+ @tab -0.24634 (0.006)
+ @tab 0.02229 (0.003)
+ @tab -0.0134 (0.006)
+@item 
+s15-4
+ @tab 10000
+ @tab -0.212 (0.02)
+ @tab 0.0491 (0.01)
+ @tab 0.0798 (0.02)
+@item 
+s15-5
+ @tab 10000
+ @tab -0.1584 (0.02)
+ @tab 0.0804 (0.01)
+ @tab 0.1388 (0.02)
+@item 
+s15-6
+ @tab 1000
+ @tab -0.092 (0.06)
+ @tab 0.109 (0.03)
+ @tab 0.23 (0.06)
+@item 
+s15-7
+ @tab 10000
+ @tab -0.4756 (0.02)
+ @tab 0.0379 (0.01)
+ @tab -0.1748 (0.02)
+@item 
+s15-8
+ @tab 1000
+ @tab -0.542 (0.06)
+ @tab -0.039 (0.03)
+ @tab -0.34 (0.06)
+@item 
+s15-9
+ @tab 1000
+ @tab -0.554 (0.06)
+ @tab -0.086 (0.03)
+ @tab -0.398 (0.06)
+@item 
+s15-T
+ @tab 1000
+ @tab -0.582 (0.06)
+ @tab -0.237 (0.03)
+ @tab -0.63 (0.06)
+@item 
+s15-A
+ @tab 1000
+ @tab -0.71 (0.05)
+ @tab -0.448 (0.03)
+ @tab -0.664 (0.05)
+@item 
+s14-2
+ @tab 1000
+ @tab -0.262 (0.06)
+ @tab 0.03 (0.03)
+ @tab -0.134 (0.06)
+@item 
+s14-3
+ @tab 10000
+ @tab -0.2244 (0.02)
+ @tab 0.0605 (0.01)
+ @tab 0.0012 (0.02)
+@item 
+s14-4
+ @tab 100000
+ @tab -0.20532 (0.006)
+ @tab 0.07772 (0.003)
+ @tab 0.0549 (0.006)
+@item 
+s14-5
+ @tab 10000
+ @tab -0.1508 (0.02)
+ @tab 0.0975 (0.01)
+ @tab 0.1382 (0.02)
+@item 
+s14-6
+ @tab 1000
+ @tab -0.14 (0.06)
+ @tab 0.121 (0.03)
+ @tab 0.232 (0.06)
+@item 
+s14-7
+ @tab 1000
+ @tab -0.49 (0.06)
+ @tab 0.09 (0.03)
+ @tab -0.284 (0.06)
+@item 
+s14-8
+ @tab 1000
+ @tab -0.494 (0.06)
+ @tab -0.031 (0.03)
+ @tab -0.36 (0.06)
+@item 
+s14-9
+ @tab 1000
+ @tab -0.56 (0.06)
+ @tab -0.096 (0.03)
+ @tab -0.386 (0.06)
+@item 
+s14-T
+ @tab 1000
+ @tab -0.556 (0.06)
+ @tab -0.192 (0.03)
+ @tab -0.622 (0.06)
+@item 
+s14-A
+ @tab 1000
+ @tab -0.708 (0.05)
+ @tab -0.404 (0.03)
+ @tab -0.654 (0.05)
+@item 
+s13-2
+ @tab 1000
+ @tab -0.26 (0.06)
+ @tab 0.082 (0.03)
+ @tab -0.19 (0.06)
+@item 
+s13-3
+ @tab 10000
+ @tab -0.248 (0.02)
+ @tab 0.0618 (0.01)
+ @tab -0.0196 (0.02)
+@item 
+s13-4
+ @tab 10000
+ @tab -0.2056 (0.02)
+ @tab 0.0949 (0.01)
+ @tab 0.0602 (0.02)
+@item 
+s13-5
+ @tab 1000000
+ @tab -0.163838 (0)
+ @tab 0.130573 (0)
+ @tab 0.127766 (0)
+@item 
+s13-6
+ @tab 100000
+ @tab -0.11506 (0.006)
+ @tab 0.13519 (0.003)
+ @tab 0.18672 (0.006)
+@item 
+s13-7
+ @tab 1000
+ @tab -0.432 (0.06)
+ @tab 0.124 (0.03)
+ @tab -0.23 (0.06)
+@item 
+s13-8
+ @tab 1000
+ @tab -0.494 (0.06)
+ @tab 0.034 (0.03)
+ @tab -0.296 (0.06)
+@item 
+s13-9
+ @tab 1000
+ @tab -0.554 (0.06)
+ @tab -0.01 (0.03)
+ @tab -0.472 (0.06)
+@item 
+s13-T
+ @tab 1000
+ @tab -0.606 (0.06)
+ @tab -0.178 (0.03)
+ @tab -0.606 (0.06)
+@item 
+s13-A
+ @tab 1000
+ @tab -0.73 (0.05)
+ @tab -0.335 (0.03)
+ @tab -0.702 (0.05)
+@item 
+s12-2
+ @tab 10000
+ @tab -0.2868 (0.02)
+ @tab 0.0886 (0.01)
+ @tab -0.0724 (0.02)
+@item 
+s12-3
+ @tab 1000
+ @tab -0.182 (0.06)
+ @tab 0.121 (0.03)
+ @tab -0.02 (0.06)
+@item 
+s12-4
+ @tab 1000
+ @tab -0.24 (0.06)
+ @tab 0.207 (0.03)
+ @tab 0.042 (0.06)
+@item 
+s12-5
+ @tab 10000
+ @tab -0.1792 (0.02)
+ @tab 0.156 (0.01)
+ @tab 0.1094 (0.02)
+@item 
+s12-6
+ @tab 10000
+ @tab -0.1206 (0.02)
+ @tab 0.1582 (0.01)
+ @tab 0.2116 (0.02)
+@item 
+s12-7
+ @tab 1000
+ @tab -0.484 (0.06)
+ @tab 0.106 (0.03)
+ @tab -0.212 (0.06)
+@item 
+s12-8
+ @tab 1000
+ @tab -0.52 (0.06)
+ @tab 0.081 (0.03)
+ @tab -0.32 (0.06)
+@item 
+s12-9
+ @tab 1000
+ @tab -0.554 (0.06)
+ @tab -0.035 (0.03)
+ @tab -0.416 (0.06)
+@item 
+s12-T
+ @tab 1000
+ @tab -0.604 (0.06)
+ @tab -0.215 (0.03)
+ @tab -0.512 (0.06)
+@item 
+s12-A
+ @tab 1000
+ @tab -0.656 (0.05)
+ @tab -0.363 (0.03)
+ @tab -0.747 (0.05)
+@end multitable
+
+@multitable {p2-A} {Number of hands} {-0.08631 (0.006)} {-0.11174 (0.003)} 
+@headitem 
+Hand
+ @tab Number of hands
+ @tab Yes
+ @tab No
+@item 
+pA-2
+ @tab 1000
+ @tab 0.441 (0.05)
+ @tab 0.061 (0.03)
+@item 
+pA-3
+ @tab 1000
+ @tab 0.455 (0.05)
+ @tab 0.127 (0.03)
+@item 
+pA-4
+ @tab 1000
+ @tab 0.613 (0.05)
+ @tab 0.113 (0.03)
+@item 
+pA-5
+ @tab 1000
+ @tab 0.597 (0.05)
+ @tab 0.143 (0.03)
+@item 
+pA-6
+ @tab 1000
+ @tab 0.755 (0.05)
+ @tab 0.076 (0.06)
+@item 
+pA-7
+ @tab 1000
+ @tab 0.465 (0.05)
+ @tab 0.205 (0.03)
+@item 
+pA-8
+ @tab 1000
+ @tab 0.4 (0.05)
+ @tab 0.115 (0.03)
+@item 
+pA-9
+ @tab 1000
+ @tab 0.196 (0.05)
+ @tab 0.011 (0.03)
+@item 
+pA-T
+ @tab 1000
+ @tab -0.025 (0.05)
+ @tab -0.19 (0.03)
+@item 
+pA-A
+ @tab 1000
+ @tab -0.268 (0.04)
+ @tab -0.357 (0.03)
+@item 
+pT-2
+ @tab 1000
+ @tab 0.52 (0.05)
+ @tab 0.614 (0.02)
+@item 
+pT-3
+ @tab 1000
+ @tab 0.423 (0.05)
+ @tab 0.673 (0.02)
+@item 
+pT-4
+ @tab 1000
+ @tab 0.553 (0.05)
+ @tab 0.658 (0.02)
+@item 
+pT-5
+ @tab 1000
+ @tab 0.486 (0.05)
+ @tab 0.703 (0.02)
+@item 
+pT-6
+ @tab 1000
+ @tab 0.591 (0.05)
+ @tab 0.663 (0.02)
+@item 
+pT-7
+ @tab 1000
+ @tab 0.482 (0.05)
+ @tab 0.771 (0.02)
+@item 
+pT-8
+ @tab 1000
+ @tab 0.378 (0.05)
+ @tab 0.814 (0.02)
+@item 
+pT-9
+ @tab 1000
+ @tab 0.246 (0.04)
+ @tab 0.754 (0.02)
+@item 
+pT-T
+ @tab 1000
+ @tab 0.035 (0.05)
+ @tab 0.432 (0.02)
+@item 
+pT-A
+ @tab 1000
+ @tab -0.241 (0.04)
+ @tab 0.09 (0.03)
+@item 
+p9-2
+ @tab 10000
+ @tab 0.173 (0.02)
+ @tab 0.1071 (0.009)
+@item 
+p9-3
+ @tab 1000
+ @tab 0.291 (0.06)
+ @tab 0.132 (0.03)
+@item 
+p9-4
+ @tab 10000
+ @tab 0.2773 (0.02)
+ @tab 0.1663 (0.009)
+@item 
+p9-5
+ @tab 1000
+ @tab 0.422 (0.06)
+ @tab 0.157 (0.03)
+@item 
+p9-6
+ @tab 1000
+ @tab 0.362 (0.06)
+ @tab 0.206 (0.03)
+@item 
+p9-7
+ @tab 100000
+ @tab 0.37708 (0.005)
+ @tab 0.39894 (0.003)
+@item 
+p9-8
+ @tab 1000
+ @tab 0.233 (0.05)
+ @tab 0.073 (0.02)
+@item 
+p9-9
+ @tab 10000
+ @tab -0.0951 (0.02)
+ @tab -0.165 (0.009)
+@item 
+p9-T
+ @tab 1000
+ @tab -0.433 (0.05)
+ @tab -0.264 (0.03)
+@item 
+p9-A
+ @tab 100000
+ @tab -0.47946 (0.004)
+ @tab -0.46333 (0.003)
+@item 
+p8-2
+ @tab 1000
+ @tab -0.028 (0.07)
+ @tab -0.222 (0.03)
+@item 
+p8-3
+ @tab 1000
+ @tab 0.097 (0.07)
+ @tab -0.28 (0.03)
+@item 
+p8-4
+ @tab 1000
+ @tab 0.193 (0.07)
+ @tab -0.204 (0.03)
+@item 
+p8-5
+ @tab 1000
+ @tab 0.193 (0.07)
+ @tab -0.142 (0.03)
+@item 
+p8-6
+ @tab 1000
+ @tab 0.26 (0.07)
+ @tab -0.118 (0.03)
+@item 
+p8-7
+ @tab 1000
+ @tab 0.265 (0.06)
+ @tab -0.41 (0.03)
+@item 
+p8-8
+ @tab 1000
+ @tab -0.059 (0.06)
+ @tab -0.465 (0.03)
+@item 
+p8-9
+ @tab 10000
+ @tab -0.3916 (0.02)
+ @tab -0.5137 (0.008)
+@item 
+p8-T
+ @tab 1000
+ @tab -0.508 (0.05)
+ @tab -0.602 (0.03)
+@item 
+p8-A
+ @tab 1000000
+ @tab -0.681325 (0)
+ @tab -0.684029 (0)
+@item 
+p7-2
+ @tab 1000
+ @tab -0.11 (0.07)
+ @tab -0.344 (0.03)
+@item 
+p7-3
+ @tab 1000
+ @tab -0.111 (0.08)
+ @tab -0.248 (0.03)
+@item 
+p7-4
+ @tab 1000
+ @tab -0.002 (0.08)
+ @tab -0.198 (0.03)
+@item 
+p7-5
+ @tab 1000
+ @tab 0.132 (0.08)
+ @tab -0.23 (0.03)
+@item 
+p7-6
+ @tab 1000
+ @tab 0.05 (0.08)
+ @tab -0.172 (0.03)
+@item 
+p7-7
+ @tab 1000
+ @tab -0.167 (0.06)
+ @tab -0.331 (0.03)
+@item 
+p7-8
+ @tab 1000000
+ @tab -0.39019 (0)
+ @tab -0.371056 (0)
+@item 
+p7-9
+ @tab 1000
+ @tab -0.583 (0.06)
+ @tab -0.434 (0.03)
+@item 
+p7-T
+ @tab 1000
+ @tab -0.729 (0.05)
+ @tab -0.49 (0.03)
+@item 
+p7-A
+ @tab 1000
+ @tab -0.778 (0.04)
+ @tab -0.667 (0.02)
+@item 
+p6-2
+ @tab 100000
+ @tab -0.21344 (0.007)
+ @tab -0.25389 (0.003)
+@item 
+p6-3
+ @tab 10000
+ @tab -0.118 (0.02)
+ @tab -0.2393 (0.009)
+@item 
+p6-4
+ @tab 1000
+ @tab -0.09 (0.08)
+ @tab -0.25 (0.03)
+@item 
+p6-5
+ @tab 1000
+ @tab -0.023 (0.08)
+ @tab -0.16 (0.03)
+@item 
+p6-6
+ @tab 1000
+ @tab 0.169 (0.08)
+ @tab -0.106 (0.03)
+@item 
+p6-7
+ @tab 10000
+ @tab -0.2601 (0.02)
+ @tab -0.2155 (0.009)
+@item 
+p6-8
+ @tab 1000
+ @tab -0.346 (0.05)
+ @tab -0.25 (0.03)
+@item 
+p6-9
+ @tab 1000
+ @tab -0.592 (0.05)
+ @tab -0.314 (0.03)
+@item 
+p6-T
+ @tab 1000
+ @tab -0.588 (0.05)
+ @tab -0.419 (0.03)
+@item 
+p6-A
+ @tab 1000
+ @tab -0.799 (0.04)
+ @tab -0.539 (0.03)
+@item 
+p5-2
+ @tab 1000
+ @tab -0.081 (0.07)
+ @tab 0.406 (0.06)
+@item 
+p5-3
+ @tab 1000
+ @tab -0.192 (0.07)
+ @tab 0.384 (0.06)
+@item 
+p5-4
+ @tab 1000
+ @tab -0.072 (0.08)
+ @tab 0.45 (0.06)
+@item 
+p5-5
+ @tab 1000
+ @tab -0.018 (0.08)
+ @tab 0.548 (0.06)
+@item 
+p5-6
+ @tab 1000
+ @tab 0.103 (0.08)
+ @tab 0.586 (0.06)
+@item 
+p5-7
+ @tab 1000
+ @tab -0.188 (0.05)
+ @tab 0.516 (0.06)
+@item 
+p5-8
+ @tab 1000
+ @tab -0.229 (0.06)
+ @tab 0.332 (0.06)
+@item 
+p5-9
+ @tab 1000
+ @tab -0.595 (0.05)
+ @tab 0.1 (0.06)
+@item 
+p5-T
+ @tab 1000
+ @tab -0.703 (0.05)
+ @tab -0.058 (0.03)
+@item 
+p5-A
+ @tab 1000
+ @tab -0.792 (0.04)
+ @tab -0.37 (0.05)
+@item 
+p4-2
+ @tab 1000
+ @tab -0.196 (0.06)
+ @tab -0.024 (0.03)
+@item 
+p4-3
+ @tab 1000
+ @tab -0.141 (0.07)
+ @tab 0.008 (0.03)
+@item 
+p4-4
+ @tab 10000
+ @tab -0.0201 (0.02)
+ @tab 0.0318 (0.01)
+@item 
+p4-5
+ @tab 1000
+ @tab 0.227 (0.08)
+ @tab 0.059 (0.03)
+@item 
+p4-6
+ @tab 10000
+ @tab 0.1502 (0.02)
+ @tab 0.0797 (0.01)
+@item 
+p4-7
+ @tab 1000
+ @tab -0.175 (0.06)
+ @tab 0.104 (0.03)
+@item 
+p4-8
+ @tab 1000
+ @tab -0.3 (0.06)
+ @tab -0.026 (0.03)
+@item 
+p4-9
+ @tab 1000
+ @tab -0.584 (0.05)
+ @tab -0.254 (0.03)
+@item 
+p4-T
+ @tab 1000
+ @tab -0.528 (0.05)
+ @tab -0.283 (0.03)
+@item 
+p4-A
+ @tab 1000
+ @tab -0.761 (0.04)
+ @tab -0.511 (0.03)
+@item 
+p3-2
+ @tab 10000
+ @tab -0.1154 (0.02)
+ @tab -0.1628 (0.01)
+@item 
+p3-3
+ @tab 1000
+ @tab 0.009 (0.07)
+ @tab -0.156 (0.03)
+@item 
+p3-4
+ @tab 10000
+ @tab 0.0318 (0.02)
+ @tab -0.0634 (0.01)
+@item 
+p3-5
+ @tab 10000
+ @tab 0.0928 (0.02)
+ @tab -0.0301 (0.01)
+@item 
+p3-6
+ @tab 1000
+ @tab 0.208 (0.08)
+ @tab -0.009 (0.03)
+@item 
+p3-7
+ @tab 10000
+ @tab -0.0545 (0.02)
+ @tab -0.1646 (0.009)
+@item 
+p3-8
+ @tab 10000
+ @tab -0.2405 (0.02)
+ @tab -0.2107 (0.009)
+@item 
+p3-9
+ @tab 1000
+ @tab -0.418 (0.06)
+ @tab -0.239 (0.03)
+@item 
+p3-T
+ @tab 1000
+ @tab -0.556 (0.05)
+ @tab -0.412 (0.03)
+@item 
+p3-A
+ @tab 1000
+ @tab -0.718 (0.04)
+ @tab -0.489 (0.03)
+@item 
+p2-2
+ @tab 100000
+ @tab -0.08631 (0.006)
+ @tab -0.11174 (0.003)
+@item 
+p2-3
+ @tab 10000
+ @tab -0.0276 (0.02)
+ @tab -0.093 (0.01)
+@item 
+p2-4
+ @tab 10000
+ @tab 0.0193 (0.02)
+ @tab -0.0345 (0.01)
+@item 
+p2-5
+ @tab 10000
+ @tab 0.102 (0.02)
+ @tab -0.0088 (0.01)
+@item 
+p2-6
+ @tab 1000
+ @tab 0.209 (0.08)
+ @tab -0.019 (0.03)
+@item 
+p2-7
+ @tab 10000
+ @tab 0.0157 (0.02)
+ @tab -0.0907 (0.01)
+@item 
+p2-8
+ @tab 1000000
+ @tab -0.17563 (0)
+ @tab -0.159877 (0)
+@item 
+p2-9
+ @tab 10000
+ @tab -0.3596 (0.02)
+ @tab -0.2423 (0.009)
+@item 
+p2-T
+ @tab 1000
+ @tab -0.517 (0.05)
+ @tab -0.314 (0.03)
+@item 
+p2-A
+ @tab 1000
+ @tab -0.602 (0.04)
+ @tab -0.485 (0.03)
+@end multitable
 
 @node Detailed explanation
 @subsection Detailed explanation
@@ -1160,8 +3341,6 @@ done
 
 
 cat << EOF >> table.md
-| ---- | ----- | ----- | ------ | --- |
-
 
 
 | Hand | \$n\$ |  Yes  |  No  |
@@ -1315,8 +3494,6 @@ EOF
   done
  done
 done
-
-echo "| ---- | ----- | ----- | ---- |" >> table.md
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt

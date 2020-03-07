@@ -219,8 +219,6 @@ done
 
 
 cat << EOF >> table.md
-| ---- | ----- | ----- | ------ | --- |
-
 
 
 | Hand | \$n\$ |  Yes  |  No  |
@@ -375,8 +373,6 @@ EOF
   done
  done
 done
-
-echo "| ---- | ----- | ----- | ---- |" >> table.md
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt
