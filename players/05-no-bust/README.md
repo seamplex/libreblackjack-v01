@@ -31,7 +31,7 @@ STDOUT->autoflush(1);
 
 while ($command ne "bye") {
   # do not play more than a number of commands
-  # if the argument -n was not passed to libreblackjack
+  # if the argument -n was not passed to blackjack
   if ($i++ == 123456789) {
     print "quit\n";
     exit;
@@ -73,7 +73,7 @@ do
   elif test "`echo ${command} | cut -c-5`" = 'play?'; then
     echo "count"
     read count
-    read play      # libreblackjack will ask again for 'play?'
+    read play      # blackjack will ask again for 'play?'
     if test ${count} -lt 12; then
       echo "hit"
     else
@@ -83,7 +83,7 @@ do
 done
 ```
 
-To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
+To check these two players give the same results, make them play against Libre Blackjack with the same seed (say one) and send the YAML report to two different files:
 
 ```terminal
 blackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml \
@@ -108,7 +108,8 @@ diff perl.yml shell.yml
 
 As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
 
-> Exercise: modifiy the players so they always insure aces and see if it improves or degrades the result.
+> **Exercise:** modify the players so they always insure aces and see if it improves or degrades the result.
+
 
 -------
 :::{.text-center}

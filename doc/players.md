@@ -1,21 +1,16 @@
-
----
-title_case: Internal player
-...
-
 ## Internal player
 
-> Difficulty: 00/100
+If `blackjack` is called with the `-i` option, it uses an *internal*
+player to play against itself. By default it plays basic strategy. Run
 
-If `libreblackjack` is called with the `-i` option, it uses an _internal_ player to play against itself. By default it plays basic strategy. Run 
-
-```terminal
+``` {.terminal}
 blackjack -i
 ```
 
-and you will get a report with the results of one million hands.
+and you will get the following report with the results of playing one
+million hands with basic strategy.
 
-```yaml
+``` {.yaml}
 ---
 rules:
   decks:                  6
@@ -58,37 +53,44 @@ player:
   error:               0.00115279
   result:             "(-0.7 ± 0.2) %"
 ...
-
 ```
 
-
----
-title_case: Always stand
-...
 
 ## Always stand
 
-> Difficulty: 02/100
+To play Blackjack as an "always-stander" run the following command:
 
-To play libreblackjack as an “always-stander” run the following command:
-
-```terminal
+``` {.terminal}
 yes stand | blackjack -n1e5 --flat_bet --no_insurance > /dev/null
 ```
 
-The UNIX command `yes stand` writes the string “stand” repeteadly to the standard output, which is piped to the executable `libreblackjack` (assumed to be installed system-wide). The arguments tell libreblackjack to play one hundred thousand hands (`-n1e5`) using a flat bet (`flat_bet`, it defaults to a unit bet in each hand) and without asking for insurance if the dealer shows an ace (`no_insurance`). As there is no `libreblackjack.ini` file, the rules are---as expected---the default ones (see the documentation for details).
+The UNIX command `yes stand` writes the string "stand" repeteadly to the
+standard output, which is piped to the executable `blackjack` (assumed
+to be installed system-wide). The arguments tell Libre Blackjack to play
+one hundred thousand hands (`-n1e5`) using a flat bet (`flat_bet`, it
+defaults to a unit bet in each hand) and without asking for insurance if
+the dealer shows an ace (`no_insurance`). As there is no
+`blackjack.conf` file, the rules are---as expected---the default ones
+(see the documentation for details).
 
-The `/dev/null` part is important, otherwise libreblackjack will think that there is a human at the other side of the table and will
+The `/dev/null` part is important, otherwise Libre Blackjack will think
+that there is a human at the other side of the table and will
 
-  1. run slower (it will add explicit delays to mimic an actual human dealer), and
-  2. give all the details of the dealt hands in the terminal as ASCII (actually UTF-8) art
+1.  run slower (it will add explicit time delays to mimic an actual
+    human dealer), and
+2.  give all the details of the dealt hands in the terminal as ASCII
+    (actually UTF-8) art
 
-This example is only one-way (i.e. the player ignores what the dealer says) so it is better to redirect the standard output to `/dev/null` to save execution time. The results are written as a [YAML](http://yaml.org/)-formatted data to `stderr` by default once the hands are over, so they will show up in the terminal nevertheless. This format is human-friendly (far more than JSON) so it can be easily parsed, but it also allows complex objects to be represented (arrays, lists, etc.).
+This example is only one-way (i.e. the player ignores what the dealer
+says) so it is better to redirect the standard output to `/dev/null` to
+save execution time. The results are written as a
+[YAML](http://yaml.org/)-formatted data to `stderr` by default once the
+hands are over, so they will show up in the terminal nevertheless. This
+format is human-friendly (far more than JSON) so it can be easily
+parsed, but it also allows complex objects to be represented (arrays,
+lists, etc.).
 
-
-As an exercise, verify that the analytical probability of getting a natural playing with a single deck (for both the dealer and the player) is 32/663 = 0.04826546...
-
-```yaml
+``` {.yaml}
 ---
 rules:
   decks:                  6
@@ -131,49 +133,58 @@ player:
   error:               0.00313804
   result:             "(-15.9 ± 0.6) %"
 ...
-
 ```
 
+> **Exercise:** verify that the analytical probability of getting a
+> natural playing with a single deck (for both the dealer and the
+> player) is 32/663 = 0.04826546...
 
----
-title_case: No-bust strategy
-...
 
 ## No-bust strategy
 
-> Difficulty: 05/100
+This directory shows how to play a "no-bust" strategy, i.e. not hitting
+any hand higher or equal to hard twelve with Libre Blackjack. The
+communication between the player and the back end is through standard
+input and output. The player reads from its standard input
+Libre Blackjack's commands and writes to its standard output the playing
+commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So
+first, we create it (if it is not already created):
 
-This directory shows how to play a “no-bust” strategy, i.e. not hitting any hand higher or equal to hard twelve with Libre Blackjack. The communication between the player and the back end is through standard input and output. The player reads from its standard input Libre Blackjack's commands and writes to its standard output the playing commands. In order to do this a FIFO (a.k.a. named pipe) is needed. So first, we create it (if it is not already created):
-
-```terminal
+``` {.terminal}
 mkfifo fifo
 ```
 
-Then we execute `blackjack`, piping its output to the player (say `no-bust.pl`) and reading the standard input from `fifo`, whilst at the same time we redirect the player's standard output to `fifo`:
+Then we execute `blackjack`, piping its output to the player (say
+`no-bust.pl`) and reading the standard input from `fifo`, whilst at the
+same time we redirect the player's standard output to `fifo`:
 
-```terminal
+``` {.terminal}
 if test ! -e fifo; then
  mkfifo fifo
 fi
 blackjack -n1e5 < fifo | ./no-bust.pl > fifo
 ```
 
-As this time the player is coded in an interpreted langauge, it is far smarter than the previous `yes`-based player. So the player can handle bets and insurances, and there is not need to pass the options `--flat_bet` nor `--no_insurance` (though they can be passed anyway). Let us take a look at the Perl implementation:
+As this time the player is coded in an interpreted langauge, it is far
+smarter than the previous `yes`-based player. So the player can handle
+bets and insurances, and there is not need to pass the options
+`--flat_bet` nor `--no_insurance` (though they can be passed anyway).
+Let us take a look at the Perl implementation:
 
-```perl
-##!/usr/bin/perl
-## this is needed to avoid deadlock with the fifo
+``` {.perl}
+#!/usr/bin/perl
+# this is needed to avoid deadlock with the fifo
 STDOUT->autoflush(1);
 
 while ($command ne "bye") {
-  ## do not play more than a number of commands
-  ## if the argument -n was not passed to libreblackjack
+  # do not play more than a number of commands
+  # if the argument -n was not passed to blackjack
   if ($i++ == 123456789) {
     print "quit\n";
     exit;
   }
   
-  ## read and process the commands
+  # read and process the commands
   chomp($command = <STDIN>);
   
   if ($command eq "bet?") {
@@ -182,8 +193,8 @@ while ($command ne "bye") {
     print "no\n";
   } elsif ($comm eq "play?") {
     print "count\n";
-    chomp($count = <STDIN>); ## the count
-    chomp($play = <STDIN>);  ## again the "play?" query
+    chomp($count = <STDIN>); # the count
+    chomp($play = <STDIN>);  # again the "play?" query
     if ($count < 12) {
       print "hit\n";
     } else {
@@ -195,8 +206,8 @@ while ($command ne "bye") {
 
 The very same player may be implemented as a shell script:
 
-```bash
-##!/bin/sh
+``` {.bash}
+#!/bin/sh
 
 while read command
 do
@@ -209,7 +220,7 @@ do
   elif test "`echo ${command} | cut -c-5`" = 'play?'; then
     echo "count"
     read count
-    read play      ## libreblackjack will ask again for 'play?'
+    read play      # blackjack will ask again for 'play?'
     if test ${count} -lt 12; then
       echo "hit"
     else
@@ -219,9 +230,11 @@ do
 done
 ```
 
-To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
+To check these two players give the same results, make them play against
+Libre Blackjack with the same seed (say one) and send the YAML report to
+two different files:
 
-```terminal
+``` {.terminal}
 blackjack -n1e3 --rng_seed=1 --yaml_report=perl.yml \
     < fifo | ./no-bust.pl > fifo
 blackjack -n1e3 --rng_seed=1 --yaml_report=shell.yml \
@@ -242,66 +255,91 @@ diff perl.yml shell.yml
 >   hands_per_second: 9.0e+01
 ```
 
-As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
+As expected, the reports are the same. They just differ in the speed
+because the shell script is orders of magnitude slower than its
+Perl-based counterpart.
 
-> Exercise: modifiy the players so they always insure aces and see if it improves or degrades the result.
+> **Exercise:** modify the players so they always insure aces and see if
+> it improves or degrades the result.
 
-
----
-title_case: Mimic the dealer
-...
 
 ## Mimic the dealer
 
-> Difficulty: 08/100
+This example implements a "mimic-the-dealer strategy," i.e. hits if the
+hand totals less than seventeen and stands on eighteen or more. The
+player stands on hard seventeen but hits on soft seventeen.
 
-This example implements a “mimic-the-dealer strategy,” i.e. hits if the hand totals less than seventeen and stands on eighteen or more. The player stands on hard seventeen but hits on soft seventeen. 
+This time, the configuration file `blackjack.conf` is used. If a file
+with this name exists in the directory where `blackjack` is executed, it
+is read and parsed. The options should be fairly self descriptive. See
+the \[configuration file\] section of the manual for a detailed
+explanation of the variables and values that can be entered. In
+particular, we ask to play one hundred thousand hands at a six-deck game
+where the dealer hits soft seventeens. If the random seed is set to a
+fixed value so each execution will lead to the very same sequence of
+cards.
 
-This time, the configuration file `blackjack.conf` is used. If a file with this name exists in the directory where `blackjack` is executed, it is read and parsed. The options should be fairly self descriptive. See the [configuration file] section of the manual for a detailed explanation of the variables and values that can be entered. In particular, we ask to play one hundred thousand hands at a six-deck game where the dealer hits soft seventeens. If the random seed is set to a fixed value so each execution will lead to the very same sequence of cards.
+Now, there are two options that tell Libre Blackjack how the player is
+going to talk to the backend: `player2dealer` and `dealer2player`. The
+first one sets the communication mechanism from the player to the dealer
+(by default is `blackjack`'s standard input), and the second one sets
+the mechanism from the dealer to the player (by default `blackjack`'s
+standard output). In this case, the configuration file reads:
 
-Now, there are two options that tell Libre Blackjack how the player is going to talk to the backend: `player2dealer` and `dealer2player`. The first one sets the communication mechanism from the player to the dealer (by default is `blackjack`’s standard input), and the second one sets the mechanism from the dealer to the player (by default `blackjack`’s standard output). In this case, the configuration file reads:
-
-```ini
+``` {.ini}
 hands = 1e5
 decks = 6
 hit_soft_17 = 1
-## uncomment to obtain the same cards each time
-## rng_seed = 1  
+# uncomment to obtain the same cards each time
+# rng_seed = 1  
 
 player2dealer = fifo mimic_p2d
 dealer2player = fifo mimic_d2p
 buffered_fifo = 1
 ```
 
-This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by libreblackjack upon execution. 
+This means that two FIFOs (a.k.a. named pipes) are to be used for
+communication, `player2dealer` from the player to the dealer and
+`dealer2player` for the dealer to the player. If these FIFOs do not
+exist, they are created by `blackjack` upon execution.
 
-The player this time is implemented as an awk script, whose input should be read from `dealer2player` and whose output should be written to `player2dealer`. To run the game, execute libreblackjack in one terminal making sure the current directory is where the `libreblackjack.ini` file exists. It should print a message telling that it is waiting for someone to be at the other side of the named pipes:
+The player this time is implemented as an awk script, whose input should
+be read from `dealer2player` and whose output should be written to
+`player2dealer`. To run the game, execute `blackjack` in one terminal
+making sure the current directory is where the `blackjack.conf` file
+exists. It should print a message telling that it is waiting for someone
+to be at the other side of the named pipes:
 
-```terminal
-$ libreblackjack
+``` {.terminal}
+$ blackjack
 [...]
 waiting for dealer2player buffered fifo 'dealer2player'...
 ```
 
 In another terminal run the player
 
-```terminal
+``` {.terminal}
 $ ./mimic-the-dealer.awk < dealer2player > player2dealer
 ```
 
-Both dealer and player may be run in the same terminal putting the first one on the background:
+Both dealer and player may be run in the same terminal putting the first
+one on the background:
 
-```terminal
+``` {.terminal}
 rm -f mimic_d2p mimic_p2d
 mkfifo mimic_d2p mimic_p2d
 blackjack &
 gawk -f mimic-the-dealer.awk < mimic_d2p > mimic_p2d
 ```
 
-To understand the decisions taken by the player, we have to remember that when Libre Blackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
+To understand the decisions taken by the player, we have to remember
+that when Libre Blackjack receives the command `count` asking for the
+current player's count, it returns a positive number for hard hands and
+a negative number for soft hands. The instructions `fflush()` are needed
+in order to avoid deadlocks on the named pipes:
 
-```awk
-##!/usr/bin/gawk -f
+``` {.awk}
+#!/usr/bin/gawk -f
 function abs(x){return ( x >= 0 ) ? x : -x } 
 
 /bet\?/ {
@@ -316,8 +354,8 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 
 /play\?/ {
   count = $2
-  ## mimic the dealer: hit until 17 (hit soft 17)
-  if (abs(count) < 17 || count == -17) {   ## soft hands are negative
+  # mimic the dealer: hit until 17 (hit soft 17)
+  if (abs(count) < 17 || count == -17) {   # soft hands are negative
     print "hit";
   } else {
     print "stand";
@@ -330,7 +368,7 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 }
 ```
 
-```yaml
+``` {.yaml}
 ---
 rules:
   decks:                  6
@@ -373,25 +411,21 @@ player:
   error:               0.00309034
   result:             "(-6.0 ± 0.6) %"
 ...
-
 ```
 
-> Exercise: modify the player and the ini file so both the dealer and the player may stand on soft seventeen. Analyze the four combinations (player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer h17, player s17 - dealer s17)
+> **Exercise:** modify the player and the configuration file so both the
+> dealer and the player may stand on soft seventeen. Analyze the four
+> combinations (player h17 - dealer h17, player h17 - dealer s17, player
+> s17 - dealer h17, player s17 - dealer s17)
 
-
----
-title_case: Derivation of the basic strategy
-...
 
 ## Derivation of the basic strategy
-
-> Difficulty: 20/100
 
 ### Quick run
 
 Execute the `run.sh` script. It should take a minute or so:
 
-```terminal
+``` {.terminal}
 $ ./run.sh
 h20-2 (10 10) n=1000    s=0.634 (0.03)  d=-1.676 (0.03) h=-0.844 (0.02) stand
 h20-3 (10 10) n=1000    s=0.66 (0.03)   d=-1.744 (0.03) h=-0.847 (0.02) stand
@@ -402,62 +436,61 @@ p2-A n=1000     y=-0.565 (0.04) n=-0.543 (0.03) uncertain
 p2-A n=10000    y=-0.6505 (0.01)        n=-0.5025 (0.008)       no
 ```
 
-A new text file called `bs.txt` with the strategy should be created from scratch:
+A new text file called `bs.txt` with the strategy should be created from
+scratch:
 
-```
-##    2  3  4  5  6  7  8  9  T  A
-h20  s  s  s  s  s  s  s  s  s  s  
-h19  s  s  s  s  s  s  s  s  s  s  
-h18  s  s  s  s  s  s  s  s  s  s  
-h17  s  s  s  s  s  s  s  s  s  s  
-h16  s  s  s  s  s  h  h  h  s  h  
-h15  s  s  s  s  s  h  h  h  h  h  
-h14  s  s  s  s  s  h  h  h  h  h  
-h13  s  s  s  s  s  h  h  h  h  h  
-h12  h  h  s  s  s  h  h  h  h  h  
-h11  d  d  d  d  d  d  d  d  d  h  
-h10  d  d  d  d  d  d  d  d  h  d  
-h9   h  d  d  d  d  h  h  h  h  h  
-h8   h  h  h  h  h  h  h  h  h  h  
-h7   h  h  h  h  h  h  h  h  h  h  
-h6   h  h  h  h  h  h  h  h  h  h  
-h5   h  h  h  h  h  h  h  h  h  h  
-h4   h  h  h  h  h  h  h  h  h  h  
-##    2  3  4  5  6  7  8  9  T  A
-s20  s  s  s  s  s  s  s  s  s  s  
-s19  s  s  s  s  d  s  s  s  s  s  
-s18  d  d  d  d  d  s  s  h  h  h  
-s17  h  d  d  d  d  h  h  h  h  h  
-s16  h  h  d  d  d  h  h  h  h  h  
-s15  h  h  d  d  d  h  h  h  h  h  
-s14  h  h  h  d  d  h  h  h  h  h  
-s13  h  h  h  h  d  h  h  h  h  h  
-s12  h  h  h  h  d  h  h  h  h  h  
-##    2  3  4  5  6  7  8  9  T  A
-pA   y  y  y  y  y  y  y  y  y  y  
-pT   n  n  n  n  n  n  n  n  n  n  
-p9   y  y  y  y  y  n  y  y  n  n  
-p8   y  y  y  y  y  y  y  y  y  y  
-p7   y  y  y  y  y  y  n  n  n  n  
-p6   y  y  y  y  y  n  n  n  n  n  
-p5   n  n  n  n  n  n  n  n  n  n  
-p4   n  n  n  y  y  n  n  n  n  n  
-p3   y  y  y  y  y  y  n  n  n  n  
-p2   y  y  y  y  y  y  n  n  n  n  
-```
+    #    2  3  4  5  6  7  8  9  T  A
+    h20  s  s  s  s  s  s  s  s  s  s  
+    h19  s  s  s  s  s  s  s  s  s  s  
+    h18  s  s  s  s  s  s  s  s  s  s  
+    h17  s  s  s  s  s  s  s  s  s  s  
+    h16  s  s  s  s  s  h  h  h  s  h  
+    h15  s  s  s  s  s  h  h  h  h  h  
+    h14  s  s  s  s  s  h  h  h  h  h  
+    h13  s  s  s  s  s  h  h  h  h  h  
+    h12  h  h  s  s  s  h  h  h  h  h  
+    h11  d  d  d  d  d  d  d  d  d  h  
+    h10  d  d  d  d  d  d  d  d  h  d  
+    h9   h  d  d  d  d  h  h  h  h  h  
+    h8   h  h  h  h  h  h  h  h  h  h  
+    h7   h  h  h  h  h  h  h  h  h  h  
+    h6   h  h  h  h  h  h  h  h  h  h  
+    h5   h  h  h  h  h  h  h  h  h  h  
+    h4   h  h  h  h  h  h  h  h  h  h  
+    #    2  3  4  5  6  7  8  9  T  A
+    s20  s  s  s  s  s  s  s  s  s  s  
+    s19  s  s  s  s  d  s  s  s  s  s  
+    s18  d  d  d  d  d  s  s  h  h  h  
+    s17  h  d  d  d  d  h  h  h  h  h  
+    s16  h  h  d  d  d  h  h  h  h  h  
+    s15  h  h  d  d  d  h  h  h  h  h  
+    s14  h  h  h  d  d  h  h  h  h  h  
+    s13  h  h  h  h  d  h  h  h  h  h  
+    s12  h  h  h  h  d  h  h  h  h  h  
+    #    2  3  4  5  6  7  8  9  T  A
+    pA   y  y  y  y  y  y  y  y  y  y  
+    pT   n  n  n  n  n  n  n  n  n  n  
+    p9   y  y  y  y  y  n  y  y  n  n  
+    p8   y  y  y  y  y  y  y  y  y  y  
+    p7   y  y  y  y  y  y  n  n  n  n  
+    p6   y  y  y  y  y  n  n  n  n  n  
+    p5   n  n  n  n  n  n  n  n  n  n  
+    p4   n  n  n  y  y  n  n  n  n  n  
+    p3   y  y  y  y  y  y  n  n  n  n  
+    p2   y  y  y  y  y  y  n  n  n  n  
 
 ### Full table with results
 
 The script computes the expected value of each combination
 
- 1. Player’s hand (hard, soft and pair)
- 2. Dealer upcard
- 3. Hit, soft and stand (for hards and softs) and splitting or not (for pairs)
- 
-The results are given as the expected value in percentage with the uncertainty (one standard deviation) in the last significant digit.
- 
+1.  Player's hand (hard, soft and pair)
+2.  Dealer upcard
+3.  Hit, soft and stand (for hards and softs) and splitting or not (for
+    pairs)
 
- 
+The results are given as the expected value in percentage with the
+uncertainty (one standard deviation) in the last significant digit.
+
 ```{=html}
 <table class="table table-sm table-responsive table-hover small w-100">
  <thead>
@@ -1867,420 +1900,463 @@ The results are given as the expected value in percentage with the uncertainty (
  </tbody>
 </table>
 ```
+  Hand    Number of hands   Stand              Double             Hit
+  ------- ----------------- ------------------ ------------------ ------------------
+  h20-2   1000              0.631 (0.03)       -0.844 (0.02)      -1.722 (0.03)
+  h20-3   1000              0.618 (0.03)       -0.866 (0.02)      -1.714 (0.03)
+  h20-4   1000              0.648 (0.03)       -0.899 (0.01)      -1.718 (0.03)
+  h20-5   1000              0.673 (0.03)       -0.874 (0.02)      -1.718 (0.03)
+  h20-6   1000              0.684 (0.03)       -0.855 (0.02)      -1.722 (0.03)
+  h20-7   1000              0.759 (0.03)       -0.844 (0.02)      -1.698 (0.03)
+  h20-8   1000              0.76 (0.03)        -0.846 (0.02)      -1.692 (0.03)
+  h20-9   1000              0.756 (0.03)       -0.83 (0.02)       -1.7 (0.03)
+  h20-T   1000              0.477 (0.03)       -0.853 (0.02)      -1.62 (0.03)
+  h20-A   1000              0.034 (0.03)       -0.888 (0.01)      -1.518 (0.03)
+  h19-2   1000              0.375 (0.04)       -0.741 (0.02)      -1.43 (0.04)
+  h19-3   1000              0.434 (0.04)       -0.704 (0.02)      -1.474 (0.04)
+  h19-4   1000              0.426 (0.04)       -0.756 (0.02)      -1.436 (0.04)
+  h19-5   1000              0.44 (0.04)        -0.725 (0.02)      -1.414 (0.04)
+  h19-6   1000              0.436 (0.04)       -0.734 (0.02)      -1.394 (0.04)
+  h19-7   1000              0.609 (0.04)       -0.734 (0.02)      -1.418 (0.04)
+  h19-8   1000              0.673 (0.05)       -0.727 (0.02)      -1.378 (0.05)
+  h19-9   1000              0.298 (0.04)       -0.705 (0.02)      -1.486 (0.04)
+  h19-T   1000              -0.015 (0.04)      -0.758 (0.02)      -1.413 (0.04)
+  h19-A   1000              -0.163 (0.04)      -0.823 (0.02)      -1.336 (0.04)
+  h18-2   1000              0.094 (0.05)       -0.652 (0.02)      -1.276 (0.05)
+  h18-3   1000              0.173 (0.05)       -0.624 (0.02)      -1.266 (0.05)
+  h18-4   1000              0.162 (0.05)       -0.631 (0.02)      -1.23 (0.05)
+  h18-5   1000              0.171 (0.05)       -0.598 (0.02)      -1.27 (0.05)
+  h18-6   1000              0.216 (0.05)       -0.627 (0.02)      -1.204 (0.05)
+  h18-7   1000              0.398 (0.05)       -0.568 (0.03)      -1.212 (0.05)
+  h18-8   1000              0.125 (0.05)       -0.628 (0.02)      -1.188 (0.05)
+  h18-9   1000              -0.202 (0.05)      -0.583 (0.02)      -1.238 (0.05)
+  h18-T   1000              -0.236 (0.05)      -0.726 (0.02)      -1.221 (0.05)
+  h18-A   1000              -0.448 (0.04)      -0.753 (0.02)      -1.14 (0.04)
+  h17-2   1000              -0.156 (0.05)      -0.57 (0.03)       -0.992 (0.05)
+  h17-3   1000              -0.158 (0.05)      -0.557 (0.03)      -1.058 (0.05)
+  h17-4   1000              -0.088 (0.05)      -0.548 (0.03)      -1.074 (0.05)
+  h17-5   1000              -0.021 (0.05)      -0.531 (0.03)      -1.058 (0.05)
+  h17-6   1000              0.042 (0.05)       -0.533 (0.03)      -1.054 (0.05)
+  h17-7   1000              -0.125 (0.05)      -0.494 (0.03)      -1.03 (0.05)
+  h17-8   1000              -0.375 (0.05)      -0.574 (0.03)      -1.05 (0.05)
+  h17-9   1000              -0.402 (0.05)      -0.525 (0.03)      -1.138 (0.05)
+  h17-T   1000              -0.489 (0.05)      -0.623 (0.02)      -1.211 (0.05)
+  h17-A   1000              -0.651 (0.04)      -0.721 (0.02)      -1.093 (0.04)
+  h16-2   1000              -0.282 (0.05)      -0.438 (0.03)      -1.01 (0.05)
+  h16-3   1000              -0.24 (0.05)       -0.508 (0.03)      -0.99 (0.05)
+  h16-4   1000              -0.196 (0.05)      -0.469 (0.03)      -0.976 (0.05)
+  h16-5   1000              -0.222 (0.06)      -0.423 (0.03)      -0.874 (0.06)
+  h16-6   1000              -0.106 (0.05)      -0.473 (0.03)      -0.976 (0.05)
+  h16-7   1000              -0.522 (0.06)      -0.412 (0.03)      -0.788 (0.06)
+  h16-8   1000              -0.524 (0.05)      -0.433 (0.03)      -0.934 (0.05)
+  h16-9   10000             -0.5468 (0.02)     -0.4897 (0.008)    -1.0266 (0.02)
+  h16-T   1000000           -0.575524 (0)      -0.575795 (0)      -1.07298 (0)
+  h16-A   10000             -0.7306 (0.01)     -0.6893 (0.007)    -1.045 (0.01)
+  h15-2   1000              -0.304 (0.05)      -0.42 (0.03)       -0.96 (0.05)
+  h15-3   1000              -0.186 (0.05)      -0.353 (0.03)      -0.88 (0.05)
+  h15-4   1000              -0.176 (0.06)      -0.384 (0.03)      -0.7 (0.06)
+  h15-5   1000              -0.152 (0.06)      -0.371 (0.03)      -0.682 (0.06)
+  h15-6   1000              -0.166 (0.06)      -0.348 (0.03)      -0.73 (0.06)
+  h15-7   1000              -0.524 (0.06)      -0.382 (0.03)      -0.776 (0.06)
+  h15-8   10000             -0.5124 (0.02)     -0.4169 (0.009)    -0.8406 (0.02)
+  h15-9   1000              -0.596 (0.05)      -0.425 (0.03)      -0.942 (0.05)
+  h15-T   100000            -0.57872 (0.005)   -0.54447 (0.003)   -1.01351 (0.005)
+  h15-A   1000              -0.724 (0.04)      -0.662 (0.02)      -1.028 (0.04)
+  h14-2   10000             -0.3006 (0.02)     -0.3675 (0.009)    -0.7454 (0.02)
+  h14-3   10000             -0.2476 (0.02)     -0.3417 (0.009)    -0.6788 (0.02)
+  h14-4   1000              -0.222 (0.06)      -0.381 (0.03)      -0.688 (0.06)
+  h14-5   1000              -0.128 (0.06)      -0.271 (0.03)      -0.734 (0.06)
+  h14-6   10000             -0.1314 (0.02)     -0.3164 (0.009)    -0.619 (0.02)
+  h14-7   1000              -0.49 (0.06)       -0.322 (0.03)      -0.62 (0.06)
+  h14-8   1000              -0.54 (0.06)       -0.366 (0.03)      -0.828 (0.06)
+  h14-9   1000              -0.538 (0.05)      -0.411 (0.03)      -0.924 (0.05)
+  h14-T   10000             -0.5848 (0.02)     -0.5143 (0.008)    -0.9248 (0.02)
+  h14-A   1000              -0.718 (0.04)      -0.576 (0.02)      -0.902 (0.04)
+  h13-2   100000            -0.28324 (0.006)   -0.30386 (0.003)   -0.62712 (0.006)
+  h13-3   10000             -0.2492 (0.02)     -0.2861 (0.009)    -0.5528 (0.02)
+  h13-4   1000              -0.206 (0.06)      -0.318 (0.03)      -0.576 (0.06)
+  h13-5   1000              -0.18 (0.06)       -0.278 (0.03)      -0.42 (0.06)
+  h13-6   1000              -0.068 (0.06)      -0.219 (0.03)      -0.516 (0.06)
+  h13-7   1000              -0.478 (0.06)      -0.223 (0.03)      -0.602 (0.06)
+  h13-8   1000              -0.506 (0.06)      -0.334 (0.03)      -0.708 (0.06)
+  h13-9   1000              -0.516 (0.06)      -0.394 (0.03)      -0.746 (0.06)
+  h13-T   1000              -0.598 (0.05)      -0.5 (0.03)        -0.947 (0.05)
+  h13-A   1000              -0.734 (0.04)      -0.625 (0.02)      -0.99 (0.04)
+  h12-2   100000            -0.28482 (0.006)   -0.24941 (0.003)   -0.50748 (0.006)
+  h12-3   100000            -0.24648 (0.006)   -0.23454 (0.003)   -0.4634 (0.006)
+  h12-4   100000            -0.20318 (0.006)   -0.21475 (0.003)   -0.43554 (0.006)
+  h12-5   10000             -0.1632 (0.02)     -0.1934 (0.01)     -0.4412 (0.02)
+  h12-6   10000             -0.1184 (0.02)     -0.1702 (0.01)     -0.3416 (0.02)
+  h12-7   1000              -0.462 (0.06)      -0.264 (0.03)      -0.538 (0.06)
+  h12-8   1000              -0.526 (0.06)      -0.281 (0.03)      -0.552 (0.06)
+  h12-9   1000              -0.536 (0.06)      -0.366 (0.03)      -0.706 (0.06)
+  h12-T   1000              -0.556 (0.05)      -0.434 (0.03)      -0.745 (0.05)
+  h12-A   1000              -0.728 (0.05)      -0.543 (0.03)      -0.841 (0.05)
+  h11-2   1000              -0.316 (0.06)      0.25 (0.03)        0.476 (0.06)
+  h11-3   1000              -0.204 (0.06)      0.288 (0.03)       0.566 (0.06)
+  h11-4   1000              -0.224 (0.06)      0.296 (0.03)       0.636 (0.06)
+  h11-5   1000              -0.192 (0.06)      0.286 (0.03)       0.62 (0.06)
+  h11-6   1000              -0.14 (0.06)       0.282 (0.03)       0.626 (0.06)
+  h11-7   1000              -0.516 (0.06)      0.271 (0.03)       0.46 (0.06)
+  h11-8   1000              -0.494 (0.06)      0.193 (0.03)       0.342 (0.06)
+  h11-9   10000             -0.5302 (0.02)     0.184 (0.009)      0.279 (0.02)
+  h11-T   10000             -0.5806 (0.02)     0.0312 (0.01)      0.076 (0.02)
+  h11-A   100000            -0.72378 (0.005)   -0.2353 (0.003)    -0.24466 (0.005)
+  h10-2   1000              -0.318 (0.06)      0.116 (0.03)       0.386 (0.06)
+  h10-3   1000              -0.226 (0.06)      0.146 (0.03)       0.466 (0.06)
+  h10-4   1000              -0.212 (0.06)      0.235 (0.03)       0.582 (0.06)
+  h10-5   1000              -0.184 (0.06)      0.279 (0.03)       0.45 (0.06)
+  h10-6   1000              -0.118 (0.06)      0.314 (0.03)       0.592 (0.06)
+  h10-7   1000              -0.46 (0.06)       0.267 (0.03)       0.514 (0.06)
+  h10-8   10000             -0.517 (0.02)      0.1957 (0.009)     0.2802 (0.02)
+  h10-9   1000              -0.546 (0.06)      0.129 (0.03)       0.22 (0.06)
+  h10-T   10000             -0.5862 (0.02)     -0.0588 (0.009)    -0.1086 (0.02)
+  h10-A   1000              -0.696 (0.05)      -0.29 (0.03)       -0.206 (0.05)
+  h9-2    1000              -0.248 (0.06)      0.088 (0.03)       -0.006 (0.06)
+  h9-3    10000             -0.255 (0.02)      0.0932 (0.01)      0.1294 (0.02)
+  h9-4    10000             -0.2024 (0.02)     0.1175 (0.01)      0.19 (0.02)
+  h9-5    1000              -0.182 (0.06)      0.168 (0.03)       0.272 (0.06)
+  h9-6    10000             -0.1058 (0.02)     0.1937 (0.009)     0.2904 (0.02)
+  h9-7    10000             -0.4702 (0.02)     0.1666 (0.009)     0.0708 (0.02)
+  h9-8    1000              -0.524 (0.06)      0.093 (0.03)       -0.024 (0.06)
+  h9-9    1000              -0.536 (0.06)      -0.067 (0.03)      -0.298 (0.06)
+  h9-T    1000              -0.618 (0.06)      -0.191 (0.03)      -0.527 (0.06)
+  h9-A    1000              -0.708 (0.05)      -0.383 (0.03)      -0.65 (0.05)
+  h8-2    1000              -0.286 (0.06)      -0.037 (0.03)      -0.18 (0.06)
+  h8-3    1000              -0.226 (0.06)      -0.092 (0.03)      -0.198 (0.06)
+  h8-4    1000              -0.22 (0.06)       0.084 (0.03)       -0.168 (0.06)
+  h8-5    10000             -0.164 (0.02)      0.0565 (0.01)      0.0248 (0.02)
+  h8-6    100000            -0.11954 (0.006)   0.10471 (0.003)    0.08198 (0.006)
+  h8-7    1000              -0.54 (0.06)       0.088 (0.03)       -0.212 (0.06)
+  h8-8    1000              -0.516 (0.06)      0 (0.03)           -0.458 (0.06)
+  h8-9    1000              -0.548 (0.06)      -0.195 (0.03)      -0.668 (0.06)
+  h8-T    1000              -0.608 (0.05)      -0.323 (0.03)      -0.774 (0.05)
+  h8-A    1000              -0.75 (0.05)       -0.464 (0.03)      -0.884 (0.05)
+  h7-2    1000              -0.326 (0.06)      -0.073 (0.03)      -0.414 (0.06)
+  h7-3    1000              -0.21 (0.06)       -0.075 (0.03)      -0.348 (0.06)
+  h7-4    1000              -0.21 (0.06)       -0.02 (0.03)       -0.36 (0.06)
+  h7-5    1000              -0.132 (0.06)      0.075 (0.03)       -0.13 (0.06)
+  h7-6    1000              -0.122 (0.06)      0.076 (0.03)       -0.13 (0.06)
+  h7-7    1000              -0.452 (0.06)      -0.066 (0.03)      -0.492 (0.06)
+  h7-8    1000              -0.522 (0.05)      -0.198 (0.03)      -0.892 (0.05)
+  h7-9    1000              -0.562 (0.05)      -0.275 (0.03)      -0.994 (0.05)
+  h7-T    1000              -0.57 (0.05)       -0.351 (0.03)      -0.923 (0.05)
+  h7-A    1000              -0.716 (0.04)      -0.546 (0.03)      -1.077 (0.04)
+  h6-2    1000              -0.254 (0.06)      -0.126 (0.03)      -0.472 (0.06)
+  h6-3    10000             -0.244 (0.02)      -0.1126 (0.01)     -0.4712 (0.02)
+  h6-4    1000              -0.192 (0.06)      -0.036 (0.03)      -0.396 (0.06)
+  h6-5    1000              -0.216 (0.06)      -0.097 (0.03)      -0.322 (0.06)
+  h6-6    1000              -0.12 (0.06)       -0.008 (0.03)      -0.178 (0.06)
+  h6-7    1000              -0.488 (0.05)      -0.153 (0.03)      -0.942 (0.05)
+  h6-8    1000              -0.536 (0.05)      -0.221 (0.03)      -0.998 (0.05)
+  h6-9    1000              -0.536 (0.05)      -0.309 (0.03)      -1.058 (0.05)
+  h6-T    1000              -0.58 (0.05)       -0.406 (0.03)      -1.127 (0.05)
+  h6-A    1000              -0.706 (0.04)      -0.578 (0.02)      -1.111 (0.04)
+  h5-2    1000              -0.284 (0.06)      -0.114 (0.03)      -0.576 (0.06)
+  h5-3    1000              -0.22 (0.06)       -0.127 (0.03)      -0.44 (0.06)
+  h5-4    1000              -0.232 (0.06)      -0.058 (0.03)      -0.504 (0.06)
+  h5-5    1000              -0.174 (0.06)      -0.02 (0.03)       -0.224 (0.06)
+  h5-6    1000              -0.134 (0.06)      -0.015 (0.03)      -0.248 (0.06)
+  h5-7    1000              -0.454 (0.06)      -0.167 (0.03)      -0.964 (0.06)
+  h5-8    1000              -0.536 (0.05)      -0.244 (0.03)      -1.088 (0.05)
+  h5-9    1000              -0.556 (0.05)      -0.324 (0.03)      -1.08 (0.05)
+  h5-T    1000              -0.526 (0.05)      -0.392 (0.03)      -1.112 (0.05)
+  h5-A    1000              -0.744 (0.04)      -0.522 (0.03)      -1.1 (0.04)
+  h4-2    1000              -0.286 (0.06)      -0.182 (0.03)      -0.512 (0.06)
+  h4-3    1000              -0.252 (0.06)      -0.141 (0.03)      -0.496 (0.06)
+  h4-4    1000              -0.206 (0.06)      -0.052 (0.03)      -0.348 (0.06)
+  h4-5    1000              -0.156 (0.06)      -0.013 (0.03)      -0.296 (0.06)
+  h4-6    1000              -0.104 (0.06)      0.02 (0.03)        -0.184 (0.06)
+  h4-7    1000              -0.478 (0.06)      -0.137 (0.03)      -0.94 (0.06)
+  h4-8    1000              -0.526 (0.05)      -0.193 (0.03)      -1.108 (0.05)
+  h4-9    1000              -0.528 (0.05)      -0.283 (0.03)      -1.084 (0.05)
+  h4-T    1000              -0.612 (0.05)      -0.399 (0.03)      -1.072 (0.05)
+  h4-A    1000              -0.74 (0.04)       -0.557 (0.03)      -1.081 (0.04)
+  s20-2   1000              0.646 (0.06)       0.217 (0.03)       0.312 (0.06)
+  s20-3   1000              0.677 (0.06)       0.181 (0.03)       0.338 (0.06)
+  s20-4   1000              0.637 (0.06)       0.213 (0.03)       0.436 (0.06)
+  s20-5   10000             0.6604 (0.02)      0.2455 (0.009)     0.5394 (0.02)
+  s20-6   1000              0.694 (0.06)       0.281 (0.03)       0.524 (0.06)
+  s20-7   1000              0.753 (0.06)       0.304 (0.03)       0.488 (0.06)
+  s20-8   1000              0.777 (0.06)       0.229 (0.03)       0.274 (0.06)
+  s20-9   1000              0.733 (0.06)       0.138 (0.03)       0.098 (0.06)
+  s20-T   1000              0.438 (0.06)       -0.057 (0.03)      -0.038 (0.06)
+  s20-A   1000              0.067 (0.05)       -0.272 (0.03)      -0.341 (0.05)
+  s19-2   1000              0.389 (0.06)       0.092 (0.03)       0.256 (0.06)
+  s19-3   10000             0.39 (0.02)        0.1464 (0.009)     0.3168 (0.02)
+  s19-4   10000             0.4082 (0.02)      0.1816 (0.009)     0.3286 (0.02)
+  s19-5   100000            0.43517 (0.006)    0.20004 (0.003)    0.398 (0.006)
+  s19-6   1000000           0.453457 (0)       0.231529 (0)       0.460572 (0)
+  s19-7   1000              0.633 (0.06)       0.231 (0.03)       0.372 (0.06)
+  s19-8   1000              0.59 (0.06)        0.122 (0.03)       0.192 (0.06)
+  s19-9   1000              0.301 (0.06)       -0.013 (0.03)      -0.122 (0.06)
+  s19-T   1000              -0.032 (0.06)      -0.175 (0.03)      -0.395 (0.06)
+  s19-A   1000              -0.133 (0.05)      -0.331 (0.03)      -0.48 (0.05)
+  s18-2   1000000           0.109892 (0)       0.058827 (0)       0.117848 (0)
+  s18-3   10000             0.1328 (0.02)      0.1039 (0.01)      0.2114 (0.02)
+  s18-4   10000             0.1586 (0.02)      0.1282 (0.01)      0.2484 (0.02)
+  s18-5   1000              0.203 (0.06)       0.135 (0.03)       0.344 (0.06)
+  s18-6   10000             0.2239 (0.02)      0.1889 (0.009)     0.3842 (0.02)
+  s18-7   10000             0.3993 (0.02)      0.169 (0.009)      0.1994 (0.02)
+  s18-8   10000             0.1101 (0.02)      0.0447 (0.009)     -0.0398 (0.02)
+  s18-9   10000             -0.1749 (0.02)     -0.0937 (0.009)    -0.2754 (0.02)
+  s18-T   10000             -0.2431 (0.02)     -0.2043 (0.009)    -0.388 (0.02)
+  s18-A   1000              -0.494 (0.05)      -0.405 (0.03)      -0.662 (0.05)
+  s17-2   1000000           -0.155882 (0)      -0.006551 (0)      -0.012158 (0)
+  s17-3   1000              -0.113 (0.06)      -0.008 (0.03)      0.096 (0.06)
+  s17-4   1000              -0.06 (0.06)       0.018 (0.03)       0.112 (0.06)
+  s17-5   1000              -0.003 (0.06)      0.071 (0.03)       0.314 (0.06)
+  s17-6   1000              -0.015 (0.06)      0.11 (0.03)        0.252 (0.06)
+  s17-7   1000              -0.086 (0.06)      0.059 (0.03)       -0.042 (0.06)
+  s17-8   1000              -0.349 (0.06)      -0.064 (0.03)      -0.234 (0.06)
+  s17-9   1000              -0.408 (0.06)      -0.211 (0.03)      -0.332 (0.06)
+  s17-T   1000              -0.455 (0.06)      -0.209 (0.03)      -0.507 (0.06)
+  s17-A   1000              -0.649 (0.05)      -0.479 (0.03)      -0.649 (0.05)
+  s16-2   1000              -0.258 (0.06)      0.002 (0.03)       -0.158 (0.06)
+  s16-3   10000             -0.2604 (0.02)     0.0147 (0.01)      -0.0448 (0.02)
+  s16-4   1000              -0.162 (0.06)      -0.037 (0.03)      0.07 (0.06)
+  s16-5   10000             -0.1576 (0.02)     0.063 (0.01)       0.133 (0.02)
+  s16-6   10000             -0.1218 (0.02)     0.0883 (0.01)      0.183 (0.02)
+  s16-7   1000              -0.484 (0.06)      0.027 (0.03)       -0.194 (0.06)
+  s16-8   1000              -0.556 (0.06)      -0.06 (0.03)       -0.346 (0.06)
+  s16-9   1000              -0.548 (0.06)      -0.105 (0.03)      -0.482 (0.06)
+  s16-T   1000              -0.562 (0.06)      -0.271 (0.03)      -0.474 (0.06)
+  s16-A   1000              -0.724 (0.05)      -0.471 (0.03)      -0.679 (0.05)
+  s15-2   10000             -0.2686 (0.02)     -0.0012 (0.01)     -0.0432 (0.02)
+  s15-3   100000            -0.24634 (0.006)   0.02229 (0.003)    -0.0134 (0.006)
+  s15-4   10000             -0.212 (0.02)      0.0491 (0.01)      0.0798 (0.02)
+  s15-5   10000             -0.1584 (0.02)     0.0804 (0.01)      0.1388 (0.02)
+  s15-6   1000              -0.092 (0.06)      0.109 (0.03)       0.23 (0.06)
+  s15-7   10000             -0.4756 (0.02)     0.0379 (0.01)      -0.1748 (0.02)
+  s15-8   1000              -0.542 (0.06)      -0.039 (0.03)      -0.34 (0.06)
+  s15-9   1000              -0.554 (0.06)      -0.086 (0.03)      -0.398 (0.06)
+  s15-T   1000              -0.582 (0.06)      -0.237 (0.03)      -0.63 (0.06)
+  s15-A   1000              -0.71 (0.05)       -0.448 (0.03)      -0.664 (0.05)
+  s14-2   1000              -0.262 (0.06)      0.03 (0.03)        -0.134 (0.06)
+  s14-3   10000             -0.2244 (0.02)     0.0605 (0.01)      0.0012 (0.02)
+  s14-4   100000            -0.20532 (0.006)   0.07772 (0.003)    0.0549 (0.006)
+  s14-5   10000             -0.1508 (0.02)     0.0975 (0.01)      0.1382 (0.02)
+  s14-6   1000              -0.14 (0.06)       0.121 (0.03)       0.232 (0.06)
+  s14-7   1000              -0.49 (0.06)       0.09 (0.03)        -0.284 (0.06)
+  s14-8   1000              -0.494 (0.06)      -0.031 (0.03)      -0.36 (0.06)
+  s14-9   1000              -0.56 (0.06)       -0.096 (0.03)      -0.386 (0.06)
+  s14-T   1000              -0.556 (0.06)      -0.192 (0.03)      -0.622 (0.06)
+  s14-A   1000              -0.708 (0.05)      -0.404 (0.03)      -0.654 (0.05)
+  s13-2   1000              -0.26 (0.06)       0.082 (0.03)       -0.19 (0.06)
+  s13-3   10000             -0.248 (0.02)      0.0618 (0.01)      -0.0196 (0.02)
+  s13-4   10000             -0.2056 (0.02)     0.0949 (0.01)      0.0602 (0.02)
+  s13-5   1000000           -0.163838 (0)      0.130573 (0)       0.127766 (0)
+  s13-6   100000            -0.11506 (0.006)   0.13519 (0.003)    0.18672 (0.006)
+  s13-7   1000              -0.432 (0.06)      0.124 (0.03)       -0.23 (0.06)
+  s13-8   1000              -0.494 (0.06)      0.034 (0.03)       -0.296 (0.06)
+  s13-9   1000              -0.554 (0.06)      -0.01 (0.03)       -0.472 (0.06)
+  s13-T   1000              -0.606 (0.06)      -0.178 (0.03)      -0.606 (0.06)
+  s13-A   1000              -0.73 (0.05)       -0.335 (0.03)      -0.702 (0.05)
+  s12-2   10000             -0.2868 (0.02)     0.0886 (0.01)      -0.0724 (0.02)
+  s12-3   1000              -0.182 (0.06)      0.121 (0.03)       -0.02 (0.06)
+  s12-4   1000              -0.24 (0.06)       0.207 (0.03)       0.042 (0.06)
+  s12-5   10000             -0.1792 (0.02)     0.156 (0.01)       0.1094 (0.02)
+  s12-6   10000             -0.1206 (0.02)     0.1582 (0.01)      0.2116 (0.02)
+  s12-7   1000              -0.484 (0.06)      0.106 (0.03)       -0.212 (0.06)
+  s12-8   1000              -0.52 (0.06)       0.081 (0.03)       -0.32 (0.06)
+  s12-9   1000              -0.554 (0.06)      -0.035 (0.03)      -0.416 (0.06)
+  s12-T   1000              -0.604 (0.06)      -0.215 (0.03)      -0.512 (0.06)
+  s12-A   1000              -0.656 (0.05)      -0.363 (0.03)      -0.747 (0.05)
 
-| Hand | Number of hands | Stand | Double | Hit |
-| ---- | ----- | ----- | ------ | --- |
-| h20-2 | 1000 | 0.631 (0.03) | -0.844 (0.02) | -1.722 (0.03) |
-| h20-3 | 1000 | 0.618 (0.03) | -0.866 (0.02) | -1.714 (0.03) |
-| h20-4 | 1000 | 0.648 (0.03) | -0.899 (0.01) | -1.718 (0.03) |
-| h20-5 | 1000 | 0.673 (0.03) | -0.874 (0.02) | -1.718 (0.03) |
-| h20-6 | 1000 | 0.684 (0.03) | -0.855 (0.02) | -1.722 (0.03) |
-| h20-7 | 1000 | 0.759 (0.03) | -0.844 (0.02) | -1.698 (0.03) |
-| h20-8 | 1000 | 0.76 (0.03) | -0.846 (0.02) | -1.692 (0.03) |
-| h20-9 | 1000 | 0.756 (0.03) | -0.83 (0.02) | -1.7 (0.03) |
-| h20-T | 1000 | 0.477 (0.03) | -0.853 (0.02) | -1.62 (0.03) |
-| h20-A | 1000 | 0.034 (0.03) | -0.888 (0.01) | -1.518 (0.03) |
-| h19-2 | 1000 | 0.375 (0.04) | -0.741 (0.02) | -1.43 (0.04) |
-| h19-3 | 1000 | 0.434 (0.04) | -0.704 (0.02) | -1.474 (0.04) |
-| h19-4 | 1000 | 0.426 (0.04) | -0.756 (0.02) | -1.436 (0.04) |
-| h19-5 | 1000 | 0.44 (0.04) | -0.725 (0.02) | -1.414 (0.04) |
-| h19-6 | 1000 | 0.436 (0.04) | -0.734 (0.02) | -1.394 (0.04) |
-| h19-7 | 1000 | 0.609 (0.04) | -0.734 (0.02) | -1.418 (0.04) |
-| h19-8 | 1000 | 0.673 (0.05) | -0.727 (0.02) | -1.378 (0.05) |
-| h19-9 | 1000 | 0.298 (0.04) | -0.705 (0.02) | -1.486 (0.04) |
-| h19-T | 1000 | -0.015 (0.04) | -0.758 (0.02) | -1.413 (0.04) |
-| h19-A | 1000 | -0.163 (0.04) | -0.823 (0.02) | -1.336 (0.04) |
-| h18-2 | 1000 | 0.094 (0.05) | -0.652 (0.02) | -1.276 (0.05) |
-| h18-3 | 1000 | 0.173 (0.05) | -0.624 (0.02) | -1.266 (0.05) |
-| h18-4 | 1000 | 0.162 (0.05) | -0.631 (0.02) | -1.23 (0.05) |
-| h18-5 | 1000 | 0.171 (0.05) | -0.598 (0.02) | -1.27 (0.05) |
-| h18-6 | 1000 | 0.216 (0.05) | -0.627 (0.02) | -1.204 (0.05) |
-| h18-7 | 1000 | 0.398 (0.05) | -0.568 (0.03) | -1.212 (0.05) |
-| h18-8 | 1000 | 0.125 (0.05) | -0.628 (0.02) | -1.188 (0.05) |
-| h18-9 | 1000 | -0.202 (0.05) | -0.583 (0.02) | -1.238 (0.05) |
-| h18-T | 1000 | -0.236 (0.05) | -0.726 (0.02) | -1.221 (0.05) |
-| h18-A | 1000 | -0.448 (0.04) | -0.753 (0.02) | -1.14 (0.04) |
-| h17-2 | 1000 | -0.156 (0.05) | -0.57 (0.03) | -0.992 (0.05) |
-| h17-3 | 1000 | -0.158 (0.05) | -0.557 (0.03) | -1.058 (0.05) |
-| h17-4 | 1000 | -0.088 (0.05) | -0.548 (0.03) | -1.074 (0.05) |
-| h17-5 | 1000 | -0.021 (0.05) | -0.531 (0.03) | -1.058 (0.05) |
-| h17-6 | 1000 | 0.042 (0.05) | -0.533 (0.03) | -1.054 (0.05) |
-| h17-7 | 1000 | -0.125 (0.05) | -0.494 (0.03) | -1.03 (0.05) |
-| h17-8 | 1000 | -0.375 (0.05) | -0.574 (0.03) | -1.05 (0.05) |
-| h17-9 | 1000 | -0.402 (0.05) | -0.525 (0.03) | -1.138 (0.05) |
-| h17-T | 1000 | -0.489 (0.05) | -0.623 (0.02) | -1.211 (0.05) |
-| h17-A | 1000 | -0.651 (0.04) | -0.721 (0.02) | -1.093 (0.04) |
-| h16-2 | 1000 | -0.282 (0.05) | -0.438 (0.03) | -1.01 (0.05) |
-| h16-3 | 1000 | -0.24 (0.05) | -0.508 (0.03) | -0.99 (0.05) |
-| h16-4 | 1000 | -0.196 (0.05) | -0.469 (0.03) | -0.976 (0.05) |
-| h16-5 | 1000 | -0.222 (0.06) | -0.423 (0.03) | -0.874 (0.06) |
-| h16-6 | 1000 | -0.106 (0.05) | -0.473 (0.03) | -0.976 (0.05) |
-| h16-7 | 1000 | -0.522 (0.06) | -0.412 (0.03) | -0.788 (0.06) |
-| h16-8 | 1000 | -0.524 (0.05) | -0.433 (0.03) | -0.934 (0.05) |
-| h16-9 | 10000 | -0.5468 (0.02) | -0.4897 (0.008) | -1.0266 (0.02) |
-| h16-T | 1000000 | -0.575524 (0) | -0.575795 (0) | -1.07298 (0) |
-| h16-A | 10000 | -0.7306 (0.01) | -0.6893 (0.007) | -1.045 (0.01) |
-| h15-2 | 1000 | -0.304 (0.05) | -0.42 (0.03) | -0.96 (0.05) |
-| h15-3 | 1000 | -0.186 (0.05) | -0.353 (0.03) | -0.88 (0.05) |
-| h15-4 | 1000 | -0.176 (0.06) | -0.384 (0.03) | -0.7 (0.06) |
-| h15-5 | 1000 | -0.152 (0.06) | -0.371 (0.03) | -0.682 (0.06) |
-| h15-6 | 1000 | -0.166 (0.06) | -0.348 (0.03) | -0.73 (0.06) |
-| h15-7 | 1000 | -0.524 (0.06) | -0.382 (0.03) | -0.776 (0.06) |
-| h15-8 | 10000 | -0.5124 (0.02) | -0.4169 (0.009) | -0.8406 (0.02) |
-| h15-9 | 1000 | -0.596 (0.05) | -0.425 (0.03) | -0.942 (0.05) |
-| h15-T | 100000 | -0.57872 (0.005) | -0.54447 (0.003) | -1.01351 (0.005) |
-| h15-A | 1000 | -0.724 (0.04) | -0.662 (0.02) | -1.028 (0.04) |
-| h14-2 | 10000 | -0.3006 (0.02) | -0.3675 (0.009) | -0.7454 (0.02) |
-| h14-3 | 10000 | -0.2476 (0.02) | -0.3417 (0.009) | -0.6788 (0.02) |
-| h14-4 | 1000 | -0.222 (0.06) | -0.381 (0.03) | -0.688 (0.06) |
-| h14-5 | 1000 | -0.128 (0.06) | -0.271 (0.03) | -0.734 (0.06) |
-| h14-6 | 10000 | -0.1314 (0.02) | -0.3164 (0.009) | -0.619 (0.02) |
-| h14-7 | 1000 | -0.49 (0.06) | -0.322 (0.03) | -0.62 (0.06) |
-| h14-8 | 1000 | -0.54 (0.06) | -0.366 (0.03) | -0.828 (0.06) |
-| h14-9 | 1000 | -0.538 (0.05) | -0.411 (0.03) | -0.924 (0.05) |
-| h14-T | 10000 | -0.5848 (0.02) | -0.5143 (0.008) | -0.9248 (0.02) |
-| h14-A | 1000 | -0.718 (0.04) | -0.576 (0.02) | -0.902 (0.04) |
-| h13-2 | 100000 | -0.28324 (0.006) | -0.30386 (0.003) | -0.62712 (0.006) |
-| h13-3 | 10000 | -0.2492 (0.02) | -0.2861 (0.009) | -0.5528 (0.02) |
-| h13-4 | 1000 | -0.206 (0.06) | -0.318 (0.03) | -0.576 (0.06) |
-| h13-5 | 1000 | -0.18 (0.06) | -0.278 (0.03) | -0.42 (0.06) |
-| h13-6 | 1000 | -0.068 (0.06) | -0.219 (0.03) | -0.516 (0.06) |
-| h13-7 | 1000 | -0.478 (0.06) | -0.223 (0.03) | -0.602 (0.06) |
-| h13-8 | 1000 | -0.506 (0.06) | -0.334 (0.03) | -0.708 (0.06) |
-| h13-9 | 1000 | -0.516 (0.06) | -0.394 (0.03) | -0.746 (0.06) |
-| h13-T | 1000 | -0.598 (0.05) | -0.5 (0.03) | -0.947 (0.05) |
-| h13-A | 1000 | -0.734 (0.04) | -0.625 (0.02) | -0.99 (0.04) |
-| h12-2 | 100000 | -0.28482 (0.006) | -0.24941 (0.003) | -0.50748 (0.006) |
-| h12-3 | 100000 | -0.24648 (0.006) | -0.23454 (0.003) | -0.4634 (0.006) |
-| h12-4 | 100000 | -0.20318 (0.006) | -0.21475 (0.003) | -0.43554 (0.006) |
-| h12-5 | 10000 | -0.1632 (0.02) | -0.1934 (0.01) | -0.4412 (0.02) |
-| h12-6 | 10000 | -0.1184 (0.02) | -0.1702 (0.01) | -0.3416 (0.02) |
-| h12-7 | 1000 | -0.462 (0.06) | -0.264 (0.03) | -0.538 (0.06) |
-| h12-8 | 1000 | -0.526 (0.06) | -0.281 (0.03) | -0.552 (0.06) |
-| h12-9 | 1000 | -0.536 (0.06) | -0.366 (0.03) | -0.706 (0.06) |
-| h12-T | 1000 | -0.556 (0.05) | -0.434 (0.03) | -0.745 (0.05) |
-| h12-A | 1000 | -0.728 (0.05) | -0.543 (0.03) | -0.841 (0.05) |
-| h11-2 | 1000 | -0.316 (0.06) | 0.25 (0.03) | 0.476 (0.06) |
-| h11-3 | 1000 | -0.204 (0.06) | 0.288 (0.03) | 0.566 (0.06) |
-| h11-4 | 1000 | -0.224 (0.06) | 0.296 (0.03) | 0.636 (0.06) |
-| h11-5 | 1000 | -0.192 (0.06) | 0.286 (0.03) | 0.62 (0.06) |
-| h11-6 | 1000 | -0.14 (0.06) | 0.282 (0.03) | 0.626 (0.06) |
-| h11-7 | 1000 | -0.516 (0.06) | 0.271 (0.03) | 0.46 (0.06) |
-| h11-8 | 1000 | -0.494 (0.06) | 0.193 (0.03) | 0.342 (0.06) |
-| h11-9 | 10000 | -0.5302 (0.02) | 0.184 (0.009) | 0.279 (0.02) |
-| h11-T | 10000 | -0.5806 (0.02) | 0.0312 (0.01) | 0.076 (0.02) |
-| h11-A | 100000 | -0.72378 (0.005) | -0.2353 (0.003) | -0.24466 (0.005) |
-| h10-2 | 1000 | -0.318 (0.06) | 0.116 (0.03) | 0.386 (0.06) |
-| h10-3 | 1000 | -0.226 (0.06) | 0.146 (0.03) | 0.466 (0.06) |
-| h10-4 | 1000 | -0.212 (0.06) | 0.235 (0.03) | 0.582 (0.06) |
-| h10-5 | 1000 | -0.184 (0.06) | 0.279 (0.03) | 0.45 (0.06) |
-| h10-6 | 1000 | -0.118 (0.06) | 0.314 (0.03) | 0.592 (0.06) |
-| h10-7 | 1000 | -0.46 (0.06) | 0.267 (0.03) | 0.514 (0.06) |
-| h10-8 | 10000 | -0.517 (0.02) | 0.1957 (0.009) | 0.2802 (0.02) |
-| h10-9 | 1000 | -0.546 (0.06) | 0.129 (0.03) | 0.22 (0.06) |
-| h10-T | 10000 | -0.5862 (0.02) | -0.0588 (0.009) | -0.1086 (0.02) |
-| h10-A | 1000 | -0.696 (0.05) | -0.29 (0.03) | -0.206 (0.05) |
-| h9-2 | 1000 | -0.248 (0.06) | 0.088 (0.03) | -0.006 (0.06) |
-| h9-3 | 10000 | -0.255 (0.02) | 0.0932 (0.01) | 0.1294 (0.02) |
-| h9-4 | 10000 | -0.2024 (0.02) | 0.1175 (0.01) | 0.19 (0.02) |
-| h9-5 | 1000 | -0.182 (0.06) | 0.168 (0.03) | 0.272 (0.06) |
-| h9-6 | 10000 | -0.1058 (0.02) | 0.1937 (0.009) | 0.2904 (0.02) |
-| h9-7 | 10000 | -0.4702 (0.02) | 0.1666 (0.009) | 0.0708 (0.02) |
-| h9-8 | 1000 | -0.524 (0.06) | 0.093 (0.03) | -0.024 (0.06) |
-| h9-9 | 1000 | -0.536 (0.06) | -0.067 (0.03) | -0.298 (0.06) |
-| h9-T | 1000 | -0.618 (0.06) | -0.191 (0.03) | -0.527 (0.06) |
-| h9-A | 1000 | -0.708 (0.05) | -0.383 (0.03) | -0.65 (0.05) |
-| h8-2 | 1000 | -0.286 (0.06) | -0.037 (0.03) | -0.18 (0.06) |
-| h8-3 | 1000 | -0.226 (0.06) | -0.092 (0.03) | -0.198 (0.06) |
-| h8-4 | 1000 | -0.22 (0.06) | 0.084 (0.03) | -0.168 (0.06) |
-| h8-5 | 10000 | -0.164 (0.02) | 0.0565 (0.01) | 0.0248 (0.02) |
-| h8-6 | 100000 | -0.11954 (0.006) | 0.10471 (0.003) | 0.08198 (0.006) |
-| h8-7 | 1000 | -0.54 (0.06) | 0.088 (0.03) | -0.212 (0.06) |
-| h8-8 | 1000 | -0.516 (0.06) | 0 (0.03) | -0.458 (0.06) |
-| h8-9 | 1000 | -0.548 (0.06) | -0.195 (0.03) | -0.668 (0.06) |
-| h8-T | 1000 | -0.608 (0.05) | -0.323 (0.03) | -0.774 (0.05) |
-| h8-A | 1000 | -0.75 (0.05) | -0.464 (0.03) | -0.884 (0.05) |
-| h7-2 | 1000 | -0.326 (0.06) | -0.073 (0.03) | -0.414 (0.06) |
-| h7-3 | 1000 | -0.21 (0.06) | -0.075 (0.03) | -0.348 (0.06) |
-| h7-4 | 1000 | -0.21 (0.06) | -0.02 (0.03) | -0.36 (0.06) |
-| h7-5 | 1000 | -0.132 (0.06) | 0.075 (0.03) | -0.13 (0.06) |
-| h7-6 | 1000 | -0.122 (0.06) | 0.076 (0.03) | -0.13 (0.06) |
-| h7-7 | 1000 | -0.452 (0.06) | -0.066 (0.03) | -0.492 (0.06) |
-| h7-8 | 1000 | -0.522 (0.05) | -0.198 (0.03) | -0.892 (0.05) |
-| h7-9 | 1000 | -0.562 (0.05) | -0.275 (0.03) | -0.994 (0.05) |
-| h7-T | 1000 | -0.57 (0.05) | -0.351 (0.03) | -0.923 (0.05) |
-| h7-A | 1000 | -0.716 (0.04) | -0.546 (0.03) | -1.077 (0.04) |
-| h6-2 | 1000 | -0.254 (0.06) | -0.126 (0.03) | -0.472 (0.06) |
-| h6-3 | 10000 | -0.244 (0.02) | -0.1126 (0.01) | -0.4712 (0.02) |
-| h6-4 | 1000 | -0.192 (0.06) | -0.036 (0.03) | -0.396 (0.06) |
-| h6-5 | 1000 | -0.216 (0.06) | -0.097 (0.03) | -0.322 (0.06) |
-| h6-6 | 1000 | -0.12 (0.06) | -0.008 (0.03) | -0.178 (0.06) |
-| h6-7 | 1000 | -0.488 (0.05) | -0.153 (0.03) | -0.942 (0.05) |
-| h6-8 | 1000 | -0.536 (0.05) | -0.221 (0.03) | -0.998 (0.05) |
-| h6-9 | 1000 | -0.536 (0.05) | -0.309 (0.03) | -1.058 (0.05) |
-| h6-T | 1000 | -0.58 (0.05) | -0.406 (0.03) | -1.127 (0.05) |
-| h6-A | 1000 | -0.706 (0.04) | -0.578 (0.02) | -1.111 (0.04) |
-| h5-2 | 1000 | -0.284 (0.06) | -0.114 (0.03) | -0.576 (0.06) |
-| h5-3 | 1000 | -0.22 (0.06) | -0.127 (0.03) | -0.44 (0.06) |
-| h5-4 | 1000 | -0.232 (0.06) | -0.058 (0.03) | -0.504 (0.06) |
-| h5-5 | 1000 | -0.174 (0.06) | -0.02 (0.03) | -0.224 (0.06) |
-| h5-6 | 1000 | -0.134 (0.06) | -0.015 (0.03) | -0.248 (0.06) |
-| h5-7 | 1000 | -0.454 (0.06) | -0.167 (0.03) | -0.964 (0.06) |
-| h5-8 | 1000 | -0.536 (0.05) | -0.244 (0.03) | -1.088 (0.05) |
-| h5-9 | 1000 | -0.556 (0.05) | -0.324 (0.03) | -1.08 (0.05) |
-| h5-T | 1000 | -0.526 (0.05) | -0.392 (0.03) | -1.112 (0.05) |
-| h5-A | 1000 | -0.744 (0.04) | -0.522 (0.03) | -1.1 (0.04) |
-| h4-2 | 1000 | -0.286 (0.06) | -0.182 (0.03) | -0.512 (0.06) |
-| h4-3 | 1000 | -0.252 (0.06) | -0.141 (0.03) | -0.496 (0.06) |
-| h4-4 | 1000 | -0.206 (0.06) | -0.052 (0.03) | -0.348 (0.06) |
-| h4-5 | 1000 | -0.156 (0.06) | -0.013 (0.03) | -0.296 (0.06) |
-| h4-6 | 1000 | -0.104 (0.06) | 0.02 (0.03) | -0.184 (0.06) |
-| h4-7 | 1000 | -0.478 (0.06) | -0.137 (0.03) | -0.94 (0.06) |
-| h4-8 | 1000 | -0.526 (0.05) | -0.193 (0.03) | -1.108 (0.05) |
-| h4-9 | 1000 | -0.528 (0.05) | -0.283 (0.03) | -1.084 (0.05) |
-| h4-T | 1000 | -0.612 (0.05) | -0.399 (0.03) | -1.072 (0.05) |
-| h4-A | 1000 | -0.74 (0.04) | -0.557 (0.03) | -1.081 (0.04) |
-| s20-2 | 1000 | 0.646 (0.06) | 0.217 (0.03) | 0.312 (0.06) |
-| s20-3 | 1000 | 0.677 (0.06) | 0.181 (0.03) | 0.338 (0.06) |
-| s20-4 | 1000 | 0.637 (0.06) | 0.213 (0.03) | 0.436 (0.06) |
-| s20-5 | 10000 | 0.6604 (0.02) | 0.2455 (0.009) | 0.5394 (0.02) |
-| s20-6 | 1000 | 0.694 (0.06) | 0.281 (0.03) | 0.524 (0.06) |
-| s20-7 | 1000 | 0.753 (0.06) | 0.304 (0.03) | 0.488 (0.06) |
-| s20-8 | 1000 | 0.777 (0.06) | 0.229 (0.03) | 0.274 (0.06) |
-| s20-9 | 1000 | 0.733 (0.06) | 0.138 (0.03) | 0.098 (0.06) |
-| s20-T | 1000 | 0.438 (0.06) | -0.057 (0.03) | -0.038 (0.06) |
-| s20-A | 1000 | 0.067 (0.05) | -0.272 (0.03) | -0.341 (0.05) |
-| s19-2 | 1000 | 0.389 (0.06) | 0.092 (0.03) | 0.256 (0.06) |
-| s19-3 | 10000 | 0.39 (0.02) | 0.1464 (0.009) | 0.3168 (0.02) |
-| s19-4 | 10000 | 0.4082 (0.02) | 0.1816 (0.009) | 0.3286 (0.02) |
-| s19-5 | 100000 | 0.43517 (0.006) | 0.20004 (0.003) | 0.398 (0.006) |
-| s19-6 | 1000000 | 0.453457 (0) | 0.231529 (0) | 0.460572 (0) |
-| s19-7 | 1000 | 0.633 (0.06) | 0.231 (0.03) | 0.372 (0.06) |
-| s19-8 | 1000 | 0.59 (0.06) | 0.122 (0.03) | 0.192 (0.06) |
-| s19-9 | 1000 | 0.301 (0.06) | -0.013 (0.03) | -0.122 (0.06) |
-| s19-T | 1000 | -0.032 (0.06) | -0.175 (0.03) | -0.395 (0.06) |
-| s19-A | 1000 | -0.133 (0.05) | -0.331 (0.03) | -0.48 (0.05) |
-| s18-2 | 1000000 | 0.109892 (0) | 0.058827 (0) | 0.117848 (0) |
-| s18-3 | 10000 | 0.1328 (0.02) | 0.1039 (0.01) | 0.2114 (0.02) |
-| s18-4 | 10000 | 0.1586 (0.02) | 0.1282 (0.01) | 0.2484 (0.02) |
-| s18-5 | 1000 | 0.203 (0.06) | 0.135 (0.03) | 0.344 (0.06) |
-| s18-6 | 10000 | 0.2239 (0.02) | 0.1889 (0.009) | 0.3842 (0.02) |
-| s18-7 | 10000 | 0.3993 (0.02) | 0.169 (0.009) | 0.1994 (0.02) |
-| s18-8 | 10000 | 0.1101 (0.02) | 0.0447 (0.009) | -0.0398 (0.02) |
-| s18-9 | 10000 | -0.1749 (0.02) | -0.0937 (0.009) | -0.2754 (0.02) |
-| s18-T | 10000 | -0.2431 (0.02) | -0.2043 (0.009) | -0.388 (0.02) |
-| s18-A | 1000 | -0.494 (0.05) | -0.405 (0.03) | -0.662 (0.05) |
-| s17-2 | 1000000 | -0.155882 (0) | -0.006551 (0) | -0.012158 (0) |
-| s17-3 | 1000 | -0.113 (0.06) | -0.008 (0.03) | 0.096 (0.06) |
-| s17-4 | 1000 | -0.06 (0.06) | 0.018 (0.03) | 0.112 (0.06) |
-| s17-5 | 1000 | -0.003 (0.06) | 0.071 (0.03) | 0.314 (0.06) |
-| s17-6 | 1000 | -0.015 (0.06) | 0.11 (0.03) | 0.252 (0.06) |
-| s17-7 | 1000 | -0.086 (0.06) | 0.059 (0.03) | -0.042 (0.06) |
-| s17-8 | 1000 | -0.349 (0.06) | -0.064 (0.03) | -0.234 (0.06) |
-| s17-9 | 1000 | -0.408 (0.06) | -0.211 (0.03) | -0.332 (0.06) |
-| s17-T | 1000 | -0.455 (0.06) | -0.209 (0.03) | -0.507 (0.06) |
-| s17-A | 1000 | -0.649 (0.05) | -0.479 (0.03) | -0.649 (0.05) |
-| s16-2 | 1000 | -0.258 (0.06) | 0.002 (0.03) | -0.158 (0.06) |
-| s16-3 | 10000 | -0.2604 (0.02) | 0.0147 (0.01) | -0.0448 (0.02) |
-| s16-4 | 1000 | -0.162 (0.06) | -0.037 (0.03) | 0.07 (0.06) |
-| s16-5 | 10000 | -0.1576 (0.02) | 0.063 (0.01) | 0.133 (0.02) |
-| s16-6 | 10000 | -0.1218 (0.02) | 0.0883 (0.01) | 0.183 (0.02) |
-| s16-7 | 1000 | -0.484 (0.06) | 0.027 (0.03) | -0.194 (0.06) |
-| s16-8 | 1000 | -0.556 (0.06) | -0.06 (0.03) | -0.346 (0.06) |
-| s16-9 | 1000 | -0.548 (0.06) | -0.105 (0.03) | -0.482 (0.06) |
-| s16-T | 1000 | -0.562 (0.06) | -0.271 (0.03) | -0.474 (0.06) |
-| s16-A | 1000 | -0.724 (0.05) | -0.471 (0.03) | -0.679 (0.05) |
-| s15-2 | 10000 | -0.2686 (0.02) | -0.0012 (0.01) | -0.0432 (0.02) |
-| s15-3 | 100000 | -0.24634 (0.006) | 0.02229 (0.003) | -0.0134 (0.006) |
-| s15-4 | 10000 | -0.212 (0.02) | 0.0491 (0.01) | 0.0798 (0.02) |
-| s15-5 | 10000 | -0.1584 (0.02) | 0.0804 (0.01) | 0.1388 (0.02) |
-| s15-6 | 1000 | -0.092 (0.06) | 0.109 (0.03) | 0.23 (0.06) |
-| s15-7 | 10000 | -0.4756 (0.02) | 0.0379 (0.01) | -0.1748 (0.02) |
-| s15-8 | 1000 | -0.542 (0.06) | -0.039 (0.03) | -0.34 (0.06) |
-| s15-9 | 1000 | -0.554 (0.06) | -0.086 (0.03) | -0.398 (0.06) |
-| s15-T | 1000 | -0.582 (0.06) | -0.237 (0.03) | -0.63 (0.06) |
-| s15-A | 1000 | -0.71 (0.05) | -0.448 (0.03) | -0.664 (0.05) |
-| s14-2 | 1000 | -0.262 (0.06) | 0.03 (0.03) | -0.134 (0.06) |
-| s14-3 | 10000 | -0.2244 (0.02) | 0.0605 (0.01) | 0.0012 (0.02) |
-| s14-4 | 100000 | -0.20532 (0.006) | 0.07772 (0.003) | 0.0549 (0.006) |
-| s14-5 | 10000 | -0.1508 (0.02) | 0.0975 (0.01) | 0.1382 (0.02) |
-| s14-6 | 1000 | -0.14 (0.06) | 0.121 (0.03) | 0.232 (0.06) |
-| s14-7 | 1000 | -0.49 (0.06) | 0.09 (0.03) | -0.284 (0.06) |
-| s14-8 | 1000 | -0.494 (0.06) | -0.031 (0.03) | -0.36 (0.06) |
-| s14-9 | 1000 | -0.56 (0.06) | -0.096 (0.03) | -0.386 (0.06) |
-| s14-T | 1000 | -0.556 (0.06) | -0.192 (0.03) | -0.622 (0.06) |
-| s14-A | 1000 | -0.708 (0.05) | -0.404 (0.03) | -0.654 (0.05) |
-| s13-2 | 1000 | -0.26 (0.06) | 0.082 (0.03) | -0.19 (0.06) |
-| s13-3 | 10000 | -0.248 (0.02) | 0.0618 (0.01) | -0.0196 (0.02) |
-| s13-4 | 10000 | -0.2056 (0.02) | 0.0949 (0.01) | 0.0602 (0.02) |
-| s13-5 | 1000000 | -0.163838 (0) | 0.130573 (0) | 0.127766 (0) |
-| s13-6 | 100000 | -0.11506 (0.006) | 0.13519 (0.003) | 0.18672 (0.006) |
-| s13-7 | 1000 | -0.432 (0.06) | 0.124 (0.03) | -0.23 (0.06) |
-| s13-8 | 1000 | -0.494 (0.06) | 0.034 (0.03) | -0.296 (0.06) |
-| s13-9 | 1000 | -0.554 (0.06) | -0.01 (0.03) | -0.472 (0.06) |
-| s13-T | 1000 | -0.606 (0.06) | -0.178 (0.03) | -0.606 (0.06) |
-| s13-A | 1000 | -0.73 (0.05) | -0.335 (0.03) | -0.702 (0.05) |
-| s12-2 | 10000 | -0.2868 (0.02) | 0.0886 (0.01) | -0.0724 (0.02) |
-| s12-3 | 1000 | -0.182 (0.06) | 0.121 (0.03) | -0.02 (0.06) |
-| s12-4 | 1000 | -0.24 (0.06) | 0.207 (0.03) | 0.042 (0.06) |
-| s12-5 | 10000 | -0.1792 (0.02) | 0.156 (0.01) | 0.1094 (0.02) |
-| s12-6 | 10000 | -0.1206 (0.02) | 0.1582 (0.01) | 0.2116 (0.02) |
-| s12-7 | 1000 | -0.484 (0.06) | 0.106 (0.03) | -0.212 (0.06) |
-| s12-8 | 1000 | -0.52 (0.06) | 0.081 (0.03) | -0.32 (0.06) |
-| s12-9 | 1000 | -0.554 (0.06) | -0.035 (0.03) | -0.416 (0.06) |
-| s12-T | 1000 | -0.604 (0.06) | -0.215 (0.03) | -0.512 (0.06) |
-| s12-A | 1000 | -0.656 (0.05) | -0.363 (0.03) | -0.747 (0.05) |
-
-
-
-| Hand | Number of hands |  Yes  |  No  |
-| ---- | ----- | ----- | ---- |
-| pA-2 | 1000 | 0.441 (0.05) | 0.061 (0.03) |
-| pA-3 | 1000 | 0.455 (0.05) | 0.127 (0.03) |
-| pA-4 | 1000 | 0.613 (0.05) | 0.113 (0.03) |
-| pA-5 | 1000 | 0.597 (0.05) | 0.143 (0.03) |
-| pA-6 | 1000 | 0.755 (0.05) | 0.076 (0.06) |
-| pA-7 | 1000 | 0.465 (0.05) | 0.205 (0.03) |
-| pA-8 | 1000 | 0.4 (0.05) | 0.115 (0.03) |
-| pA-9 | 1000 | 0.196 (0.05) | 0.011 (0.03) |
-| pA-T | 1000 | -0.025 (0.05) | -0.19 (0.03) |
-| pA-A | 1000 | -0.268 (0.04) | -0.357 (0.03) |
-| pT-2 | 1000 | 0.52 (0.05) | 0.614 (0.02) |
-| pT-3 | 1000 | 0.423 (0.05) | 0.673 (0.02) |
-| pT-4 | 1000 | 0.553 (0.05) | 0.658 (0.02) |
-| pT-5 | 1000 | 0.486 (0.05) | 0.703 (0.02) |
-| pT-6 | 1000 | 0.591 (0.05) | 0.663 (0.02) |
-| pT-7 | 1000 | 0.482 (0.05) | 0.771 (0.02) |
-| pT-8 | 1000 | 0.378 (0.05) | 0.814 (0.02) |
-| pT-9 | 1000 | 0.246 (0.04) | 0.754 (0.02) |
-| pT-T | 1000 | 0.035 (0.05) | 0.432 (0.02) |
-| pT-A | 1000 | -0.241 (0.04) | 0.09 (0.03) |
-| p9-2 | 10000 | 0.173 (0.02) | 0.1071 (0.009) |
-| p9-3 | 1000 | 0.291 (0.06) | 0.132 (0.03) |
-| p9-4 | 10000 | 0.2773 (0.02) | 0.1663 (0.009) |
-| p9-5 | 1000 | 0.422 (0.06) | 0.157 (0.03) |
-| p9-6 | 1000 | 0.362 (0.06) | 0.206 (0.03) |
-| p9-7 | 100000 | 0.37708 (0.005) | 0.39894 (0.003) |
-| p9-8 | 1000 | 0.233 (0.05) | 0.073 (0.02) |
-| p9-9 | 10000 | -0.0951 (0.02) | -0.165 (0.009) |
-| p9-T | 1000 | -0.433 (0.05) | -0.264 (0.03) |
-| p9-A | 100000 | -0.47946 (0.004) | -0.46333 (0.003) |
-| p8-2 | 1000 | -0.028 (0.07) | -0.222 (0.03) |
-| p8-3 | 1000 | 0.097 (0.07) | -0.28 (0.03) |
-| p8-4 | 1000 | 0.193 (0.07) | -0.204 (0.03) |
-| p8-5 | 1000 | 0.193 (0.07) | -0.142 (0.03) |
-| p8-6 | 1000 | 0.26 (0.07) | -0.118 (0.03) |
-| p8-7 | 1000 | 0.265 (0.06) | -0.41 (0.03) |
-| p8-8 | 1000 | -0.059 (0.06) | -0.465 (0.03) |
-| p8-9 | 10000 | -0.3916 (0.02) | -0.5137 (0.008) |
-| p8-T | 1000 | -0.508 (0.05) | -0.602 (0.03) |
-| p8-A | 1000000 | -0.681325 (0) | -0.684029 (0) |
-| p7-2 | 1000 | -0.11 (0.07) | -0.344 (0.03) |
-| p7-3 | 1000 | -0.111 (0.08) | -0.248 (0.03) |
-| p7-4 | 1000 | -0.002 (0.08) | -0.198 (0.03) |
-| p7-5 | 1000 | 0.132 (0.08) | -0.23 (0.03) |
-| p7-6 | 1000 | 0.05 (0.08) | -0.172 (0.03) |
-| p7-7 | 1000 | -0.167 (0.06) | -0.331 (0.03) |
-| p7-8 | 1000000 | -0.39019 (0) | -0.371056 (0) |
-| p7-9 | 1000 | -0.583 (0.06) | -0.434 (0.03) |
-| p7-T | 1000 | -0.729 (0.05) | -0.49 (0.03) |
-| p7-A | 1000 | -0.778 (0.04) | -0.667 (0.02) |
-| p6-2 | 100000 | -0.21344 (0.007) | -0.25389 (0.003) |
-| p6-3 | 10000 | -0.118 (0.02) | -0.2393 (0.009) |
-| p6-4 | 1000 | -0.09 (0.08) | -0.25 (0.03) |
-| p6-5 | 1000 | -0.023 (0.08) | -0.16 (0.03) |
-| p6-6 | 1000 | 0.169 (0.08) | -0.106 (0.03) |
-| p6-7 | 10000 | -0.2601 (0.02) | -0.2155 (0.009) |
-| p6-8 | 1000 | -0.346 (0.05) | -0.25 (0.03) |
-| p6-9 | 1000 | -0.592 (0.05) | -0.314 (0.03) |
-| p6-T | 1000 | -0.588 (0.05) | -0.419 (0.03) |
-| p6-A | 1000 | -0.799 (0.04) | -0.539 (0.03) |
-| p5-2 | 1000 | -0.081 (0.07) | 0.406 (0.06) |
-| p5-3 | 1000 | -0.192 (0.07) | 0.384 (0.06) |
-| p5-4 | 1000 | -0.072 (0.08) | 0.45 (0.06) |
-| p5-5 | 1000 | -0.018 (0.08) | 0.548 (0.06) |
-| p5-6 | 1000 | 0.103 (0.08) | 0.586 (0.06) |
-| p5-7 | 1000 | -0.188 (0.05) | 0.516 (0.06) |
-| p5-8 | 1000 | -0.229 (0.06) | 0.332 (0.06) |
-| p5-9 | 1000 | -0.595 (0.05) | 0.1 (0.06) |
-| p5-T | 1000 | -0.703 (0.05) | -0.058 (0.03) |
-| p5-A | 1000 | -0.792 (0.04) | -0.37 (0.05) |
-| p4-2 | 1000 | -0.196 (0.06) | -0.024 (0.03) |
-| p4-3 | 1000 | -0.141 (0.07) | 0.008 (0.03) |
-| p4-4 | 10000 | -0.0201 (0.02) | 0.0318 (0.01) |
-| p4-5 | 1000 | 0.227 (0.08) | 0.059 (0.03) |
-| p4-6 | 10000 | 0.1502 (0.02) | 0.0797 (0.01) |
-| p4-7 | 1000 | -0.175 (0.06) | 0.104 (0.03) |
-| p4-8 | 1000 | -0.3 (0.06) | -0.026 (0.03) |
-| p4-9 | 1000 | -0.584 (0.05) | -0.254 (0.03) |
-| p4-T | 1000 | -0.528 (0.05) | -0.283 (0.03) |
-| p4-A | 1000 | -0.761 (0.04) | -0.511 (0.03) |
-| p3-2 | 10000 | -0.1154 (0.02) | -0.1628 (0.01) |
-| p3-3 | 1000 | 0.009 (0.07) | -0.156 (0.03) |
-| p3-4 | 10000 | 0.0318 (0.02) | -0.0634 (0.01) |
-| p3-5 | 10000 | 0.0928 (0.02) | -0.0301 (0.01) |
-| p3-6 | 1000 | 0.208 (0.08) | -0.009 (0.03) |
-| p3-7 | 10000 | -0.0545 (0.02) | -0.1646 (0.009) |
-| p3-8 | 10000 | -0.2405 (0.02) | -0.2107 (0.009) |
-| p3-9 | 1000 | -0.418 (0.06) | -0.239 (0.03) |
-| p3-T | 1000 | -0.556 (0.05) | -0.412 (0.03) |
-| p3-A | 1000 | -0.718 (0.04) | -0.489 (0.03) |
-| p2-2 | 100000 | -0.08631 (0.006) | -0.11174 (0.003) |
-| p2-3 | 10000 | -0.0276 (0.02) | -0.093 (0.01) |
-| p2-4 | 10000 | 0.0193 (0.02) | -0.0345 (0.01) |
-| p2-5 | 10000 | 0.102 (0.02) | -0.0088 (0.01) |
-| p2-6 | 1000 | 0.209 (0.08) | -0.019 (0.03) |
-| p2-7 | 10000 | 0.0157 (0.02) | -0.0907 (0.01) |
-| p2-8 | 1000000 | -0.17563 (0) | -0.159877 (0) |
-| p2-9 | 10000 | -0.3596 (0.02) | -0.2423 (0.009) |
-| p2-T | 1000 | -0.517 (0.05) | -0.314 (0.03) |
-| p2-A | 1000 | -0.602 (0.04) | -0.485 (0.03) |
-
+  Hand   Number of hands   Yes                No
+  ------ ----------------- ------------------ ------------------
+  pA-2   1000              0.441 (0.05)       0.061 (0.03)
+  pA-3   1000              0.455 (0.05)       0.127 (0.03)
+  pA-4   1000              0.613 (0.05)       0.113 (0.03)
+  pA-5   1000              0.597 (0.05)       0.143 (0.03)
+  pA-6   1000              0.755 (0.05)       0.076 (0.06)
+  pA-7   1000              0.465 (0.05)       0.205 (0.03)
+  pA-8   1000              0.4 (0.05)         0.115 (0.03)
+  pA-9   1000              0.196 (0.05)       0.011 (0.03)
+  pA-T   1000              -0.025 (0.05)      -0.19 (0.03)
+  pA-A   1000              -0.268 (0.04)      -0.357 (0.03)
+  pT-2   1000              0.52 (0.05)        0.614 (0.02)
+  pT-3   1000              0.423 (0.05)       0.673 (0.02)
+  pT-4   1000              0.553 (0.05)       0.658 (0.02)
+  pT-5   1000              0.486 (0.05)       0.703 (0.02)
+  pT-6   1000              0.591 (0.05)       0.663 (0.02)
+  pT-7   1000              0.482 (0.05)       0.771 (0.02)
+  pT-8   1000              0.378 (0.05)       0.814 (0.02)
+  pT-9   1000              0.246 (0.04)       0.754 (0.02)
+  pT-T   1000              0.035 (0.05)       0.432 (0.02)
+  pT-A   1000              -0.241 (0.04)      0.09 (0.03)
+  p9-2   10000             0.173 (0.02)       0.1071 (0.009)
+  p9-3   1000              0.291 (0.06)       0.132 (0.03)
+  p9-4   10000             0.2773 (0.02)      0.1663 (0.009)
+  p9-5   1000              0.422 (0.06)       0.157 (0.03)
+  p9-6   1000              0.362 (0.06)       0.206 (0.03)
+  p9-7   100000            0.37708 (0.005)    0.39894 (0.003)
+  p9-8   1000              0.233 (0.05)       0.073 (0.02)
+  p9-9   10000             -0.0951 (0.02)     -0.165 (0.009)
+  p9-T   1000              -0.433 (0.05)      -0.264 (0.03)
+  p9-A   100000            -0.47946 (0.004)   -0.46333 (0.003)
+  p8-2   1000              -0.028 (0.07)      -0.222 (0.03)
+  p8-3   1000              0.097 (0.07)       -0.28 (0.03)
+  p8-4   1000              0.193 (0.07)       -0.204 (0.03)
+  p8-5   1000              0.193 (0.07)       -0.142 (0.03)
+  p8-6   1000              0.26 (0.07)        -0.118 (0.03)
+  p8-7   1000              0.265 (0.06)       -0.41 (0.03)
+  p8-8   1000              -0.059 (0.06)      -0.465 (0.03)
+  p8-9   10000             -0.3916 (0.02)     -0.5137 (0.008)
+  p8-T   1000              -0.508 (0.05)      -0.602 (0.03)
+  p8-A   1000000           -0.681325 (0)      -0.684029 (0)
+  p7-2   1000              -0.11 (0.07)       -0.344 (0.03)
+  p7-3   1000              -0.111 (0.08)      -0.248 (0.03)
+  p7-4   1000              -0.002 (0.08)      -0.198 (0.03)
+  p7-5   1000              0.132 (0.08)       -0.23 (0.03)
+  p7-6   1000              0.05 (0.08)        -0.172 (0.03)
+  p7-7   1000              -0.167 (0.06)      -0.331 (0.03)
+  p7-8   1000000           -0.39019 (0)       -0.371056 (0)
+  p7-9   1000              -0.583 (0.06)      -0.434 (0.03)
+  p7-T   1000              -0.729 (0.05)      -0.49 (0.03)
+  p7-A   1000              -0.778 (0.04)      -0.667 (0.02)
+  p6-2   100000            -0.21344 (0.007)   -0.25389 (0.003)
+  p6-3   10000             -0.118 (0.02)      -0.2393 (0.009)
+  p6-4   1000              -0.09 (0.08)       -0.25 (0.03)
+  p6-5   1000              -0.023 (0.08)      -0.16 (0.03)
+  p6-6   1000              0.169 (0.08)       -0.106 (0.03)
+  p6-7   10000             -0.2601 (0.02)     -0.2155 (0.009)
+  p6-8   1000              -0.346 (0.05)      -0.25 (0.03)
+  p6-9   1000              -0.592 (0.05)      -0.314 (0.03)
+  p6-T   1000              -0.588 (0.05)      -0.419 (0.03)
+  p6-A   1000              -0.799 (0.04)      -0.539 (0.03)
+  p5-2   1000              -0.081 (0.07)      0.406 (0.06)
+  p5-3   1000              -0.192 (0.07)      0.384 (0.06)
+  p5-4   1000              -0.072 (0.08)      0.45 (0.06)
+  p5-5   1000              -0.018 (0.08)      0.548 (0.06)
+  p5-6   1000              0.103 (0.08)       0.586 (0.06)
+  p5-7   1000              -0.188 (0.05)      0.516 (0.06)
+  p5-8   1000              -0.229 (0.06)      0.332 (0.06)
+  p5-9   1000              -0.595 (0.05)      0.1 (0.06)
+  p5-T   1000              -0.703 (0.05)      -0.058 (0.03)
+  p5-A   1000              -0.792 (0.04)      -0.37 (0.05)
+  p4-2   1000              -0.196 (0.06)      -0.024 (0.03)
+  p4-3   1000              -0.141 (0.07)      0.008 (0.03)
+  p4-4   10000             -0.0201 (0.02)     0.0318 (0.01)
+  p4-5   1000              0.227 (0.08)       0.059 (0.03)
+  p4-6   10000             0.1502 (0.02)      0.0797 (0.01)
+  p4-7   1000              -0.175 (0.06)      0.104 (0.03)
+  p4-8   1000              -0.3 (0.06)        -0.026 (0.03)
+  p4-9   1000              -0.584 (0.05)      -0.254 (0.03)
+  p4-T   1000              -0.528 (0.05)      -0.283 (0.03)
+  p4-A   1000              -0.761 (0.04)      -0.511 (0.03)
+  p3-2   10000             -0.1154 (0.02)     -0.1628 (0.01)
+  p3-3   1000              0.009 (0.07)       -0.156 (0.03)
+  p3-4   10000             0.0318 (0.02)      -0.0634 (0.01)
+  p3-5   10000             0.0928 (0.02)      -0.0301 (0.01)
+  p3-6   1000              0.208 (0.08)       -0.009 (0.03)
+  p3-7   10000             -0.0545 (0.02)     -0.1646 (0.009)
+  p3-8   10000             -0.2405 (0.02)     -0.2107 (0.009)
+  p3-9   1000              -0.418 (0.06)      -0.239 (0.03)
+  p3-T   1000              -0.556 (0.05)      -0.412 (0.03)
+  p3-A   1000              -0.718 (0.04)      -0.489 (0.03)
+  p2-2   100000            -0.08631 (0.006)   -0.11174 (0.003)
+  p2-3   10000             -0.0276 (0.02)     -0.093 (0.01)
+  p2-4   10000             0.0193 (0.02)      -0.0345 (0.01)
+  p2-5   10000             0.102 (0.02)       -0.0088 (0.01)
+  p2-6   1000              0.209 (0.08)       -0.019 (0.03)
+  p2-7   10000             0.0157 (0.02)      -0.0907 (0.01)
+  p2-8   1000000           -0.17563 (0)       -0.159877 (0)
+  p2-9   10000             -0.3596 (0.02)     -0.2423 (0.009)
+  p2-T   1000              -0.517 (0.05)      -0.314 (0.03)
+  p2-A   1000              -0.602 (0.04)      -0.485 (0.03)
 
 ### Detailed explanation
 
-We want to derive the basic strategy from scratch, i.e. without assuming anything. What we are going to do is to play a large (more on what _large_ means below) number of hands by fixing our first two cards and the dealer upcard and sequentially standing, doubling or hitting the first card. Then we will compare the results for the three cases and select as the proper strategy the better one.
+We want to derive the basic strategy from scratch, i.e. without assuming
+anything. What we are going to do is to play a large (more on what
+*large* means below) number of hands by fixing our first two cards and
+the dealer upcard and sequentially standing, doubling or hitting the
+first card. Then we will compare the results for the three cases and
+select as the proper strategy the better one.
 
-Standing and doubling are easy plays, because after we stand or double the dealer plays accordingly to the rules. She hits until seventeen (either soft or hard). But if we hit on our hand, we might need to make another decision wether to stand or hit again. As we do not want to assume anything, we have to play in such an order that if we do need to make another decision, we already know which is the better one. 
+Standing and doubling are easy plays, because after we stand or double
+the dealer plays accordingly to the rules. She hits until seventeen
+(either soft or hard). But if we hit on our hand, we might need to make
+another decision wether to stand or hit again. As we do not want to
+assume anything, we have to play in such an order that if we do need to
+make another decision, we already know which is the better one.
 
 #### Hard hands
 
-So we start by arranging the shoe so that the user gets hard twenty (i.e. two faces) and the dealer gets succesively upcards of two to ace. So we play each combination of dealer upcard (ten) three times each playing either
+So we start by arranging the shoe so that the user gets hard twenty
+(i.e. two faces) and the dealer gets succesively upcards of two to ace.
+So we play each combination of dealer upcard (ten) three times each
+playing either
 
- 1. always standing
- 2. always doubling
- 3. always hitting
- 
-In general the first two plays are easy, because the game stops either after standing or after receiving only one card. The last one might lead to further hitting, but since we are starting with a hard twenty, that would either give the player twenty one or a bust. In any case, the game also ends.
-So we play a certain number of hands (say one thousand hands) each of these three plays for each of the ten upcard faces and record the outcome. The correct play for hard twenty against each of the ten upcards is the play that gave the better result, which is of course standing.
+1.  always standing
+2.  always doubling
+3.  always hitting
 
-Next, we do the same for a hard nineteen. In this case, the hitting play might not end after one card is drawn. But if that is the case, i.e. receiving an ace for a total of hard twenty, we already know what the best play is from the previous step so we play accordingly and we stand. Repeating this procedure down to hard four we can build the basic strategy table for any hard total against any dealer upcard.
+In general the first two plays are easy, because the game stops either
+after standing or after receiving only one card. The last one might lead
+to further hitting, but since we are starting with a hard twenty, that
+would either give the player twenty one or a bust. In any case, the game
+also ends. So we play a certain number of hands (say one thousand hands)
+each of these three plays for each of the ten upcard faces and record
+the outcome. The correct play for hard twenty against each of the ten
+upcards is the play that gave the better result, which is of course
+standing.
+
+Next, we do the same for a hard nineteen. In this case, the hitting play
+might not end after one card is drawn. But if that is the case,
+i.e. receiving an ace for a total of hard twenty, we already know what
+the best play is from the previous step so we play accordingly and we
+stand. Repeating this procedure down to hard four we can build the basic
+strategy table for any hard total against any dealer upcard.
 
 #### Soft hands
 
-We can now switch to analyze soft hands. Starting from soft twenty (i.e. an ace and a nine) we do the same we did for the hard case. The only difference is that wehn hitting, we might end either in another soft hand which we would already analyzed because we start from twenty and go down, or in a hard hand, which we also already analyzed se we can play accordingly.
+We can now switch to analyze soft hands. Starting from soft twenty
+(i.e. an ace and a nine) we do the same we did for the hard case. The
+only difference is that wehn hitting, we might end either in another
+soft hand which we would already analyzed because we start from twenty
+and go down, or in a hard hand, which we also already analyzed se we can
+play accordingly.
 
 #### Pairs
 
-When dealing with pairs, we have to decide wether to split or not. When we do not split, we end up in one of the already-analyzed cases: either a soft twelve of any even hard hand. When we split, we might end in a hard or soft hand (already analyzed) or in a new pair. But since the new pair can be only the same pair we are analyzing, we have to treat it like we treated the first pair: either to split it or not, so we know how to deal with it.  
+When dealing with pairs, we have to decide wether to split or not. When
+we do not split, we end up in one of the already-analyzed cases: either
+a soft twelve of any even hard hand. When we split, we might end in a
+hard or soft hand (already analyzed) or in a new pair. But since the new
+pair can be only the same pair we are analyzing, we have to treat it
+like we treated the first pair: either to split it or not, so we know
+how to deal with it.
 
 #### Number of hands
 
-The output is the expected value\ $e$ of the bankroll, which is a random variable with an associated uncertainty\ $\Delta e$ (i.e. a certain numbers of standard deviations). For example, if we received only blackjacks, the expected value would be 1.5 (provided blackjacks pay 3 to 2). If we busted all of our hands without doubling or splitting, the expected value would be -1. In order to say that the best strategy is, let’s say stand and not hitting or doubling, we have to make sure that $e_h-\Delta e_h > e_s+\Delta e_s$ and $e_h-\Delta e_h > e_d+\Delta e_d$. If there is no play that can give a better expected value than the other two taking into account the uncertainties, then we have to play more hands in order to reduce the random uncertainty.
-
+The output is the expected value $e$ of the bankroll, which is a random
+variable with an associated uncertainty $\Delta e$ (i.e. a certain
+numbers of standard deviations). For example, if we received only
+blackjacks, the expected value would be 1.5 (provided blackjacks pay 3
+to 2). If we busted all of our hands without doubling or splitting, the
+expected value would be -1. In order to say that the best strategy is,
+let's say stand and not hitting or doubling, we have to make sure that
+$e_h-\Delta e_h > e_s+\Delta e_s$ and $e_h-\Delta e_h > e_d+\Delta e_d$.
+If there is no play that can give a better expected value than the other
+two taking into account the uncertainties, then we have to play more
+hands in order to reduce the random uncertainty.
 
 ### Implementation
 
-The steps above can be written in a [Bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) script that
+The steps above can be written in a
+[Bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) script that
 
- * loops over hands and upcards,
- * creates a strategy file for each possible play hit, double or stand (or split or not),
- * runs [Libre Blackjack](https://www.seamplex.com/blackjack),
- * checks the results and picks the best play,
- * updates the strategy file
+-   loops over hands and upcards,
+-   creates a strategy file for each possible play hit, double or stand
+    (or split or not),
+-   runs [Libre Blackjack](https://www.seamplex.com/blackjack),
+-   checks the results and picks the best play,
+-   updates the strategy file
 
-```bash
-##!/bin/bash
+``` {.bash}
+#!/bin/bash
 
 for i in grep cut bc awk; do
  if [ -z "`which $i`" ]; then
@@ -2295,12 +2371,12 @@ declare -A strategy
 declare -A ev
 
 declare -A min
-min["hard"]=4   ## from 20 to 4 in hards
-min["soft"]=12  ## from 20 to 12 in softs
+min["hard"]=4   # from 20 to 4 in hards
+min["soft"]=12  # from 20 to 12 in softs
 
 rm -f hard.html soft.html pair.html
 
-## start with standing
+# start with standing
 cp hard-stand.txt hard.txt
 cp soft-stand.txt soft.txt
 
@@ -2313,7 +2389,7 @@ EOF
 for type in hard soft; do
  for hand in `seq 20 -1 ${min[${type}]}`; do
  
-  ## choose two random cards that make up the player's assumed total
+  # choose two random cards that make up the player's assumed total
   if [ ${type} = "hard" ]; then
    t="h"
    card1=11
@@ -2324,7 +2400,7 @@ for type in hard soft; do
    done
   elif [ ${type} = "soft" ]; then
    t="s"
-   ## one card is an ace
+   # one card is an ace
    card1=1
    card2=$((${hand} - 10 - ${card1}))
   fi
@@ -2349,28 +2425,28 @@ EOF
      upcard_n=$(($upcard))
    fi
  
-   n=1000    ## start with n hands
-   best="x"  ## x means don't know what to so, so play
+   n=1000    # start with n hands
+   best="x"  # x means don't know what to so, so play
    
    while [ "${best}" = "x" ]; do
-    ## tell the user which combination we are trying and how many we will play
+    # tell the user which combination we are trying and how many we will play
     echo -n ${t}${hand}-${upcard} \($card1 $card2\) "n="${n}
    
     for play in s d h; do
      
-     ## start with options.conf as a template and add some custom stuff
+     # start with options.conf as a template and add some custom stuff
      cp options.conf blackjack.conf
      cat << EOF >> blackjack.conf
 hands = ${n}
 dealer2player = internal
 arranged_cards = ${card1} $((${upcard_n} + 13)) $((${card2} + 26))
 yaml_report = ${t}${hand}-${upcard}-${play}.yaml
-##log = ${t}${hand}-${upcard}-${play}.log
+#log = ${t}${hand}-${upcard}-${play}.log
 EOF
  
-     ## read the current strategy
+     # read the current strategy
      while read w p2 p3 p4 p5 p6 p7 p8 p9 pT pA; do
-      ## w already has the "h" or the "s"
+      # w already has the "h" or the "s"
       strategy[${w},2]=$p2   
       strategy[${w},3]=$p3
       strategy[${w},4]=$p4    
@@ -2383,15 +2459,15 @@ EOF
       strategy[${w},A]=$pA    
      done < ${type}.txt
      
-     ## override the read strategy with the explicit play: s, d or h
+     # override the read strategy with the explicit play: s, d or h
      strategy[${t}${hand},${upcard}]=${play}
      
-     ## save the new (temporary) strategy
+     # save the new (temporary) strategy
      rm -f ${type}.txt
      for h in `seq 20 -1 ${min[${type}]}`; do
       echo -n "${t}${h}  " >> ${type}.txt
       
-      ## extra space if h < 10
+      # extra space if h < 10
       if [ ${h} -lt 10 ]; then
        echo -n " " >> ${type}.txt
       fi 
@@ -2402,36 +2478,36 @@ EOF
       echo >> ${type}.txt
      done
      
-     ## debug, comment for production
+     # debug, comment for production
      if [ "${debug}" != "0" ]; then
       cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
      fi
     
-     ## ensamble the full bs.txt with no pairing
+     # ensamble the full bs.txt with no pairing
      cat hard.txt soft.txt pair-no.txt > bs.txt
     
-     ## play!
+     # play!
      blackjack > /dev/null
     
-     ## evaluate the results
+     # evaluate the results
      ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
      error[${t}${hand},${upcard},${play}]=`grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}'`
      
     done
    
-    ## choose the best one
+    # choose the best one
     ev_s=`printf %g ${ev[${t}${hand},${upcard},s]}`
     ev_d=`printf %g ${ev[${t}${hand},${upcard},d]}`
     ev_h=`printf %g ${ev[${t}${hand},${upcard},h]}`
    
     
     if [ $n -le 999999 ]; then 
-     ## if we still have room, take into account errors
+     # if we still have room, take into account errors
      error_s=${error[${t}${hand},${upcard},s]}
      error_d=${error[${t}${hand},${upcard},d]}
      error_h=${error[${t}${hand},${upcard},h]}
     else
-     ## instead of running infinite hands, above a threshold asume errors are zero
+     # instead of running infinite hands, above a threshold asume errors are zero
      error_s=0
      error_d=0
      error_h=0
@@ -2474,12 +2550,12 @@ EOF
    echo " </td>" >> ${type}.html
    
    
-   ## save the strategy again with the best strategy
+   # save the strategy again with the best strategy
    rm -f ${type}.txt
    for h in `seq 20 -1 ${min[${type}]}`; do
     echo -n "${t}${h}  " >> ${type}.txt
     
-    ## extra space if h < 10
+    # extra space if h < 10
     if [ ${h} -lt 10 ]; then
      echo -n " " >> ${type}.txt
     fi 
@@ -2506,7 +2582,7 @@ cat << EOF >> table.md
 | ---- | ----- | ----- | ---- |
 EOF
 
-## pairs
+# pairs
 type="pair"
 t="p"
 cp pair-no.txt pair.txt
@@ -2538,16 +2614,16 @@ EOF
     upcard_n=$(($upcard))
   fi
  
-  n=1000    ## start with n hands
-  best="x"  ## x means don't know what to so, so play
+  n=1000    # start with n hands
+  best="x"  # x means don't know what to so, so play
    
   while [ "${best}" = "x" ]; do
-   ## tell the user which combination we are trying and how many we will play
+   # tell the user which combination we are trying and how many we will play
    echo -n ${t}${hand}-${upcard} "n="${n}
    
    for play in y n; do
      
-    ## start with options.conf as a template and add some custom stuff
+    # start with options.conf as a template and add some custom stuff
     cp options.conf blackjack.conf
     cat << EOF >> blackjack.conf
 hands = ${n}
@@ -2557,9 +2633,9 @@ yaml_report = ${t}${hand}-${upcard}-${play}.yaml
 log = ${t}${hand}-${upcard}-${play}.log
 EOF
  
-    ## read the current strategy
+    # read the current strategy
     while read w p2 p3 p4 p5 p6 p7 p8 p9 pT pA; do
-     ## w already has the "p"
+     # w already has the "p"
      strategy[${w},2]=$p2   
      strategy[${w},3]=$p3
      strategy[${w},4]=$p4    
@@ -2572,10 +2648,10 @@ EOF
      strategy[${w},A]=$pA    
     done < ${type}.txt
      
-    ## override the read strategy with the explicit play: y or n
+    # override the read strategy with the explicit play: y or n
     strategy[${t}${hand},${upcard}]=${play}
      
-    ## save the new (temporary) strategy
+    # save the new (temporary) strategy
     rm -f ${type}.txt
     for h in A T `seq 9 -1 2`; do
      echo -n "${t}${h}   " >> ${type}.txt
@@ -2589,28 +2665,28 @@ EOF
      cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
     fi  
     
-    ## ensamble the full bs.txt
+    # ensamble the full bs.txt
     cat hard.txt soft.txt pair.txt > bs.txt
     
-    ## play!
+    # play!
     blackjack > /dev/null
     
-    ## evaluate the results
+    # evaluate the results
     ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
     error[${t}${hand},${upcard},${play}]=`grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}'`
     
    done
    
-   ## choose the best one
+   # choose the best one
    ev_y=`printf %g ${ev[${t}${hand},${upcard},y]}`
    ev_n=`printf %g ${ev[${t}${hand},${upcard},n]}`
    
    if [ $n -le 999999 ]; then 
-    ## if we still have room, take into account errors
+    # if we still have room, take into account errors
     error_y=${error[${t}${hand},${upcard},y]}
     error_n=${error[${t}${hand},${upcard},n]}
    else
-    ## instead of running infinite hands, above a threshold asume errors are zero
+    # instead of running infinite hands, above a threshold asume errors are zero
     error_y=0
     error_n=0
    fi  
@@ -2642,7 +2718,7 @@ EOF
   
   strategy[${t}${hand},${upcard}]=${best}
    
-  ## save the strategy again with the best strategy
+  # save the strategy again with the best strategy
   rm -f ${type}.txt
   for h in A T `seq 9 -1 2`; do
    echo -n "${t}${h}   " >> ${type}.txt
@@ -2662,6 +2738,6 @@ if [ "${debug}" == "0" ]; then
  rm -f *.log
 fi
  
-
 ```
+
 

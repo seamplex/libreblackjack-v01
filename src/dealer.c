@@ -542,21 +542,36 @@ dealer_process_input (player_t * player, char *command)
   hand_t *hand;
   card_t *card;
 
-  // we firs check common commands
-/// quit  
+  // we first check common commands
+///ig+quit+name quit
+///ig+quit+desc Finish the game
+///ig+quit+detail Upon receiving this command, the game is finished
+///ig+quit+detail immediately without even finishing the hand.
+///ig+quit+detail All IPC resources are unlocked, removed and/or destroyed.
+///ig+quit+detail The YAML report is written before exiting.
   if (strcmp (command, "quit") == 0 || strcmp (command, "q") == 0)
     {
       blackjack.done = 1;
       return 1;
 
-/// help    
+///ig+help+name help
+///ig+help+desc Ask for help
+///ig+help+detail A succinct help message is written on the standard output.
+///ig+help+detail This command makes sense only when issued by a human player.
     }
   else if (strcmp (command, "help") == 0)
     {
       printf ("help yourself\n");
       return 0;
 
-/// count    
+///ig+count+name count
+///ig+count+desc Ask what the player’s current hand adds to.
+///ig+count+detail If for some reason the player cannot determine what the
+///ig+count+detail cards add to, she can ask the dealer with this command.
+///ig+count+detail The result is an ASCII string with the decimal value of
+///ig+count+detail the count. If the hand is soft, the number is negative.      
+///ig+count+detail For example, a face and a six receives `16` while an
+///ig+count+detail ace and a five receives `-16`.
     }
   else if (strcmp (command, "count") == 0 || strcmp (command, "c") == 0)
     {
@@ -566,7 +581,12 @@ dealer_process_input (player_t * player, char *command)
 	       player->current_hand->count));
       return 0;
 
-/// upcard_value
+///ig+upcard_value+name upcard_value
+///ig+upcard_value+desc Ask what the dealer’s upcard value is
+///ig+upcard_value+detail The upcard value is sent after being dealt. Yet if
+///ig+upcard_value+detail the player needs to know which is the upcard value,
+///ig+upcard_value+detail she can ask with this command.
+///ig+upcard_value+detail An ace is returned as `11`.      
     }
   else if (strcmp (command, "upcard_value") == 0
 	   || strcmp (command, "upcard") == 0 || strcmp (command, "u") == 0)
@@ -575,21 +595,29 @@ dealer_process_input (player_t * player, char *command)
 	      (player, "%d", blackjack.dealer_hand->cards->value));
       return 0;
 
-/// bankroll
+///ig+bankroll+name bankroll
+///ig+bankroll+desc Ask what the player’s bankroll is
+///ig+bankroll+detail Returns the current player’s bankroll as an ASCII string.
     }
   else if (strcmp (command, "bankroll") == 0 || strcmp (command, "b") == 0)
     {
       bjcall (write_formatted (player, "%g", player->bankroll));
       return 0;
 
-/// hands
+///ig+hands+name hands
+///ig+hands+desc Ask how many hands have been played so far
+///ig+hands+detail Returns the number of played hands as an ASCII string.
     }
   else if (strcmp (command, "hands") == 0)
     {
       bjcall (write_formatted (player, "%g", blackjack.hand));
       return 0;
 
-/// table
+///ig+table+name table
+///ig+table+desc Ask what the current table looks like
+///ig+table+detail The cards dealt so far in the current hand is written
+///ig+table+detail to the standard output.      
+///ig+table+detail This command makes sense only when issued by a human player.
     }
   else if (strcmp (command, "table") == 0 || strcmp (command, "t") == 0)
     {
@@ -699,11 +727,26 @@ dealer_process_input (player_t * player, char *command)
       return 1;
       break;
     case PLAY:
+///ip+stand+name stand
+///ip+stand+desc Stand on the current hand
+///ip+stand+detail When the player stands on a hand, the dealer moves on to
+///ip+stand+detail the next one. If the player had split, a new card is
+///ip+stand+detail dealt to the next split hand if there is one.
+///ip+stand+detail Otherwise the dealer reveals his hole card and deals
+///ip+stand+detail himself more cards if needed.
+///ip+double+detail This command can be abbreviated as `s`.
       if (strcmp (command, "stand") == 0 || strcmp (command, "s") == 0)
 	{
 	  blackjack.next_dealer_action = MOVE_ON_TO_NEXT_HAND;
 	  return 1;
 	}
+///ip+double+name double
+///ip+double+desc Double down on the current hand
+///ip+double+detail The player adds the same amount waged on the current hand
+///ip+double+detail and in exchange she receives only one hand.
+///ip+double+detail Doubling down is allowed only after receiving the first
+///ip+double+detail two cards.
+///ip+double+detail This command can be abbreviated as `d`.
       else if (strcmp (command, "double") == 0 || strcmp (command, "d") == 0)
 	{
 	  if (player->current_hand->n_cards == 2)
@@ -762,6 +805,11 @@ dealer_process_input (player_t * player, char *command)
 	      return -1;
 	    }
 	}
+///ip+split+name split
+///ip+split+desc Split the current hand
+///ip+split+detail 
+///ip+split+detail This command can be abbreviated as `p` (for pair).
+      
       else if (strcmp (command, "split") == 0 || strcmp (command, "p") == 0)
 	{
 	  if (player->has_split < 3 &&	// up to three splits (i.e. four hands) TODO: option
@@ -859,6 +907,10 @@ dealer_process_input (player_t * player, char *command)
 	    }
 
 	}
+///ip+hit+name hit
+///ip+hit+desc Hit on the current hand
+///ip+hit+detail 
+///ip+hit+detail This command can be abbreviated as `h`.
       else if (strcmp (command, "hit") == 0 || strcmp (command, "h") == 0)
 	{
 	  card = deal_card_to_hand (player->current_hand);

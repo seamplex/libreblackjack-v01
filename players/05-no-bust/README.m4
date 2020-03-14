@@ -31,7 +31,7 @@ The very same player may be implemented as a shell script:
 include(no-bust.sh)dnl
 ```
 
-To check these two players give the same results, make them play agains libreblackjack with the same seed (say one) and send the YAML report to two different files:
+To check these two players give the same results, make them play against Libre Blackjack with the same seed (say one) and send the YAML report to two different files:
 
 ```terminal
 include(diff.sh)
@@ -40,6 +40,7 @@ esyscmd(diff perl.yml shell.yml)dnl
 
 As expected, the reports are the same. They just differ in the speed because the shell script is orders of magnitude slower than its Perl-based counterpart. 
 
-> Exercise: modifiy the players so they always insure aces and see if it improves or degrades the result.
+> **Exercise:** modify the players so they always insure aces and see if it improves or degrades the result.
+
 
 case_nav

@@ -17,12 +17,12 @@ Now, there are two options that tell Libre Blackjack how the player is going to
 include(blackjack.conf)dnl
 ```
 
-This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by libreblackjack upon execution. 
+This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by `blackjack` upon execution. 
 
-The player this time is implemented as an awk script, whose input should be read from `dealer2player` and whose output should be written to `player2dealer`. To run the game, execute libreblackjack in one terminal making sure the current directory is where the `libreblackjack.ini` file exists. It should print a message telling that it is waiting for someone to be at the other side of the named pipes:
+The player this time is implemented as an awk script, whose input should be read from `dealer2player` and whose output should be written to `player2dealer`. To run the game, execute `blackjack` in one terminal making sure the current directory is where the `blackjack.conf` file exists. It should print a message telling that it is waiting for someone to be at the other side of the named pipes:
 
 ```terminal
-$ libreblackjack
+$ blackjack
 [...]
 waiting for dealer2player buffered fifo 'dealer2player'...
 ```
@@ -49,6 +49,9 @@ include(mimic-the-dealer.awk)dnl
 include(report.yaml)
 ```
 
-> Exercise: modify the player and the ini file so both the dealer and the player may stand on soft seventeen. Analyze the four combinations (player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer h17, player s17 - dealer s17)
+> **Exercise:** modify the player and the configuration file so both the dealer and the player may stand on soft seventeen. Analyze the four combinations (player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer h17, player s17 - dealer s17)
+
+
 
 case_nav
+

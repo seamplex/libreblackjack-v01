@@ -32,10 +32,13 @@ for kw in ${kws}; do
   echo  
 
   # default
-  echo -n ':    **Default:** '
-  grep "///${tag}+${kw}+default" ${dir}/${src}.c | cut -d" " -f2- | sed 's_/\\/_//_'
-  echo  
-  echo  
+  grep "///${tag}+${kw}+default"  ${dir}/${src}.c > /dev/null
+  if [ $? -eq 0 ]; then
+    echo -n ':    **Default:** '
+    grep "///${tag}+${kw}+default" ${dir}/${src}.c | cut -d" " -f2- | sed 's_/\\/_//_'
+    echo  
+    echo  
+  fi  
   
 done
 

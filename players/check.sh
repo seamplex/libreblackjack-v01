@@ -14,6 +14,15 @@ if [ ! -f ./header.m4 ]; then
   exit 1
 fi
 
+# ordered cases
+cases="00-internal 02-always-stand 05-no-bust 08-mimic-the-dealer"
+
+# fancy names
+declare -A names=(\
+["00-internal"]="Internal player" \
+["02-always-stand"]="Always stand" \
+["05-no-bust"]="No-bust strategy" \
+["08-mimic-the-dealer"]="Mimic the dealer")
 
 # expected results
 declare -A expected=(\
@@ -29,33 +38,34 @@ sigma=0.02
 if test ! -z "$1"; then
   player=`basename $1`     # remove trailing '/'
 else
-  player="${!expected[@]}"
+  player=${cases}
 fi
 
-# Markdown | Less | Pretty
-# --- | --- | ---
-# *Still* | `renders` | **nicely**
-# 1 | 2 | 3
-
-
-echo 'Name            | Expected      | Result         | Error         | Speed   | Status'
-echo '--------------- | ------------- | -------------- | ------------- | ------- | ------'
-for i in $player; do
-  if test -d $i -a -x $i/run.sh; then
-    cd $i
-    echo -ne ${i}\\t'| '${expected["$i"]}\\t'| '
-    ./run.sh 1>/dev/null 2> ../$i.yaml
+echo 'Case                    | Expected      | Result         | Error         | Speed   | Status' | tee check.md
+echo '----------------------- | ------------- | -------------- | ------------- | ------- | ------' | tee -a check.md
+for i in ${player}; do
+  if test -d ${i} -a -x ${i}/run.sh; then
+    cd ${i}
+    if test `echo "${names[${i}]}" | wc -c` -gt 16 ; then
+      sep="\\t"
+    else
+      sep="\\t\\t"
+    fi  
+    echo -ne ${names[${i}]}${sep}'| '${expected["${i}"]}\\t'| '
+    ./run.sh 1>/dev/null 2> ../${i}.yaml
     
     return=`grep return ../${i}.yaml | awk '{print $2}'`
     error=`grep error ../${i}.yaml | awk '{print $2}'`
     hands_per_second=`grep hands_per_second ../${i}.yaml | awk '{print $2}'`
     
     echo -ne ${return}\\t' | '${error}\\t' | '${hands_per_second}' | '
-    echo ${return} | awk -v e=${expected["$i"]} -v s=${sigma} 'END {ok = ($1>(e-s)&&$1<(e+s)); print ok?"ok":"failed"; exit !ok }'
+    status=`echo ${return} | awk -v e=${expected["${i}"]} -v s=${sigma} 'END {ok = ($1>(e-s)&&$1<(e+s)); print ok?"ok":"failed"; exit !ok }'`
     result=$?
     cd ..
+    echo ${status}
+    echo -e "${names[${i}]}${sep}| ${expected["${i}"]}\\t| ${return}\\t | ${error}\\t | ${hands_per_second} | ${status}" >> check.md
   else
-    echo "skipped $i"
+#     echo "skipped ${i}"
     result=77
   fi
 done

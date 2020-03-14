@@ -4,7 +4,7 @@ STDOUT->autoflush(1);
 
 while ($command ne "bye") {
   # do not play more than a number of commands
-  # if the argument -n was not passed to libreblackjack
+  # if the argument -n was not passed to blackjack
   if ($i++ == 123456789) {
     print "quit\n";
     exit;

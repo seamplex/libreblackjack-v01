@@ -11,7 +11,7 @@ do
   elif test "`echo ${command} | cut -c-5`" = 'play?'; then
     echo "count"
     read count
-    read play      # libreblackjack will ask again for 'play?'
+    read play      # blackjack will ask again for 'play?'
     if test ${count} -lt 12; then
       echo "hit"
     else
