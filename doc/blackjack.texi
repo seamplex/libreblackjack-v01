@@ -423,9 +423,13 @@ All numerical values such as hand totals or bankrolls are given as
 decimal ASCII strings.
 
 @menu
-* From the player to the dealer::
 * From the dealer to the player::
+* From the player to the dealer::
 @end menu
+
+@node From the dealer to the player
+@section From the dealer to the player
+@anchor{#from-the-dealer-to-the-player}
 
 @node From the player to the dealer
 @section From the player to the dealer
@@ -438,10 +442,10 @@ hand.
 
 Double down on the current hand
 
-This command can be abbreviated as @code{s}. The player adds the same
-amount waged on the current hand and in exchange she receives only one
-hand. Doubling down is allowed only after receiving the first two cards.
-This command can be abbreviated as @code{d}.
+The player adds the same amount waged on the current hand and in
+exchange she receives only one hand. Doubling down is allowed only after
+receiving the first two cards. This command can be abbreviated as
+@code{d}.
 
 @item @code{hit}
 
@@ -462,7 +466,8 @@ Stand on the current hand
 When the player stands on a hand, the dealer moves on to the next one.
 If the player had split, a new card is dealt to the next split hand if
 there is one. Otherwise the dealer reveals his hole card and deals
-himself more cards if needed.
+himself more cards if needed. This command can be abbreviated as
+@code{s}.
 
 @end table
 
@@ -525,10 +530,6 @@ know which is the upcard value, she can ask with this command. An ace is
 returned as @code{11}.
 
 @end table
-
-@node From the dealer to the player
-@section From the dealer to the player
-@anchor{#from-the-dealer-to-the-player}
 
 @node Results
 @chapter Results

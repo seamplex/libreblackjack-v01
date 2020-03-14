@@ -734,7 +734,7 @@ dealer_process_input (player_t * player, char *command)
 ///ip+stand+detail dealt to the next split hand if there is one.
 ///ip+stand+detail Otherwise the dealer reveals his hole card and deals
 ///ip+stand+detail himself more cards if needed.
-///ip+double+detail This command can be abbreviated as `s`.
+///ip+stand+detail This command can be abbreviated as `s`.
       if (strcmp (command, "stand") == 0 || strcmp (command, "s") == 0)
 	{
 	  blackjack.next_dealer_action = MOVE_ON_TO_NEXT_HAND;

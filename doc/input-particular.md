@@ -2,8 +2,7 @@
 
 :    Double down on the current hand
 
-:    This command can be abbreviated as `s`.
-The player adds the same amount waged on the current hand
+:    The player adds the same amount waged on the current hand
 and in exchange she receives only one hand.
 Doubling down is allowed only after receiving the first
 two cards.
@@ -32,5 +31,6 @@ the next one. If the player had split, a new card is
 dealt to the next split hand if there is one.
 Otherwise the dealer reveals his hole card and deals
 himself more cards if needed.
+This command can be abbreviated as `s`.
 
 
