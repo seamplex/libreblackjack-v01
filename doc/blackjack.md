@@ -30,21 +30,34 @@ The `blackjack` executable supports the following options:
 
 include(help.md)
 
+
 ## Interactive game
 
-## Automatic internal player
 
-## Automated playing through IPC
 
-### Standard input/output
+# Commands
 
-### FIFO named pipes
+The dealer (he) and the player (she) “talk” through commands, which are ASCII strings sent through any of the different IPC mechanisms discussed in [Automated playing through IPC]. In the most basic case, a human player reads commands from the dealer from `blackjack`’s  standard output and writes her commands into the dealer’s standard input. Those commands from the dealer that require a particular action from the player end with a quotation sign such as `bet?`, `insurance?` or `play?`.
 
-### POSIX message queues
+All numerical values such as hand totals or bankrolls are given as decimal ASCII strings.
 
-### POSIX shared memory objects
+## From the dealer to the player
 
-### TCP (through `netcat`)
+
+## From the player to the dealer
+
+The following commands are available for the player for playing her hand.
+
+include(input-particular.md)
+
+
+The following are general commands in the sense that they can be sent from the player to the dealer at any moment of the game.
+
+include(input-general.md)
+
+
+
+
 
 # Configuration file
 
@@ -101,28 +114,6 @@ decks = 1          # number of decks, negative means infinite
 
 include(conf.md)
 
-# Commands
-
-The dealer (he) and the player (she) “talk” through commands, which are ASCII strings sent through any of the different IPC mechanisms discussed in [Automated playing through IPC]. In the most basic case, a human player reads commands from the dealer from `blackjack`’s  standard output and writes her commands into the dealer’s standard input. Those commands from the dealer that require a particular action from the player end with a quotation sign such as `bet?`, `insurance?` or `play?`.
-
-All numerical values such as hand totals or bankrolls are given as decimal ASCII strings.
-
-## From the dealer to the player
-
-
-## From the player to the dealer
-
-The following commands are available for the player for playing her hand.
-
-include(input-particular.md)
-
-
-The following are general commands in the sense that they can be sent from the player to the dealer at any moment of the game.
-
-include(input-general.md)
-
-
-
 
 
 # Results
@@ -133,6 +124,22 @@ include(input-general.md)
 
 ## Player
 
+
+
+
+## Automatic internal player
+
+## Automated playing through IPC
+
+### Standard input/output
+
+### FIFO named pipes
+
+### POSIX message queues
+
+### POSIX shared memory objects
+
+### TCP (through `netcat`)
 
 
 # Example automated players

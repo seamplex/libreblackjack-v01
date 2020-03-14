@@ -46,8 +46,8 @@ February 20, 2020
 @menu
 * Overview::
 * Running blackjack::
-* Configuration file::
 * Commands::
+* Configuration file::
 * Results::
 * Example automated players::
 @end menu
@@ -93,8 +93,6 @@ ASCII blackjack.
 @menu
 * Invocation::
 * Interactive game::
-* Automatic internal player::
-* Automated playing through IPC::
 @end menu
 
 @node Invocation
@@ -160,41 +158,129 @@ output and then exit successfully.
 @section Interactive game
 @anchor{#interactive-game}
 
-@node Automatic internal player
-@section Automatic internal player
-@anchor{#automatic-internal-player}
+@node Commands
+@chapter Commands
+@anchor{#commands}
+The dealer (he) and the player (she) ``talk'' through commands, which
+are ASCII strings sent through any of the different IPC mechanisms
+discussed in @ref{#automated-playing-through-ipc,Automated playing
+through IPC}. In the most basic case, a human player reads commands from
+the dealer from @code{blackjack}'s standard output and writes her
+commands into the dealer's standard input. Those commands from the
+dealer that require a particular action from the player end with a
+quotation sign such as @code{bet?}, @code{insurance?} or @code{play?}.
 
-@node Automated playing through IPC
-@section Automated playing through IPC
-@anchor{#automated-playing-through-ipc}
+All numerical values such as hand totals or bankrolls are given as
+decimal ASCII strings.
 
 @menu
-* Standard input/output::
-* FIFO named pipes::
-* POSIX message queues::
-* POSIX shared memory objects::
-* TCP through netcat::
+* From the dealer to the player::
+* From the player to the dealer::
 @end menu
 
-@node Standard input/output
-@subsection Standard input/output
-@anchor{#standard-inputoutput}
+@node From the dealer to the player
+@section From the dealer to the player
+@anchor{#from-the-dealer-to-the-player}
 
-@node FIFO named pipes
-@subsection FIFO named pipes
-@anchor{#fifo-named-pipes}
+@node From the player to the dealer
+@section From the player to the dealer
+@anchor{#from-the-player-to-the-dealer}
+The following commands are available for the player for playing her
+hand.
 
-@node POSIX message queues
-@subsection POSIX message queues
-@anchor{#posix-message-queues}
+@table @asis
+@item @code{double}
 
-@node POSIX shared memory objects
-@subsection POSIX shared memory objects
-@anchor{#posix-shared-memory-objects}
+Double down on the current hand
 
-@node TCP through netcat
-@subsection TCP (through @code{netcat})
-@anchor{#tcp-through-netcat}
+The player adds the same amount waged on the current hand and in
+exchange she receives only one hand. Doubling down is allowed only after
+receiving the first two cards. This command can be abbreviated as
+@code{d}.
+
+@item @code{hit}
+
+Hit on the current hand
+
+This command can be abbreviated as @code{h}.
+
+@item @code{split}
+
+Split the current hand
+
+This command can be abbreviated as @code{p} (for pair).
+
+@item @code{stand}
+
+Stand on the current hand
+
+When the player stands on a hand, the dealer moves on to the next one.
+If the player had split, a new card is dealt to the next split hand if
+there is one. Otherwise the dealer reveals his hole card and deals
+himself more cards if needed. This command can be abbreviated as
+@code{s}.
+
+@end table
+
+The following are general commands in the sense that they can be sent
+from the player to the dealer at any moment of the game.
+
+@table @asis
+@item @code{bankroll}
+
+Ask what the player's bankroll is
+
+Returns the current player's bankroll as an ASCII string.
+
+@item @code{count}
+
+Ask what the player's current hand adds to.
+
+If for some reason the player cannot determine what the cards add to,
+she can ask the dealer with this command. The result is an ASCII string
+with the decimal value of the count. If the hand is soft, the number is
+negative.@*
+For example, a face and a six receives@ @code{16} while an ace and a
+five receives@ @code{-16}.
+
+@item @code{hands}
+
+Ask how many hands have been played so far
+
+Returns the number of played hands as an ASCII string.
+
+@item @code{help}
+
+Ask for help
+
+A succinct help message is written on the standard output. This command
+makes sense only when issued by a human player.
+
+@item @code{quit}
+
+Finish the game
+
+Upon receiving this command, the game is finished immediately without
+even finishing the hand. All IPC resources are unlocked, removed and/or
+destroyed. The YAML report is written before exiting.
+
+@item @code{table}
+
+Ask what the current table looks like
+
+The cards dealt so far in the current hand is written to the standard
+output.@*
+This command makes sense only when issued by a human player.
+
+@item @code{upcard_value}
+
+Ask what the dealer's upcard value is
+
+The upcard value is sent after being dealt. Yet if the player needs to
+know which is the upcard value, she can ask with this command. An ace is
+returned as @code{11}.
+
+@end table
 
 @node Configuration file
 @chapter Configuration file
@@ -407,130 +493,6 @@ repeteability in the order of the dealt cards.
 
 @end table
 
-@node Commands
-@chapter Commands
-@anchor{#commands}
-The dealer (he) and the player (she) ``talk'' through commands, which
-are ASCII strings sent through any of the different IPC mechanisms
-discussed in @ref{#automated-playing-through-ipc,Automated playing
-through IPC}. In the most basic case, a human player reads commands from
-the dealer from @code{blackjack}'s standard output and writes her
-commands into the dealer's standard input. Those commands from the
-dealer that require a particular action from the player end with a
-quotation sign such as @code{bet?}, @code{insurance?} or @code{play?}.
-
-All numerical values such as hand totals or bankrolls are given as
-decimal ASCII strings.
-
-@menu
-* From the dealer to the player::
-* From the player to the dealer::
-@end menu
-
-@node From the dealer to the player
-@section From the dealer to the player
-@anchor{#from-the-dealer-to-the-player}
-
-@node From the player to the dealer
-@section From the player to the dealer
-@anchor{#from-the-player-to-the-dealer}
-The following commands are available for the player for playing her
-hand.
-
-@table @asis
-@item @code{double}
-
-Double down on the current hand
-
-The player adds the same amount waged on the current hand and in
-exchange she receives only one hand. Doubling down is allowed only after
-receiving the first two cards. This command can be abbreviated as
-@code{d}.
-
-@item @code{hit}
-
-Hit on the current hand
-
-This command can be abbreviated as @code{h}.
-
-@item @code{split}
-
-Split the current hand
-
-This command can be abbreviated as @code{p} (for pair).
-
-@item @code{stand}
-
-Stand on the current hand
-
-When the player stands on a hand, the dealer moves on to the next one.
-If the player had split, a new card is dealt to the next split hand if
-there is one. Otherwise the dealer reveals his hole card and deals
-himself more cards if needed. This command can be abbreviated as
-@code{s}.
-
-@end table
-
-The following are general commands in the sense that they can be sent
-from the player to the dealer at any moment of the game.
-
-@table @asis
-@item @code{bankroll}
-
-Ask what the player's bankroll is
-
-Returns the current player's bankroll as an ASCII string.
-
-@item @code{count}
-
-Ask what the player's current hand adds to.
-
-If for some reason the player cannot determine what the cards add to,
-she can ask the dealer with this command. The result is an ASCII string
-with the decimal value of the count. If the hand is soft, the number is
-negative.@*
-For example, a face and a six receives@ @code{16} while an ace and a
-five receives@ @code{-16}.
-
-@item @code{hands}
-
-Ask how many hands have been played so far
-
-Returns the number of played hands as an ASCII string.
-
-@item @code{help}
-
-Ask for help
-
-A succinct help message is written on the standard output. This command
-makes sense only when issued by a human player.
-
-@item @code{quit}
-
-Finish the game
-
-Upon receiving this command, the game is finished immediately without
-even finishing the hand. All IPC resources are unlocked, removed and/or
-destroyed. The YAML report is written before exiting.
-
-@item @code{table}
-
-Ask what the current table looks like
-
-The cards dealt so far in the current hand is written to the standard
-output.@*
-This command makes sense only when issued by a human player.
-
-@item @code{upcard_value}
-
-Ask what the dealer's upcard value is
-
-The upcard value is sent after being dealt. Yet if the player needs to
-know which is the upcard value, she can ask with this command. An ace is
-returned as @code{11}.
-
-@end table
-
 @node Results
 @chapter Results
 @anchor{#results}
@@ -539,6 +501,8 @@ returned as @code{11}.
 * Rules::
 * CPU::
 * Player::
+* Automatic internal player::
+* Automated playing through IPC::
 @end menu
 
 @node Rules
@@ -552,6 +516,42 @@ returned as @code{11}.
 @node Player
 @section Player
 @anchor{#player}
+
+@node Automatic internal player
+@section Automatic internal player
+@anchor{#automatic-internal-player}
+
+@node Automated playing through IPC
+@section Automated playing through IPC
+@anchor{#automated-playing-through-ipc}
+
+@menu
+* Standard input/output::
+* FIFO named pipes::
+* POSIX message queues::
+* POSIX shared memory objects::
+* TCP through netcat::
+@end menu
+
+@node Standard input/output
+@subsection Standard input/output
+@anchor{#standard-inputoutput}
+
+@node FIFO named pipes
+@subsection FIFO named pipes
+@anchor{#fifo-named-pipes}
+
+@node POSIX message queues
+@subsection POSIX message queues
+@anchor{#posix-message-queues}
+
+@node POSIX shared memory objects
+@subsection POSIX shared memory objects
+@anchor{#posix-shared-memory-objects}
+
+@node TCP through netcat
+@subsection TCP (through @code{netcat})
+@anchor{#tcp-through-netcat}
 
 @node Example automated players
 @chapter Example automated players
